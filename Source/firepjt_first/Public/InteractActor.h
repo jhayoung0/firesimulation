@@ -38,7 +38,8 @@ public: // 인터랙트 컴포넌트 붙이기 (아웃라인, 가까이 갔을 �
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	class UAnimMontage* InteractMontage;
 	
-	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool IsInteracting;
 	
 	UFUNCTION() // 상호작용 몽타주 재생
 	void PlayInteract();
