@@ -31,7 +31,7 @@ public: // 인터랙트 컴포넌트 붙이기 (아웃라인, 가까이 갔을 �
 	class USkeletalMeshComponent* meshComp;
 
 
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	class UInteractWidgetComp* InteractWidgetComp;
 
 

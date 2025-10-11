@@ -22,7 +22,15 @@ APeopleBase::APeopleBase()
 	//상호작용 액터 붙일 컴포넌트
 	compActor = CreateDefaultSubobject<USceneComponent>(TEXT("InteractingActor"));
 	compActor ->SetupAttachment(GetMesh(), TEXT("hand_r"));
-	compActor->SetRelativeLocation(FVector(0,7,5.5f));
+	compActor->SetRelativeLocation(FVector(0,40,5.5f));
+
+	//상호작용 액터 붙일 컴포넌트
+	compActorMask = CreateDefaultSubobject<USceneComponent>(TEXT("InteractingMask"));
+	compActorMask ->SetupAttachment(GetMesh(), TEXT("headsocket"));
+	//compActorMask->SetRelativeLocation(FVector(0,7,5.5f));
+	
+	
+	
 }
 
 void APeopleBase::BeginPlay()
@@ -115,8 +123,6 @@ void APeopleBase::ApplyCrawlState(bool bEnable)
 
 	// crawl 상태일 때는 더 느리게
 	GetCharacterMovement()->MaxWalkSpeed = bEnable ? 200.f : 600.f;
-
-
 }
 
 
@@ -193,10 +199,11 @@ void APeopleBase::Interaction()
 	
 }
 
+
+
 void APeopleBase::AttachActor()
 {
-	// compActor에 붙이자.
-	InteractingActor->AttachToComponent(compActor, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+
 	IsInteracting = true;
 	InteractingActor->IsInteracting = true;
 	InteractingActor->ToggleWidget(false);
@@ -206,18 +213,24 @@ void APeopleBase::AttachActor()
 	{
 		if (InteractingActor->ActorHasTag(FName("Mask")))
 		{
-		UE_LOG(LogTemp, Log, TEXT("mask!"));
-		HasMask = true;
-		HasWetTowel = false;
-	}
-	else if (InteractingActor->ActorHasTag(FName("WetTowel")))
-	{
-		UE_LOG(LogTemp, Log, TEXT("WetTowel!"));
-		HasWetTowel = true;
-		HasMask = false;
+			// compActor에 붙이자.
+			InteractingActor->AttachToComponent(compActorMask, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+			UE_LOG(LogTemp, Log, TEXT("mask!"));
+			HasMask = true;
+			HasWetTowel = false;
+		}
+		else if (InteractingActor->ActorHasTag(FName("WetTowel")))
+		{
+			// compActor에 붙이자.
+			InteractingActor->AttachToComponent(compActorMask, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+			UE_LOG(LogTemp, Log, TEXT("WetTowel!"));
+			HasWetTowel = true;
+			HasMask = false;
 		}
 		else
 		{
+			// compActor에 붙이자.
+			InteractingActor->AttachToComponent(compActor, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
 			UE_LOG(LogTemp, Log, TEXT("태그 없음 또는 알 수 없는 타입"));
 		}
 	}
@@ -229,14 +242,22 @@ void APeopleBase::DetachActor(AInteractActor* tempActor)
 	IsInteracting = false;
 	tempActor->IsInteracting = false;
 	InteractingActor->ToggleWidget(true);
+
+	
 	
 	// 분리하자
 	if (tempActor)
 	{
 		tempActor->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
+		tempActor->SetActorRotation(ActorRotation);
+		FVector Loc = tempActor->GetActorLocation();
+		Loc.Z = 0.f;
+	
+		tempActor->SetActorLocation(Loc);
 	}
 	
 
+	
 	// tag에 따라서 구분하자.
 	if (tempActor)
 	{
@@ -255,9 +276,25 @@ void APeopleBase::DetachActor(AInteractActor* tempActor)
 			UE_LOG(LogTemp, Log, TEXT("태그 없음 또는 알 수 없는 타입"));
 		}
 	}
+	
 
+	
 	InteractingActor = nullptr;
 }
 
 
 
+/*
+
+	const FMotionRow* Row = MotionTable->FindRow<FMotionRow>(Rowkey, TEXT("PlaySignAnimByKey"));
+	if (USkeletalMeshComponent* MeshComp = GetMesh())
+	{
+		// AnimBP를 거치지 않고 단일 애니메이션 모드로 전환
+		MeshComp->SetAnimationMode(EAnimationMode::AnimationSingleNode);
+
+		// 루프 재생
+		MeshComp->PlayAnimation(Row->signAnim, true);
+		return true;
+	}
+	return false;
+*/

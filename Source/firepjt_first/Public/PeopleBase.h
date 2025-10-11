@@ -46,6 +46,8 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category= Input)
 	class UInputAction* InteractionInput;
 
+
+	
 	// 초기 카메라 위치
 	FVector CameraLocation = FVector(2.000000,-30.000000,20.000000);
 	FRotator CamerRotation = FRotator(68.000000,-75.000000,-160.000000);
@@ -57,11 +59,13 @@ public:
 	UFUNCTION()
 	void Interaction();
 
+
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Interaction)
 	TArray<AActor*> allInteractActor;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Interaction)
-	float CanInteractDist = 200.f;
+	float CanInteractDist = 300.f;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Interaction)
 	AInteractActor* InteractingActor = nullptr;
@@ -72,6 +76,9 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Interaction)
 	USceneComponent* compActor = nullptr;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Interaction)
+	USceneComponent* compActorMask = nullptr;
+	
 public: // stat
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Stats)
 	float maxOxygen = 100.f;
@@ -108,5 +115,13 @@ public: // widget
 
 	UPROPERTY(Transient)
 	UMainUI* mainui = nullptr;
+
+
+public:// 상호작용 액터
+	UPROPERTY(EditDefaultsOnly)
+	FRotator ActorRotation;
+
+	UPROPERTY(EditDefaultsOnly)
+	FVector ActorLocation;
 	
 };
