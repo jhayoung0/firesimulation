@@ -50,8 +50,7 @@ void APeopleBase::BeginPlay()
 }
 
 
-void APeopleBase::SetupPlayerInputComponent(
-	UInputComponent* PlayerInputComponent)
+void APeopleBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
@@ -200,6 +199,7 @@ void APeopleBase::AttachActor()
 	InteractingActor->AttachToComponent(compActor, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
 	IsInteracting = true;
 	InteractingActor->IsInteracting = true;
+	InteractingActor->ToggleWidget(false);
 
 	// tag에 따라서 구분하자.
 	if (InteractingActor)
@@ -228,6 +228,8 @@ void APeopleBase::DetachActor(AInteractActor* tempActor)
 {
 	IsInteracting = false;
 	tempActor->IsInteracting = false;
+	InteractingActor->ToggleWidget(true);
+	
 	// 분리하자
 	if (tempActor)
 	{

@@ -34,7 +34,8 @@ void AInteractActor::BeginPlay()
 
 	if (UUserWidget* W = InteractWidgetComp->GetWidget())
 	{
-		if (UInteractWidget* InteractUI = Cast<UInteractWidget>(W))
+		InteractUI = Cast<UInteractWidget>(W);
+		if (InteractUI)
 		{
 			InteractUI->SetVisibility(ESlateVisibility::Visible); 
 		}
@@ -61,6 +62,20 @@ void AInteractActor::PlayInteract()
 
 	// 상호작용 표시 끄기
 
+	
+}
+
+void AInteractActor::ToggleWidget(bool check)
+{
+	if (check)
+	{
+		InteractUI->SetVisibility(ESlateVisibility::Visible);
+	}
+	else
+	{
+		InteractUI->SetVisibility(ESlateVisibility::Hidden);
+	}
+	
 	
 }
 
