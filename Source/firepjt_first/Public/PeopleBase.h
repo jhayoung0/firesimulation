@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "firepjt_firstCharacter.h"
+#include "PhoneWidget.h"
 #include "PeopleBase.generated.h"
 
 class USceneComponent;
@@ -79,6 +80,22 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Interaction)
 	USceneComponent* compActorMask = nullptr;
 	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Interaction)
+	USceneComponent* compActorTowel = nullptr;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Interaction)
+	USceneComponent* compActorPeople = nullptr;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Interaction)
+	class UAnimationAsset* InteractAnimPhone;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Interaction)
+	class UAnimationAsset* InteractAnimTowel;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Interaction)
+	class UAnimationAsset* InteractAnimPeople;
+	
+		
 public: // stat
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Stats)
 	float maxOxygen = 100.f;
@@ -116,6 +133,10 @@ public: // widget
 	UPROPERTY(Transient)
 	UMainUI* mainui = nullptr;
 
+
+
+
+	
 
 public:// 상호작용 액터
 	UPROPERTY(EditDefaultsOnly)

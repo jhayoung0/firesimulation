@@ -8,6 +8,7 @@
 #include "Components/CapsuleComponent.h"
 #include "Camera/CameraComponent.h"
 #include "MainUI.h"
+#include "PeopleOnePC.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
@@ -30,6 +31,11 @@ APeopleBase::APeopleBase()
 	//compActorMask->SetRelativeLocation(FVector(0,7,5.5f));
 	
 	
+	compActorTowel = CreateDefaultSubobject<USceneComponent>(TEXT("InteractingTowel"));
+	compActorTowel ->SetupAttachment(GetMesh(), TEXT("headsocket2"));
+
+	compActorPeople = CreateDefaultSubobject<USceneComponent>(TEXT("InteractingPeople"));
+	compActorPeople ->SetupAttachment(GetMesh(), TEXT("hand_l"));
 	
 }
 
@@ -37,6 +43,8 @@ void APeopleBase::BeginPlay()
 {
 	Super::BeginPlay();
 
+
+	
 	// 레벨에 있는 모든 상호작용 액터를 찾자.
 	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AInteractActor::StaticClass(), allInteractActor);
 
@@ -54,6 +62,8 @@ void APeopleBase::BeginPlay()
 		}
 	}
 
+
+	
 
 }
 
@@ -192,7 +202,6 @@ void APeopleBase::Interaction()
 		InteractingActor = Cast<AInteractActor>(allInteractActor[ClosestIndex]);
 		// 검색된 액터의 상호작용 함수를 호출
 		if (InteractingActor) {
-			InteractingActor->PlayInteract();
 			AttachActor();
 		}
 	}
@@ -208,13 +217,17 @@ void APeopleBase::AttachActor()
 	InteractingActor->IsInteracting = true;
 	InteractingActor->ToggleWidget(false);
 
+
+
+
+	
 	// tag에 따라서 구분하자.
 	if (InteractingActor)
 	{
 		if (InteractingActor->ActorHasTag(FName("Mask")))
 		{
 			// compActor에 붙이자.
-			InteractingActor->AttachToComponent(compActorMask, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+			InteractingActor->AttachToComponent(compActorMask, FAttachmentTransformRules::SnapToTargetIncludingScale);
 			UE_LOG(LogTemp, Log, TEXT("mask!"));
 			HasMask = true;
 			HasWetTowel = false;
@@ -222,15 +235,59 @@ void APeopleBase::AttachActor()
 		else if (InteractingActor->ActorHasTag(FName("WetTowel")))
 		{
 			// compActor에 붙이자.
-			InteractingActor->AttachToComponent(compActorMask, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+			InteractingActor->AttachToComponent(compActorTowel, FAttachmentTransformRules::SnapToTargetIncludingScale);
 			UE_LOG(LogTemp, Log, TEXT("WetTowel!"));
 			HasWetTowel = true;
 			HasMask = false;
+
+			if (USkeletalMeshComponent* MeshComp = GetMesh())
+			{
+				// AnimBP를 거치지 않고 단일 애니메이션 모드로 전환
+				MeshComp->SetAnimationMode(EAnimationMode::AnimationSingleNode);
+				// 루프 재생
+				MeshComp->PlayAnimation(InteractAnimTowel, true);
+			}
+		}
+		else if (InteractingActor->ActorHasTag(FName("Phone")))
+		{
+			// compActor에 붙이자.
+			InteractingActor->AttachToComponent(compActor, FAttachmentTransformRules::SnapToTargetIncludingScale);
+			UE_LOG(LogTemp, Log, TEXT("Phone!"));
+
+			if (USkeletalMeshComponent* MeshComp = GetMesh())
+			{
+				// AnimBP를 거치지 않고 단일 애니메이션 모드로 전환
+				MeshComp->SetAnimationMode(EAnimationMode::AnimationSingleNode);
+				// 루프 재생
+				MeshComp->PlayAnimation(InteractAnimPhone, true);
+			}
+
+			// 위젯 띄우기
+
+			auto* pc = Cast<APeopleOnePC>(GetWorld()->GetFirstPlayerController());
+
+			pc->OpenPhoneUI();
+			
+			
+		}
+		else if (InteractingActor->ActorHasTag(FName("People")))
+		{
+			// compActor에 붙이자.
+			InteractingActor->AttachToComponent(compActorPeople, FAttachmentTransformRules::SnapToTargetIncludingScale);
+			UE_LOG(LogTemp, Log, TEXT("People!"));
+
+			if (USkeletalMeshComponent* MeshComp = GetMesh())
+			{
+				// AnimBP를 거치지 않고 단일 애니메이션 모드로 전환
+				MeshComp->SetAnimationMode(EAnimationMode::AnimationSingleNode);
+				// 루프 재생
+				MeshComp->PlayAnimation(InteractAnimPeople, true);
+			}
 		}
 		else
 		{
 			// compActor에 붙이자.
-			InteractingActor->AttachToComponent(compActor, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+			InteractingActor->AttachToComponent(compActor, FAttachmentTransformRules::SnapToTargetIncludingScale);
 			UE_LOG(LogTemp, Log, TEXT("태그 없음 또는 알 수 없는 타입"));
 		}
 	}
@@ -243,6 +300,11 @@ void APeopleBase::DetachActor(AInteractActor* tempActor)
 	tempActor->IsInteracting = false;
 	InteractingActor->ToggleWidget(true);
 
+	if (USkeletalMeshComponent* MeshComp = GetMesh())
+	{
+		// AnimBP를 거치지 않고 단일 애니메이션 모드로 전환
+		MeshComp->SetAnimationMode(EAnimationMode::AnimationBlueprint);
+	}
 	
 	
 	// 분리하자
@@ -270,6 +332,12 @@ void APeopleBase::DetachActor(AInteractActor* tempActor)
 		{
 			UE_LOG(LogTemp, Log, TEXT("WetTowel!"));
 			HasWetTowel = false;
+		}
+		else if (tempActor->ActorHasTag(FName("Phone")))
+		{
+			auto* pc = Cast<APeopleOnePC>(GetWorld()->GetFirstPlayerController());
+
+			pc->ClosePhoneUI();
 		}
 		else
 		{

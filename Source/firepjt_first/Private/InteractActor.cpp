@@ -49,31 +49,32 @@ void AInteractActor::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 }
 
-void AInteractActor::PlayInteract()
-{
-	// 인터랙트 몽타주 재생
-	UAnimInstance* anim = meshComp->GetAnimInstance();
-	
-	if (anim && InteractMontage)
-	{
-		anim->Montage_Play(InteractMontage);
-		
-	}
 
-	// 상호작용 표시 끄기
-
-	
-}
 
 void AInteractActor::ToggleWidget(bool check)
 {
 	if (check)
 	{
 		InteractUI->SetVisibility(ESlateVisibility::Visible);
+		if (meshComp)
+		{
+			// AnimBP를 거치지 않고 단일 애니메이션 모드로 전환
+			meshComp->SetAnimationMode(EAnimationMode::Type::AnimationBlueprint);
+
+		}
+		
 	}
 	else
 	{
 		InteractUI->SetVisibility(ESlateVisibility::Hidden);
+		if (meshComp)
+		{
+			// AnimBP를 거치지 않고 단일 애니메이션 모드로 전환
+			meshComp->SetAnimationMode(EAnimationMode::AnimationSingleNode);
+			// 루프 재생
+			meshComp->PlayAnimation(InteractAnim, true);
+		}
+		
 	}
 	
 	
