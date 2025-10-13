@@ -21,6 +21,7 @@ public class firepjt_first : ModuleRules
 			"Slate",
 			"Sockets",
 			"Networking"
+			"Niagara"
 		});
 
 		PrivateDependencyModuleNames.AddRange(new string[] { });

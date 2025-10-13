@@ -31,17 +31,22 @@ public: // 인터랙트 컴포넌트 붙이기 (아웃라인, 가까이 갔을 �
 	class USkeletalMeshComponent* meshComp;
 
 
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	class UInteractWidgetComp* InteractWidgetComp;
 
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	class UAnimMontage* InteractMontage;
+	class UAnimationAsset* InteractAnim;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool IsInteracting;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	class UInteractWidget* InteractUI;
+
 	
-	UFUNCTION() // 상호작용 몽타주 재생
-	void PlayInteract();
+
+	UFUNCTION() // 위젯 노출/미노출
+	void ToggleWidget(bool check);
 };
 

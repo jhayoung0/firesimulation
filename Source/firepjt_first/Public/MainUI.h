@@ -18,6 +18,9 @@ public:
 	UPROPERTY(meta=(BindWidget))
 	class UProgressBar* OxygenBar;
 
+	UPROPERTY(meta=(BindWidget))
+	class UImage* DamageUI;
+
 	UFUNCTION()
 	void SetOxygenPercent(float percent);
 };
