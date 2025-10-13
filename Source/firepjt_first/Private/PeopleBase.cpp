@@ -273,7 +273,7 @@ void APeopleBase::AttachActor()
 		else if (InteractingActor->ActorHasTag(FName("People")))
 		{
 			// compActor에 붙이자.
-			InteractingActor->AttachToComponent(compActorPeople, FAttachmentTransformRules::SnapToTargetIncludingScale);
+			InteractingActor->AttachToComponent(compActorPeople, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
 			UE_LOG(LogTemp, Log, TEXT("People!"));
 
 			if (USkeletalMeshComponent* MeshComp = GetMesh())
