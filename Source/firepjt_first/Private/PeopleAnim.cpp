@@ -28,6 +28,9 @@ void UPeopleAnim::NativeUpdateAnimation(float DeltaSeconds)
 	// 기고 있는지 여부 설정
 	isCrawl = pawnOwner->IsCrawl;
 
+	HasMask = pawnOwner->HasMask;
+	HasWetTowel = pawnOwner->HasWetTowel;
+	
 	// 앞 뒤 이동에 따른 값
 	FVector v = velocity;
 	v.Z = 0;

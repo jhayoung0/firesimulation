@@ -22,6 +22,6 @@ public:
 	class UTextBlock* description;
 
 	// 텍스트 변경 함수
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 	void SetInteractText(FString key, FString desc);
 };

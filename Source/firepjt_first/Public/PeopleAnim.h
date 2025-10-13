@@ -42,6 +42,13 @@ public:
 	// 앞뒤 이동에 따른 값
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	float dirV;
+
+	// 상호작용 물건
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	bool HasMask;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	bool HasWetTowel;
 	
 
 	virtual void NativeInitializeAnimation() override;
