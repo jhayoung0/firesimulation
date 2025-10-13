@@ -20,7 +20,7 @@ public class firepjt_first : ModuleRules
 			"UMG",
 			"Slate",
 			"Sockets",
-			"Networking"
+			"Networking",
 			"Niagara"
 		});
 
