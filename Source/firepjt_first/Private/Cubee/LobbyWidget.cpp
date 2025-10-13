@@ -14,6 +14,16 @@ void ULobbyWidget::NativeConstruct()
 	{
 		Btn_Start->OnClicked.AddDynamic(this, &ULobbyWidget::OnStartClicked);
 	}
+
+	if (Btn_Firefighter)
+	{
+		Btn_Firefighter->OnClicked.AddDynamic(this, &ULobbyWidget::OnFirefighterClicked);
+	}
+
+	if (Btn_Citizen)
+	{
+		Btn_Citizen->OnClicked.AddDynamic(this, &ULobbyWidget::OnCitizenClicked);
+	}
 }
 
 void ULobbyWidget::OnStartClicked()
@@ -25,4 +35,14 @@ void ULobbyWidget::OnStartClicked()
 	{
 		GM->StartGame();
 	}
+}
+
+void ULobbyWidget::OnFirefighterClicked()
+{
+	
+}
+
+void ULobbyWidget::OnCitizenClicked()
+{
+	
 }

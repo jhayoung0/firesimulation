@@ -47,4 +47,12 @@ protected:
 	/** Input mapping context setup */
 	virtual void SetupInputComponent() override;
 
+protected:
+	// UI
+	UPROPERTY(EditDefaultsOnly, Category = "UI")
+	TSubclassOf<UUserWidget> LobbyWidgetClass;
+    
+	UPROPERTY()
+	class ULobbyWidget* LobbyWidget;
+	
 };

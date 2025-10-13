@@ -8,6 +8,7 @@
 #include "firepjt_firstCameraManager.h"
 #include "Blueprint/UserWidget.h"
 #include "firepjt_first.h"
+#include "Cubee/LobbyWidget.h"
 #include "Widgets/Input/SVirtualJoystick.h"
 
 Afirepjt_firstPlayerController::Afirepjt_firstPlayerController()
@@ -38,6 +39,34 @@ void Afirepjt_firstPlayerController::BeginPlay()
 
 		}
 
+	}
+
+	// 여기서부터는 추후에 독립된 컨트롤러로 옮길 수 있음
+	if (IsLocalController())
+	{
+		FString WorldName = GetWorld()->GetName();
+
+		// Set mouse & input mode
+		if (WorldName.Contains(TEXT("House")))
+		{
+			SetShowMouseCursor(false);
+			SetInputMode(FInputModeGameOnly());
+		}
+		else if (WorldName.Contains(TEXT("Lobby")))
+		{
+			SetShowMouseCursor(true);
+			SetInputMode(FInputModeUIOnly());
+			
+			// Create Lobby widget
+			if (LobbyWidgetClass)
+			{
+				LobbyWidget = CreateWidget<ULobbyWidget>(this, LobbyWidgetClass);
+				if (LobbyWidget)
+				{
+					LobbyWidget->AddToViewport();
+				}
+			}
+		}
 	}
 }
 

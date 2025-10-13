@@ -17,19 +17,7 @@ void ALobbyGameMode::PostLogin(APlayerController* NewPlayer)
 
 	ConnectedPlayers.Add(NewPlayer);
 
-	UE_LOG(LogTemp, Warning, TEXT("Player joined"));
-	//UE_LOG(LogTemp, Display, TEXT("Player joined. Total: %d/%d"), ConnectedPlayers.Num(), MaxPlayers);
-	
-	// 새 플레이어에게 UI 생성
-	if (LobbyWidgetClass)
-	{
-		ULobbyWidget* LobbyWidget = CreateWidget<ULobbyWidget>(NewPlayer, LobbyWidgetClass);
-		if (LobbyWidget)
-		{
-			LobbyWidget->AddToViewport();
-			//LobbyWidget->
-		}
-	}
+	UE_LOG(LogTemp, Display, TEXT("Player joined. Total: %d/%d"), ConnectedPlayers.Num(), MaxPlayers);
 }
 
 void ALobbyGameMode::Logout(AController* Exiting)

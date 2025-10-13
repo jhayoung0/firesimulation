@@ -29,9 +29,5 @@ protected:
 	TArray<APlayerController*> ConnectedPlayers;
 
 	const int32 MaxPlayers = 2;
-
-public:
-	// UI
-	UPROPERTY(EditDefaultsOnly, Category = UI)
-	TSubclassOf<UUserWidget> LobbyWidgetClass;
+	
 };

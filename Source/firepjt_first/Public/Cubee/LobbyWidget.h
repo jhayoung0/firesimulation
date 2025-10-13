@@ -21,6 +21,18 @@ public:
 	UPROPERTY(meta = (BindWidget))
 	class UButton* Btn_Start;
 	
+	UPROPERTY(meta = (BindWidget))
+	class UButton* Btn_Firefighter;
+
+	UPROPERTY(meta = (BindWidget))
+	class UButton* Btn_Citizen;
+	
 	UFUNCTION()
 	void OnStartClicked();
+
+	UFUNCTION()
+	void OnFirefighterClicked();
+	
+	UFUNCTION()
+	void OnCitizenClicked();
 };
