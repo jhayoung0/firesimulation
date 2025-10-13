@@ -12,6 +12,7 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
+#include "Kismet/KismetMathLibrary.h"
 #include "Kismet/KismetSystemLibrary.h"
 
 APeopleBase::APeopleBase()
@@ -122,6 +123,13 @@ void APeopleBase::Tick(float DeltaSeconds)
 	{
 		mainui->SetOxygenPercent(percent);
 	}
+
+	// 산소 부족 UI
+	if (currOxygen < 30.f)
+	{
+		mainui->ShowDamageUI(0.5f);
+		
+	}
 }
 
 void APeopleBase::ApplyCrawlState(bool bEnable)
@@ -227,18 +235,21 @@ void APeopleBase::AttachActor()
 		if (InteractingActor->ActorHasTag(FName("Mask")))
 		{
 			// compActor에 붙이자.
-			InteractingActor->AttachToComponent(compActorMask, FAttachmentTransformRules::SnapToTargetIncludingScale);
+			InteractingActor->AttachToComponent(compActorMask, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
 			UE_LOG(LogTemp, Log, TEXT("mask!"));
 			HasMask = true;
 			HasWetTowel = false;
+			mainui->ShowMaskUI(true);
 		}
 		else if (InteractingActor->ActorHasTag(FName("WetTowel")))
 		{
 			// compActor에 붙이자.
-			InteractingActor->AttachToComponent(compActorTowel, FAttachmentTransformRules::SnapToTargetIncludingScale);
+			InteractingActor->AttachToComponent(compActorTowel, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
 			UE_LOG(LogTemp, Log, TEXT("WetTowel!"));
 			HasWetTowel = true;
 			HasMask = false;
+
+			InteractingActor->ChangeTowel(true);
 
 			if (USkeletalMeshComponent* MeshComp = GetMesh())
 			{
@@ -251,7 +262,7 @@ void APeopleBase::AttachActor()
 		else if (InteractingActor->ActorHasTag(FName("Phone")))
 		{
 			// compActor에 붙이자.
-			InteractingActor->AttachToComponent(compActor, FAttachmentTransformRules::SnapToTargetIncludingScale);
+			InteractingActor->AttachToComponent(compActor, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
 			UE_LOG(LogTemp, Log, TEXT("Phone!"));
 
 			if (USkeletalMeshComponent* MeshComp = GetMesh())
@@ -287,7 +298,7 @@ void APeopleBase::AttachActor()
 		else
 		{
 			// compActor에 붙이자.
-			InteractingActor->AttachToComponent(compActor, FAttachmentTransformRules::SnapToTargetIncludingScale);
+			InteractingActor->AttachToComponent(compActor, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
 			UE_LOG(LogTemp, Log, TEXT("태그 없음 또는 알 수 없는 타입"));
 		}
 	}
@@ -327,11 +338,13 @@ void APeopleBase::DetachActor(AInteractActor* tempActor)
 		{
 			UE_LOG(LogTemp, Log, TEXT("mask!"));
 			HasMask = false;
+			mainui->ShowMaskUI(false);
 		}
 		else if (tempActor->ActorHasTag(FName("WetTowel")))
 		{
 			UE_LOG(LogTemp, Log, TEXT("WetTowel!"));
 			HasWetTowel = false;
+			InteractingActor->ChangeTowel(false);
 		}
 		else if (tempActor->ActorHasTag(FName("Phone")))
 		{

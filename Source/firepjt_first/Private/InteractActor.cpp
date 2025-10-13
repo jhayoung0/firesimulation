@@ -8,6 +8,8 @@
 #include "Animation/AnimInstance.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "Components/WidgetComponent.h"
+#include "Kismet/GameplayStatics.h"
+#include "Kismet/KismetMathLibrary.h"
 
 
 // Sets default values
@@ -47,6 +49,8 @@ void AInteractActor::BeginPlay()
 void AInteractActor::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	BillboardInteractKey();
 }
 
 
@@ -76,6 +80,19 @@ void AInteractActor::ToggleWidget(bool check)
 		}
 		
 	}
+	
+	
+}
+
+void AInteractActor::BillboardInteractKey()
+{
+	
+	// 내가 컨트롤하고 있는 카메라를 가져오자.
+	AActor* cam = UGameplayStatics::GetPlayerCameraManager(GetWorld(), 0);
+	// 카메라의 앞 방향 (반대), 윗 방향을 이용해서 Rotator 를 구하자.
+	FRotator rot = UKismetMathLibrary::MakeRotFromXZ(-cam->GetActorForwardVector(), cam->GetActorUpVector());
+	// 구한 Rotator 를 comHP 에 설정
+	InteractWidgetComp->SetWorldRotation(rot); 
 	
 	
 }
