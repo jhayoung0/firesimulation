@@ -27,12 +27,7 @@ AInteractActor::AInteractActor()
 	InteractWidgetComp->SetupAttachment(RootComponent);
 	InteractWidgetComp->SetTwoSided(true);
 
-	static ConstructorHelpers::FObjectFinder<UMaterialInterface> OverlayMatFinder(TEXT("/Game/CustomContents/People/Material/M_Outline.M_Outline"));
-	if (OverlayMatFinder.Succeeded())
-	{
-		UE_LOG(LogTemp, Warning, TEXT("overlay"));
-		OverlayMaterialBase = OverlayMatFinder.Object; 
-	}
+
 }
 
 // Called when the game starts or when spawned
@@ -50,16 +45,7 @@ void AInteractActor::BeginPlay()
 	}
 
 	
-	
-	if (OverlayMaterialBase)
-	{
-		OutlineMatInstance = UMaterialInstanceDynamic::Create(OverlayMaterialBase, this);
-		if (OutlineMatInstance)
-		{
-			meshComp->SetOverlayMaterial(OutlineMatInstance);   
-			OutlineMatInstance->SetScalarParameterValue(TEXT("OutlineThickness"), 0.5);
-		}
-	}
+
 
 	
 }
@@ -87,10 +73,6 @@ void AInteractActor::ToggleWidget(bool check)
 
 		}
 
-		if (OutlineMatInstance)
-		{
-			OutlineMatInstance->SetScalarParameterValue(FName("LineScale"), 0.5f);
-		}
 		
 	}
 	else
@@ -103,11 +85,7 @@ void AInteractActor::ToggleWidget(bool check)
 			// 루프 재생
 			meshComp->PlayAnimation(InteractAnim, true);
 		}
-
-		if (OutlineMatInstance)
-		{
-			OutlineMatInstance->SetScalarParameterValue(FName("LineScale"), 0.f);
-		}
+		
 	}
 	
 	
