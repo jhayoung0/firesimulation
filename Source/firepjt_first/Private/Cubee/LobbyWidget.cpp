@@ -4,6 +4,7 @@
 #include "Cubee/LobbyWidget.h"
 
 #include "Components/Button.h"
+#include "Components/TextBlock.h"
 #include "Cubee/LobbyGameMode.h"
 
 void ULobbyWidget::NativeConstruct()
@@ -46,3 +47,13 @@ void ULobbyWidget::OnCitizenClicked()
 {
 	
 }
+
+void ULobbyWidget::UpdatePlayerCount(int32 Current, int32 Max)
+{
+	if (Txt_PlayerCount)
+	{
+		Txt_PlayerCount->SetText(FText::FromString(FString::Printf(TEXT("Players : %d / %d"), Current, Max)));
+	}
+}
+
+

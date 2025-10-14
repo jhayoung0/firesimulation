@@ -51,8 +51,17 @@ protected:
 	// UI
 	UPROPERTY(EditDefaultsOnly, Category = "UI")
 	TSubclassOf<UUserWidget> LobbyWidgetClass;
-    
+
 	UPROPERTY()
 	class ULobbyWidget* LobbyWidget;
-	
+
+public:
+	// Client RPC to update player count in lobby
+	UFUNCTION(Client, Reliable)
+	void Client_UpdatePlayerCount(int32 CurrentPlayers, int32 MaxPlayers);
+
+	// Server RPC to request current player count
+	UFUNCTION(Server, Reliable)
+	void Server_RequestPlayerCount();
+
 };

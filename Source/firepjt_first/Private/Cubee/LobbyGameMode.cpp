@@ -3,6 +3,7 @@
 
 #include "Cubee/LobbyGameMode.h"
 
+#include "firepjt_firstPlayerController.h"
 #include "Blueprint/UserWidget.h"
 #include "Cubee/LobbyWidget.h"
 
@@ -16,8 +17,6 @@ void ALobbyGameMode::PostLogin(APlayerController* NewPlayer)
 	Super::PostLogin(NewPlayer);
 
 	ConnectedPlayers.Add(NewPlayer);
-
-	UE_LOG(LogTemp, Display, TEXT("Player joined. Total: %d/%d"), ConnectedPlayers.Num(), MaxPlayers);
 }
 
 void ALobbyGameMode::Logout(AController* Exiting)
@@ -29,7 +28,6 @@ void ALobbyGameMode::Logout(AController* Exiting)
 	if (PC)
 	{
 		ConnectedPlayers.Remove(PC);
-		//UpdateAllPlayerUIs();
 	}
 }
 
@@ -44,4 +42,23 @@ void ALobbyGameMode::StartGame()
 
 	GetWorld()->ServerTravel("HouseMap?listen");
 }
+
+void ALobbyGameMode::BroadcastPlayerCount()
+{
+	int32 CurrentPlayerCount = ConnectedPlayers.Num();
+
+	// Iterate through all connected players and call their RPC
+	for (APlayerController* PC : ConnectedPlayers)
+	{
+		if (PC && PC->IsValidLowLevel())
+		{
+			Afirepjt_firstPlayerController* CustomPC = Cast<Afirepjt_firstPlayerController>(PC);
+			if (CustomPC)
+			{
+				CustomPC->Client_UpdatePlayerCount(CurrentPlayerCount, MaxPlayers);
+			}
+		}
+	}
+}
+
 

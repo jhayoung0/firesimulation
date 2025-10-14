@@ -8,6 +8,7 @@
 #include "firepjt_firstCameraManager.h"
 #include "Blueprint/UserWidget.h"
 #include "firepjt_first.h"
+#include "Cubee/LobbyGameMode.h"
 #include "Cubee/LobbyWidget.h"
 #include "Widgets/Input/SVirtualJoystick.h"
 
@@ -56,7 +57,7 @@ void Afirepjt_firstPlayerController::BeginPlay()
 		{
 			SetShowMouseCursor(true);
 			SetInputMode(FInputModeUIOnly());
-			
+
 			// Create Lobby widget
 			if (LobbyWidgetClass)
 			{
@@ -64,6 +65,9 @@ void Afirepjt_firstPlayerController::BeginPlay()
 				if (LobbyWidget)
 				{
 					LobbyWidget->AddToViewport();
+
+					// Request initial player count from server
+					Server_RequestPlayerCount();
 				}
 			}
 		}
@@ -95,5 +99,25 @@ void Afirepjt_firstPlayerController::SetupInputComponent()
 			}
 		}
 	}
-	
+
 }
+
+void Afirepjt_firstPlayerController::Client_UpdatePlayerCount_Implementation(int32 CurrentPlayers, int32 MaxPlayers)
+{
+	if (LobbyWidget)
+	{
+		LobbyWidget->UpdatePlayerCount(CurrentPlayers, MaxPlayers);
+	}
+}
+
+void Afirepjt_firstPlayerController::Server_RequestPlayerCount_Implementation()
+{
+	ALobbyGameMode* LobbyGM = Cast<ALobbyGameMode>(GetWorld()->GetAuthGameMode());
+	if (LobbyGM)
+	{
+		LobbyGM->BroadcastPlayerCount();
+	}
+}
+
+
+
