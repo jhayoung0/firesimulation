@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "InputActionValue.h"
 #include "FireMan.generated.h"
 
 UCLASS()
@@ -26,7 +27,34 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TObjectPtr<class UCameraComponent> FiremanCamera;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TObjectPtr<class USceneComponent> FirehosePos;
+	
 private:
-	// UPROPERTY()
-	// TObjectPtr<class USkeletalMeshComponent> 
+	UPROPERTY(VisibleAnywhere)
+	TObjectPtr<class UInputMappingContext> FiremanIMC;
+
+	UPROPERTY(VisibleAnywhere)
+	TObjectPtr<class UInputAction> MoveAction;
+	UPROPERTY(VisibleAnywhere)
+	TObjectPtr<class UInputAction> LookAction;
+	UPROPERTY(VisibleAnywhere)
+	TObjectPtr<class UInputAction> InteractAction;
+	UPROPERTY(VisibleAnywhere)
+	TObjectPtr<class UInputAction> AxeAction;
+	UPROPERTY(VisibleAnywhere)
+	TObjectPtr<class UInputAction> FireHoseAction; 
+
+	void OnMove(const struct FInputActionValue& value);
+	void OnLook(const struct FInputActionValue& value);
+	void OnInteract(const struct FInputActionValue& value);
+	void OnAxe(const struct FInputActionValue& value);
+	void OnFireHose(const struct FInputActionValue& value);
+
+	FVector direction;
+	float WalkSpeed;
+	
 };
