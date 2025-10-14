@@ -27,6 +27,9 @@ AInteractActor::AInteractActor()
 	InteractWidgetComp->SetupAttachment(RootComponent);
 	InteractWidgetComp->SetTwoSided(true);
 
+	// 아웃라인 설정
+	meshComp->bRenderCustomDepth = true;
+
 
 }
 
@@ -70,6 +73,7 @@ void AInteractActor::ToggleWidget(bool check)
 		{
 			// AnimBP를 거치지 않고 단일 애니메이션 모드로 전환
 			meshComp->SetAnimationMode(EAnimationMode::Type::AnimationBlueprint);
+			meshComp->SetRenderCustomDepth(true);
 
 		}
 
@@ -84,6 +88,8 @@ void AInteractActor::ToggleWidget(bool check)
 			meshComp->SetAnimationMode(EAnimationMode::AnimationSingleNode);
 			// 루프 재생
 			meshComp->PlayAnimation(InteractAnim, true);
+			meshComp->SetRenderCustomDepth(false);
+			
 		}
 		
 	}
