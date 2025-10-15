@@ -3,8 +3,10 @@
 
 #include "FireHose.h"
 
+#include "FireActor.h"
 #include "NiagaraComponent.h"
 #include "NiagaraSystem.h"
+#include "Engine/OverlapResult.h"
 
 
 // Sets default values
@@ -29,14 +31,15 @@ AFireHose::AFireHose()
 void AFireHose::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
+	NiagaraParticleSystemComp->SetActorParameter(FName("UserCallbackHandler"), this);
 }
 
 void AFireHose::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 }
-
+ 
 void AFireHose::OnWaterShot()
 {
 	NiagaraParticleSystemComp->SetAutoActivate(true);
@@ -55,9 +58,22 @@ void AFireHose::ReceiveParticleData_Implementation(const TArray<FBasicParticleDa
 {
 	INiagaraParticleCallbackHandler::ReceiveParticleData_Implementation(Data, NiagaraSystem, SimulationPositionOffset);
 
+	FVector offset = FVector(1, 1, 1);
+
+	FCollisionQueryParams params;
+	params.AddIgnoredActor(this);
+	
 	for (const auto& data : Data)
 	{
-		// print log 해야됨
-		UE_LOG(LogTemp, Warning, TEXT("(%f, %f, %f)"), data.Position.X, data.Position.Y, data.Position.Z);
+		FVector start = data.Position;
+		FVector end = start + offset;
+		
+		FHitResult hitResult;
+		bool bHit = GetWorld()->SweepSingleByProfile(
+			hitResult, data.Position, end, FQuat::Identity, FName("Fire"), FCollisionShape::MakeSphere(data.Size), params);
+		if (bHit)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("%s"), *start.ToString());
+		}
 	}
 }
