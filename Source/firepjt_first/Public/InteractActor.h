@@ -26,6 +26,8 @@ public:
 
 public: // 인터랙트 컴포넌트 붙이기 (아웃라인, 가까이 갔을 경우 UI 활성화)
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	class UBoxComponent* boxComp;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	class USkeletalMeshComponent* meshComp;
@@ -44,6 +46,8 @@ public: // 인터랙트 컴포넌트 붙이기 (아웃라인, 가까이 갔을 �
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	class UInteractWidget* InteractUI;
 
+
+	
 
 	UFUNCTION(BlueprintImplementableEvent)
 	void ChangeTowel(bool visiblility);

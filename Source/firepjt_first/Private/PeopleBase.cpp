@@ -224,7 +224,8 @@ void APeopleBase::AttachActor()
 	IsInteracting = true;
 	InteractingActor->IsInteracting = true;
 	InteractingActor->ToggleWidget(false);
-
+	ActorRotation = InteractingActor->GetActorRotation();
+	ActorLocation = InteractingActor->GetActorLocation();
 
 
 
@@ -272,14 +273,9 @@ void APeopleBase::AttachActor()
 				// 루프 재생
 				MeshComp->PlayAnimation(InteractAnimPhone, true);
 			}
-
 			// 위젯 띄우기
-
 			auto* pc = Cast<APeopleOnePC>(GetWorld()->GetFirstPlayerController());
-
 			pc->OpenPhoneUI();
-			
-			
 		}
 		else if (InteractingActor->ActorHasTag(FName("People")))
 		{
@@ -323,10 +319,10 @@ void APeopleBase::DetachActor(AInteractActor* tempActor)
 	{
 		tempActor->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
 		tempActor->SetActorRotation(ActorRotation);
-		FVector Loc = tempActor->GetActorLocation();
-		Loc.Z = 0.f;
+		//FVector Loc = tempActor->GetActorLocation();
+		//Loc.Z = ActorLocation.Z;
 	
-		tempActor->SetActorLocation(Loc);
+		//tempActor->SetActorLocation(Loc);
 	}
 	
 
