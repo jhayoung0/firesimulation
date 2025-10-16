@@ -40,7 +40,11 @@ void ULobbyWidget::OnStartClicked()
 
 void ULobbyWidget::OnFirefighterClicked()
 {
-	
+	ALobbyGameMode* GM = Cast<ALobbyGameMode>(GetWorld()->GetAuthGameMode());
+	if (GM)
+	{
+		
+	}
 }
 
 void ULobbyWidget::OnCitizenClicked()

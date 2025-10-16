@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Cubee/HousePlayerState.h"
 #include "GameFramework/PlayerController.h"
 #include "firepjt_firstPlayerController.generated.h"
 
@@ -55,6 +56,12 @@ protected:
 	UPROPERTY()
 	class ULobbyWidget* LobbyWidget;
 
+	UPROPERTY(EditDefaultsOnly, Category = "UI")
+	TSubclassOf<UUserWidget> InGameWidgetClass;
+
+	UPROPERTY()
+	class UInGameWidget* InGameWidget;
+
 public:
 	// Client RPC to update player count in lobby
 	UFUNCTION(Client, Reliable)
@@ -64,4 +71,10 @@ public:
 	UFUNCTION(Server, Reliable)
 	void Server_RequestPlayerCount();
 
+protected:
+	// Game state delegate binding
+	void BindToGameStateEvents();
+
+	UFUNCTION()
+	void OnGamePhaseChanged(EGamePhase NewPhase);
 };

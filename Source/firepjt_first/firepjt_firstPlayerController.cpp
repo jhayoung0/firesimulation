@@ -8,6 +8,8 @@
 #include "firepjt_firstCameraManager.h"
 #include "Blueprint/UserWidget.h"
 #include "firepjt_first.h"
+#include "Cubee/HouseGameState.h"
+#include "Cubee/InGameWidget.h"
 #include "Cubee/LobbyGameMode.h"
 #include "Cubee/LobbyWidget.h"
 #include "Widgets/Input/SVirtualJoystick.h"
@@ -21,7 +23,6 @@ Afirepjt_firstPlayerController::Afirepjt_firstPlayerController()
 void Afirepjt_firstPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
-
 	
 	// only spawn touch controls on local player controllers
 	if (SVirtualJoystick::ShouldDisplayTouchInterface() && IsLocalPlayerController())
@@ -52,6 +53,8 @@ void Afirepjt_firstPlayerController::BeginPlay()
 		{
 			SetShowMouseCursor(false);
 			SetInputMode(FInputModeGameOnly());
+
+			BindToGameStateEvents();
 		}
 		else if (WorldName.Contains(TEXT("Lobby")))
 		{
@@ -100,6 +103,41 @@ void Afirepjt_firstPlayerController::SetupInputComponent()
 		}
 	}
 
+}
+
+void Afirepjt_firstPlayerController::BindToGameStateEvents()
+{
+	AHouseGameState* HouseGS = GetWorld()->GetGameState<AHouseGameState>();
+	if (HouseGS)
+	{
+		HouseGS->OnPhaseChanged.AddDynamic(this, &Afirepjt_firstPlayerController::OnGamePhaseChanged);
+		UE_LOG(LogTemp, Warning, TEXT("[PlayerController] Successfully bound to GameState events! %d"), HasAuthority())
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("[PlayerController] GameState not ready, retrying..."));
+		FTimerHandle RetryHandle;
+		GetWorldTimerManager().SetTimer(RetryHandle, this, &Afirepjt_firstPlayerController::BindToGameStateEvents,
+			0.1f, false);
+	}
+}
+
+void Afirepjt_firstPlayerController::OnGamePhaseChanged(EGamePhase NewPhase)
+{
+	UE_LOG(LogTemp, Warning, TEXT("[PlayerController] OnGamePhaseChanged called!"));
+	
+	if (NewPhase == EGamePhase::Mission)
+	{
+		if (InGameWidgetClass)
+		{
+			InGameWidget = CreateWidget<UInGameWidget>(this, InGameWidgetClass);
+			if (InGameWidget)
+			{
+				InGameWidget->AddToViewport();
+				UE_LOG(LogTemp, Error, TEXT("[PlayerController] InGameWidget added to viewport! %d"), HasAuthority());
+			}
+		}
+	}
 }
 
 void Afirepjt_firstPlayerController::Client_UpdatePlayerCount_Implementation(int32 CurrentPlayers, int32 MaxPlayers)
