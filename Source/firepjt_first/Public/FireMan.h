@@ -32,6 +32,9 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TObjectPtr<class USceneComponent> FirehosePos;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TObjectPtr<class UChildActorComponent> WaterComp;
 	
 private:
 	UPROPERTY(VisibleAnywhere)

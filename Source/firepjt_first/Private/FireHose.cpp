@@ -6,8 +6,9 @@
 #include "FireActor.h"
 #include "NiagaraComponent.h"
 #include "NiagaraSystem.h"
-#include "Engine/OverlapResult.h"
+#include "Components/SkeletalMeshComponent.h"
 
+#define FirehoseWater ECC_GameTraceChannel3
 
 // Sets default values
 AFireHose::AFireHose()
@@ -18,13 +19,23 @@ AFireHose::AFireHose()
 	SceneRootComp = CreateDefaultSubobject<USceneComponent>("SceneRoot");
 	SetRootComponent(SceneRootComp);
 
+	FirehoseComp = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("FirehoseComp"));
+	ConstructorHelpers::FObjectFinder<USkeletalMesh> FirehoseMeshRef(TEXT("/Script/Engine.SkeletalMesh'/Game/CustomContents/Fireman/Water/firefighter_vision_fire_nozzle_turbo/StaticMeshes/SKM_firefighter_vision_fire_nozzle_turbo.SKM_firefighter_vision_fire_nozzle_turbo'"));
+	if (FirehoseMeshRef.Succeeded())
+	{
+		FirehoseComp->SetSkeletalMesh(FirehoseMeshRef.Object);
+	}
+	FirehoseComp->SetupAttachment(RootComponent);
+
 	NiagaraParticleSystemComp = CreateDefaultSubobject<UNiagaraComponent>("ParticleSystemComponent");
 	ConstructorHelpers::FObjectFinder<UNiagaraSystem> niagaraCompRef(TEXT("/Script/Niagara.NiagaraSystem'/Game/CustomContents/Fireman/Water/NS_Water.NS_Water'"));
 	if (niagaraCompRef.Succeeded())
 	{
 		NiagaraParticleSystemComp->SetAsset(niagaraCompRef.Object);
 	}
-	NiagaraParticleSystemComp->SetupAttachment(SceneRootComp);
+	NiagaraParticleSystemComp->SetupAttachment(FirehoseComp);
+	NiagaraParticleSystemComp->SetRelativeLocation(FVector(20, 0, 0));
+	NiagaraParticleSystemComp->SetRelativeRotation(FRotator(-90, 0, 0));
 	NiagaraParticleSystemComp->SetAutoActivate(false);
 }
 
@@ -69,11 +80,24 @@ void AFireHose::ReceiveParticleData_Implementation(const TArray<FBasicParticleDa
 		FVector end = start + offset;
 		
 		FHitResult hitResult;
-		bool bHit = GetWorld()->SweepSingleByProfile(
-			hitResult, data.Position, end, FQuat::Identity, FName("Fire"), FCollisionShape::MakeSphere(data.Size), params);
+		bool bHit = GetWorld()->SweepSingleByChannel(
+			hitResult,
+			data.Position,
+			end,
+			FQuat::Identity,
+			FirehoseWater,
+			FCollisionShape::MakeSphere(15),
+			params
+		);
+		DrawDebugSphere(GetWorld(), data.Position, 15, 1, FColor::Red);
+		// UE_LOG(LogTemp, Warning, TEXT("bHit가 될 것인가 %d"), bHit);
+		
 		if (bHit)
 		{
-			UE_LOG(LogTemp, Warning, TEXT("%s"), *start.ToString());
+			if (AFireActor* fire = Cast<AFireActor>(hitResult.GetActor()))
+			{
+				UE_LOG(LogTemp, Warning, TEXT("%s"), *fire->GetName());
+			}
 		}
 	}
 }

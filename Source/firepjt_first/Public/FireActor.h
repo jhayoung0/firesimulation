@@ -23,7 +23,14 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TObjectPtr<class UNiagaraComponent> FireComp;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TObjectPtr<class USphereComponent> SphereCollision;
+
 private:
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<class USceneComponent> SceneRootComp;
+	
 };

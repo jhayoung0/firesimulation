@@ -5,9 +5,11 @@
 
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
+#include "FireHose.h"
 #include "Camera/CameraComponent.h"
 #include "Components/SceneComponent.h"
 #include "EnhancedInput/Public/InputMappingContext.h"
+
 
 
 // Sets default values
@@ -27,11 +29,26 @@ AFireMan::AFireMan()
 	FiremanCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("FiremanCamera"));
 	FiremanCamera->SetupAttachment(GetMesh(), TEXT("head"));
 	FiremanCamera->SetRelativeLocationAndRotation(FVector(31.610969,0.863677,0), FRotator(0,20,-90));
+	FiremanCamera->bUsePawnControlRotation = true;
 
 	FirehosePos = CreateDefaultSubobject<USceneComponent>(TEXT("FirehosePos"));
-	FirehosePos->SetupAttachment(RootComponent);
-	FirehosePos->SetRelativeLocation(FVector(90.000000,20.000000,60.000000));
+	FirehosePos->SetupAttachment(FiremanCamera);
+	FirehosePos->SetRelativeLocation(FVector(60.000000,20.000000,-30.000000));
+	
+	WaterComp = CreateDefaultSubobject<UChildActorComponent>(TEXT("WaterComp"));
+	ConstructorHelpers::FClassFinder<AFireHose> WaterRef(TEXT("/Game/CustomContents/Fireman/Water/BP_FireHose.BP_FireHose_C"));
+	if (WaterRef.Succeeded())
+	{
+		WaterComp->SetChildActorClass(WaterRef.Class);
+	}
+	WaterComp->SetupAttachment(FirehosePos);
 
+	ConstructorHelpers::FClassFinder<UAnimInstance> animInstanceRef(TEXT("/Game/CustomContents/Fireman/Blueprints/ABP_Fireman.ABP_Fireman_C"));
+	if (animInstanceRef.Succeeded())
+	{
+		GetMesh()->SetAnimInstanceClass(animInstanceRef.Class);
+	}
+	
 	ConstructorHelpers::FObjectFinder<UInputMappingContext> IMCRef(TEXT("/Script/EnhancedInput.InputMappingContext'/Game/Input/IMC_Fireman.IMC_Fireman'"));
 	if (IMCRef.Succeeded())
 	{
