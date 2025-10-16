@@ -21,7 +21,7 @@ AInteractActor::AInteractActor()
 
 	boxComp= CreateDefaultSubobject<UBoxComponent>(TEXT("boxComp"));
 	SetRootComponent(boxComp);
-	meshComp = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("MeshComp"));
+	meshComp = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("MeshComp")); 
 	meshComp->SetupAttachment(RootComponent);
 
 	InteractWidgetComp = CreateDefaultSubobject<UInteractWidgetComp>(TEXT("InteractWidget"));
