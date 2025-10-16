@@ -28,9 +28,16 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TObjectPtr<class USphereComponent> SphereCollision;
+	
+	UFUNCTION()
+	void PutOutFire();
 
 private:
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<class USceneComponent> SceneRootComp;
-	
+
+	float FlameScale = 1.f;
+	float SmokeScale = 1.f;
+	float DistortionScale = 1.f;
+	float DebrishRate = 50.f;
 };

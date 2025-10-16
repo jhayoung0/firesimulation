@@ -44,3 +44,8 @@ void AFireActor::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 }
 
+void AFireActor::PutOutFire()
+{
+	//
+	//FireComp->SetNiagaraVariableFloat()
+}
