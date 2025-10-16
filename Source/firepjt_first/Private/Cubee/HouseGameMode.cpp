@@ -3,7 +3,6 @@
 
 #include "Cubee/HouseGameMode.h"
 #include "Cubee/HouseGameState.h"
-#include "Cubee/HousePlayerState.h"
 #include "TimerManager.h"
 #include "Kismet/GameplayStatics.h"
 
@@ -29,9 +28,12 @@ void AHouseGameMode::BeginPlay()
 		HouseGS->CurrentMissionIndex = 0;
 		HouseGS->MissionTimeRemaining = 0.f;
 
-		UE_LOG(LogTemp, Warning, TEXT("[HouseGameMode] Game initialized. Waiting to start..."));
+		UE_LOG(LogTemp, Warning, TEXT("[HouseGameMode] Waiting to start"));
 
-		// 시네마틱 했다 치고
+		// 시작 시네마틱
+		UE_LOG(LogTemp, Warning, TEXT("[HouseGameMode] Cinematic"));
+
+		// 델리게이트 설정 전 바인딩 방지
 		FTimerHandle TimerHandle;
 		GetWorldTimerManager().SetTimer(TimerHandle, this, &AHouseGameMode::StartGame,
 		1.f, false);
@@ -40,20 +42,22 @@ void AHouseGameMode::BeginPlay()
 
 void AHouseGameMode::StartGame()
 {
-	UE_LOG(LogTemp, Warning, TEXT("[HouseGameMode] StartGame"));
-	
 	AHouseGameState* HouseGS = GetGameState<AHouseGameState>();
 	if (!HouseGS) return;
 
-	//HouseGS->CurrentPhase = EGamePhase::Cinematic;
-	//UE_LOG(LogTemp, Log, TEXT("[HouseGameMode] Game started. Playing cinematic..."));
-
+	ChangeGamePhase(EGamePhase::GameStart);
+	
 	HouseGS->MissionTimeRemaining = HouseGS->MissionTimeLimit;
+	
+	FTimerHandle TimerHandle;
+	GetWorldTimerManager().SetTimer(TimerHandle, FTimerDelegate::CreateLambda([&]
+	{
+		StartMission(0);
+		
+	}),1.f, false);
 
 	GetWorldTimerManager().SetTimer(MissionTimerHandle, this, &AHouseGameMode::UpdateMissionTimer,
 		1.f, true);
-
-	StartMission(0);
 }
 
 void AHouseGameMode::UpdateMissionTimer()
@@ -61,21 +65,22 @@ void AHouseGameMode::UpdateMissionTimer()
 	AHouseGameState* HouseGS = GetGameState<AHouseGameState>();
 	if (!HouseGS) return;
 
-	UE_LOG(LogTemp, Warning, TEXT("[HouseGameMode] %s"), *HouseGS->GetFormattedTimer());
 	HouseGS->MissionTimeRemaining -= 1.f;
 
 	if (HouseGS->MissionTimeRemaining <= 0.f)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("[HouseGameMode] Time's up! Mission failed."));
+		UE_LOG(LogTemp, Warning, TEXT("[HouseGameMode] Mission failed."));
 		FailMission();
 		return;
 	}
 
+	/*
 	int32 TimeLeft = FMath::FloorToInt(HouseGS->MissionTimeRemaining);
 	if (TimeLeft == 30 || TimeLeft == 10)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("[HouseGameMode] %d seconds remaining!"), TimeLeft);
 	}
+	*/
 }
 
 void AHouseGameMode::ReportMissionComplete(APlayerController* Player)
@@ -98,17 +103,10 @@ void AHouseGameMode::StartMission(int32 MissionIndex)
 
 	if (MissionIndex >= TotalMissions) return;
 
+	ChangeGamePhase(EGamePhase::MissionStart);
+	
 	// 미션 시작
 	HouseGS->CurrentMissionIndex = MissionIndex;
-	HouseGS->CurrentPhase = EGamePhase::Mission;
-
-	// 서버쪽 브로드캐스트..?
-	if (HasAuthority())
-	{
-		UE_LOG(LogTemp, Warning, TEXT("skfhkdfgsdgfiuasg"));
-		HouseGS->OnPhaseChanged.Broadcast(EGamePhase::Mission);
-		HouseGS->PreviousPhase = EGamePhase::Mission;
-	}
 	
 	// 모든 플레이어 미션 상태 리셋
 	for (APlayerState* PS : HouseGS->PlayerArray)
@@ -162,5 +160,21 @@ void AHouseGameMode::FailMission()
 	HouseGS->CurrentPhase = EGamePhase::GameOver;
 	
 	GetWorldTimerManager().ClearTimer(MissionTimerHandle);
+}
+
+void AHouseGameMode::ChangeGamePhase(EGamePhase NewState)
+{
+	AHouseGameState* HouseGS = GetGameState<AHouseGameState>();
+	if (!HouseGS) return;
+	
+	// 클라이언트쪽 상태 변경
+	HouseGS->CurrentPhase = NewState;
+
+	// 서버쪽 상태 변경 브로드캐스트
+	if (HasAuthority())
+	{
+		HouseGS->OnPhaseChanged.Broadcast(NewState);
+		HouseGS->PreviousPhase = NewState;
+	}
 }
 

@@ -111,7 +111,7 @@ void Afirepjt_firstPlayerController::BindToGameStateEvents()
 	if (HouseGS)
 	{
 		HouseGS->OnPhaseChanged.AddDynamic(this, &Afirepjt_firstPlayerController::OnGamePhaseChanged);
-		UE_LOG(LogTemp, Warning, TEXT("[PlayerController] Successfully bound to GameState events! %d"), HasAuthority())
+		//UE_LOG(LogTemp, Warning, TEXT("[PlayerController] Successfully bound to GameState events! %d"), HasAuthority())
 	}
 	else
 	{
@@ -124,9 +124,7 @@ void Afirepjt_firstPlayerController::BindToGameStateEvents()
 
 void Afirepjt_firstPlayerController::OnGamePhaseChanged(EGamePhase NewPhase)
 {
-	UE_LOG(LogTemp, Warning, TEXT("[PlayerController] OnGamePhaseChanged called!"));
-	
-	if (NewPhase == EGamePhase::Mission)
+	if (NewPhase == EGamePhase::GameStart)
 	{
 		if (InGameWidgetClass)
 		{
@@ -134,7 +132,6 @@ void Afirepjt_firstPlayerController::OnGamePhaseChanged(EGamePhase NewPhase)
 			if (InGameWidget)
 			{
 				InGameWidget->AddToViewport();
-				UE_LOG(LogTemp, Error, TEXT("[PlayerController] InGameWidget added to viewport! %d"), HasAuthority());
 			}
 		}
 	}

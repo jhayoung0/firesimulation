@@ -22,8 +22,9 @@ UENUM(BlueprintType)
 enum class EGamePhase :uint8
 {
 	WaitingToStart  UMETA(DisplayName = "Waiting"),
+	GameStart       UMETA(DisplayName = "Game Start"),
 	Cinematic       UMETA(DisplayName = "Cinematic"),
-	Mission         UMETA(DisplayName = "Mission"),
+	MissionStart    UMETA(DisplayName = "Mission"),
 	MissionComplete UMETA(DisplayName = "Mission Complete"),
 	GameOver        UMETA(DisplayName = "Game Over"),
 	Victory         UMETA(DisplayName = "Victory")

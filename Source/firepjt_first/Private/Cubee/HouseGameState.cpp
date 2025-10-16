@@ -27,8 +27,8 @@ void AHouseGameState::OnRep_CurrentPhase()
 {
 	if (CurrentPhase != PreviousPhase)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("[HouseGameState] Phase changed from %d to %d"),
-			(int32)PreviousPhase, (int32)CurrentPhase);
+		UE_LOG(LogTemp, Warning, TEXT("[HouseGameState] Phase changed from %s to %s"),
+			*UEnum::GetValueAsString(PreviousPhase), *UEnum::GetValueAsString(CurrentPhase));
 
 		OnPhaseChanged.Broadcast(CurrentPhase);
 		PreviousPhase = CurrentPhase;

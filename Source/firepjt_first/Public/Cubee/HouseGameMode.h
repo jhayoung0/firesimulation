@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "HousePlayerState.h"
 #include "GameFramework/GameMode.h"
 #include "HouseGameMode.generated.h"
 
@@ -50,5 +51,7 @@ protected:
 	// 미션 실패
 	void FailMission();
 
-	
+protected:
+	// 상태 서버&클라이언트 일괄 변경
+	void ChangeGamePhase(EGamePhase NewState);
 };
