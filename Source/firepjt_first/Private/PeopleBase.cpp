@@ -237,7 +237,7 @@ void APeopleBase::AttachActor()
 		{
 			// compActor에 붙이자.
 			InteractingActor->AttachToComponent(compActorMask, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
-			UE_LOG(LogTemp, Log, TEXT("mask!"));
+		
 			HasMask = true;
 			HasWetTowel = false;
 			mainui->ShowMaskUI(true);
@@ -246,7 +246,7 @@ void APeopleBase::AttachActor()
 		{
 			// compActor에 붙이자.
 			InteractingActor->AttachToComponent(compActorTowel, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
-			UE_LOG(LogTemp, Log, TEXT("WetTowel!"));
+		
 			HasWetTowel = true;
 			HasMask = false;
 
@@ -264,7 +264,7 @@ void APeopleBase::AttachActor()
 		{
 			// compActor에 붙이자.
 			InteractingActor->AttachToComponent(compActor, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
-			UE_LOG(LogTemp, Log, TEXT("Phone!"));
+		
 
 			if (USkeletalMeshComponent* MeshComp = GetMesh())
 			{
@@ -281,7 +281,7 @@ void APeopleBase::AttachActor()
 		{
 			// compActor에 붙이자.
 			InteractingActor->AttachToComponent(compActorPeople, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
-			UE_LOG(LogTemp, Log, TEXT("People!"));
+			
 
 			if (USkeletalMeshComponent* MeshComp = GetMesh())
 			{
@@ -291,6 +291,10 @@ void APeopleBase::AttachActor()
 				MeshComp->PlayAnimation(InteractAnimPeople, true);
 			}
 		}
+		else if (InteractingActor->ActorHasTag(FName("Door")))
+    		{
+				InteractingActor->ToggleDoor(true);
+    		}
 		else
 		{
 			// compActor에 붙이자.
@@ -319,10 +323,6 @@ void APeopleBase::DetachActor(AInteractActor* tempActor)
 	{
 		tempActor->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
 		tempActor->SetActorRotation(ActorRotation);
-		//FVector Loc = tempActor->GetActorLocation();
-		//Loc.Z = ActorLocation.Z;
-	
-		//tempActor->SetActorLocation(Loc);
 	}
 	
 
@@ -347,6 +347,10 @@ void APeopleBase::DetachActor(AInteractActor* tempActor)
 			auto* pc = Cast<APeopleOnePC>(GetWorld()->GetFirstPlayerController());
 
 			pc->ClosePhoneUI();
+		}
+		else if (tempActor->ActorHasTag(FName("Door")))
+		{
+			InteractingActor->ToggleDoor(false);
 		}
 		else
 		{
