@@ -89,14 +89,13 @@ void AFireHose::ReceiveParticleData_Implementation(const TArray<FBasicParticleDa
 			FCollisionShape::MakeSphere(15),
 			params
 		);
-		DrawDebugSphere(GetWorld(), data.Position, 15, 1, FColor::Red);
-		// UE_LOG(LogTemp, Warning, TEXT("bHit가 될 것인가 %d"), bHit);
+		// DrawDebugSphere(GetWorld(), data.Position, 15, 1, FColor::Red);
 		
 		if (bHit)
 		{
 			if (AFireActor* fire = Cast<AFireActor>(hitResult.GetActor()))
 			{
-				UE_LOG(LogTemp, Warning, TEXT("%s"), *fire->GetName());
+				fire->PutOutFire();
 			}
 		}
 	}

@@ -77,3 +77,6 @@ Content/Gustav/Gustav__1_.uasset
 
 # JetBrains Rider / IntelliJ IDEA project files
 .idea/
+
+# Codex Agent
+AGENTS.md

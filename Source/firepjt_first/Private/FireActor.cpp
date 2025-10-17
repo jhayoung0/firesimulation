@@ -44,8 +44,75 @@ void AFireActor::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 }
 
+void AFireActor::PostEditChangeProperty(struct FPropertyChangedEvent& PropertyChangedEvent)
+{
+	Super::PostEditChangeProperty(PropertyChangedEvent);
+
+	FName PropertyName = PropertyChangedEvent.Property != nullptr ? PropertyChangedEvent.Property->GetFName() : NAME_None;
+	
+	if (PropertyName == GET_MEMBER_NAME_CHECKED(AFireActor, DebrisRate))
+	{
+		FireComp->SetVariableFloat(FName("DebrisRate"), DebrisRate);
+	}
+	else if (PropertyName == GET_MEMBER_NAME_CHECKED(AFireActor, FlameSpawnRate))
+	{
+		FireComp->SetVariableFloat(FName("FlameSpawnRate"), FlameSpawnRate);
+	}
+	else if (PropertyName == GET_MEMBER_NAME_CHECKED(AFireActor, FlameRadius))
+	{
+		FireComp->SetVariableFloat(FName("FlameRadius"), FlameRadius);
+	}
+	else if (PropertyName == GET_MEMBER_NAME_CHECKED(AFireActor, FlameVelocity))
+	{
+		FireComp->SetVariableFloat(FName("FlameVelocity"), FlameVelocity);
+	}
+	else if (PropertyName == GET_MEMBER_NAME_CHECKED(AFireActor, FlameConeAngle))
+	{
+		FireComp->SetVariableFloat(FName("FlameConeAngle"), FlameConeAngle);
+	}
+	else if (PropertyName == GET_MEMBER_NAME_CHECKED(AFireActor, SmokeSpriteSizeMin))
+	{
+		FireComp->SetVariableFloat(FName("SmokeSpriteSizeMin"), SmokeSpriteSizeMin);
+	}
+	else if (PropertyName == GET_MEMBER_NAME_CHECKED(AFireActor, SmokeSpriteSizeMax))
+	{
+		FireComp->SetVariableFloat(FName("SmokeSpriteSizeMax"), SmokeSpriteSizeMax);
+	}
+	else if (PropertyName == GET_MEMBER_NAME_CHECKED(AFireActor, SmokeLifetime))
+	{
+		FireComp->SetVariableFloat(FName("SmokeLifetime"), SmokeLifetime);
+	}
+	else if (PropertyName == GET_MEMBER_NAME_CHECKED(AFireActor, DebrisVelocity))
+	{
+		FireComp->SetVariableFloat(FName("DebrisVelocity"), DebrisVelocity);
+	}
+	else if (PropertyName == GET_MEMBER_NAME_CHECKED(AFireActor, DebrisConeAngle))
+	{
+		FireComp->SetVariableFloat(FName("DebrisConeAngle"), DebrisConeAngle);
+	}
+}
+
 void AFireActor::PutOutFire()
 {
-	//
-	//FireComp->SetNiagaraVariableFloat()
+	// 알파값 하나로 0~1 동일한 비율로 줄게 수정하기
+	FlameScale -= 0.0025f;
+	SmokeScale -= 0.0025f;
+	DistortionScale -= 0.0025f;
+	DebrisRate -= 0.125f;
+	
+	FireComp->SetVariableFloat(FName("FlameScale"), FlameScale);
+	FireComp->SetVariableFloat(FName("SmokeScale"), SmokeScale);
+	FireComp->SetVariableFloat(FName("DistortionScale"), DistortionScale);
+	FireComp->SetVariableFloat(FName("DebrisRate"), DebrisRate);
+	
+	if (FlameScale <= 0.f)
+	{
+		Destroy();
+	}
 }
+
+
+
+
+
+
