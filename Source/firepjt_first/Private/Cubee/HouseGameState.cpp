@@ -45,10 +45,12 @@ bool AHouseGameState::AreAllPlayersMissionComplete() const
 		if (HousePS)
 		{
 			if (!HousePS->bCurrentMissionComplete)
+			{
 				return false;
+			}
 		}
 	}
-
+	
 	return true;
 }
 

@@ -50,7 +50,7 @@ public:
 	// 미션 상태
 	UPROPERTY(Replicated, BlueprintReadOnly, Category = "Mission")
 	bool bCurrentMissionComplete = false;
-	// 미션 성공
+	// 미션 성공(플레이어 개별 성공 시 호출)
 	UFUNCTION(BlueprintCallable, Category = "Mission")
 	void SetMissionComplete();
 	// 미션 상태 리셋

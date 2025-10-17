@@ -3,6 +3,7 @@
 
 #include "Cubee/HousePlayerState.h"
 
+#include "Cubee/HouseGameMode.h"
 #include "Net/UnrealNetwork.h"
 
 AHousePlayerState::AHousePlayerState()
@@ -24,7 +25,17 @@ void AHousePlayerState::SetMissionComplete()
 	if (HasAuthority())
 	{
 		bCurrentMissionComplete = true;
-		UE_LOG(LogTemp, Log, TEXT("[PlayerState] %s mission complete!"), *GetPlayerName()); 
+
+		// GameMode에 미션 완료 보고
+		AHouseGameMode* GameMode = GetWorld()->GetAuthGameMode<AHouseGameMode>();
+		if (GameMode)
+		{
+			APlayerController* PC = Cast<APlayerController>(GetOwner());
+			if (PC)
+			{
+				GameMode->ReportMissionComplete(PC);
+			}
+		}
 	}
 }
 
@@ -33,6 +44,6 @@ void AHousePlayerState::ResetForNextMission()
 	if (HasAuthority())
 	{
 		bCurrentMissionComplete = false;
-		UE_LOG(LogTemp, Log, TEXT("[PlayerState] %s reset for next mission"), *GetPlayerName());
+		UE_LOG(LogTemp, Log, TEXT("[PlayerState] reset for next mission"));
 	}
 }

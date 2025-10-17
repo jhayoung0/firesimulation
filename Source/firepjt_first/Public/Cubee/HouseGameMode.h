@@ -37,7 +37,7 @@ protected:
 	void UpdateMissionTimer();
 
 public:
-	// 각 플레이어가 미션 성공 시 호출
+	// 각 플레이어 미션 성공 여부 업데이트
 	UFUNCTION(BlueprintCallable, Category = "Mission")
 	void ReportMissionComplete(APlayerController* Player);
 

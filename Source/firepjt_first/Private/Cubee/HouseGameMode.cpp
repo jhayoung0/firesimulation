@@ -90,9 +90,9 @@ void AHouseGameMode::ReportMissionComplete(APlayerController* Player)
 	AHousePlayerState* HousePS = Player->GetPlayerState<AHousePlayerState>();
 	if (!HousePS) return;
 
-	HousePS->SetMissionComplete();
-	UE_LOG(LogTemp, Warning, TEXT("[HouseGameMode] 개별 미션 완료"));
-	
+	// PlayerState에서 이미 bCurrentMissionComplete를 설정했으므로 체크만 수행
+	UE_LOG(LogTemp, Warning, TEXT("[HouseGameMode] %s reported mission complete"), *Player->GetName());
+
 	CheckMissionProgress();
 }
 
@@ -126,6 +126,7 @@ void AHouseGameMode::CheckMissionProgress()
 
 	if (HouseGS->AreAllPlayersMissionComplete())
 	{
+		UE_LOG(LogTemp, Warning, TEXT("All mission complete"));
 		AdvanceToNextMission();
 	}
 }
@@ -145,7 +146,7 @@ void AHouseGameMode::AdvanceToNextMission()
 		GetWorldTimerManager().ClearTimer(MissionTimerHandle);
 		return;
 	}
-
+	
 	// 다음 미션 시작
 	HouseGS->CurrentPhase = EGamePhase::MissionComplete;
 	

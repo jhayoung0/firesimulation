@@ -131,8 +131,18 @@ void Afirepjt_firstPlayerController::OnGamePhaseChanged(EGamePhase NewPhase)
 			InGameWidget = CreateWidget<UInGameWidget>(this, InGameWidgetClass);
 			if (InGameWidget)
 			{
+				// DataTable 할당(추후 위치 변경 가능)
 				InGameWidget->AddToViewport();
+				InGameWidget->SetMissionDataTable(MissionDataTable);
 			}
+		}
+	}
+	else if (NewPhase == EGamePhase::MissionStart)
+	{
+		AHouseGameState* HouseGS = GetWorld()->GetGameState<AHouseGameState>();
+		if (HouseGS)
+		{
+			InGameWidget->SetMissionTextFromIndex(HouseGS->CurrentMissionIndex);
 		}
 	}
 }
