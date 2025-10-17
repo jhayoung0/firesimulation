@@ -49,13 +49,16 @@ private:
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<class UInputAction> AxeAction;
 	UPROPERTY(VisibleAnywhere)
-	TObjectPtr<class UInputAction> FireHoseAction; 
+	TObjectPtr<class UInputAction> FireHoseAction;
+	UPROPERTY(VisibleAnywhere)
+	TObjectPtr<class UInputAction> MaskOutAction;
 
 	void OnMove(const struct FInputActionValue& value);
 	void OnLook(const struct FInputActionValue& value);
 	void OnInteract(const struct FInputActionValue& value);
 	void OnAxe(const struct FInputActionValue& value);
 	void OnFireHose(const struct FInputActionValue& value);
+	void OnMaskOut(const struct FInputActionValue& value);
 
 	FVector direction;
 	float WalkSpeed;

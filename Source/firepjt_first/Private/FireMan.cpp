@@ -11,7 +11,7 @@
 #include "EnhancedInput/Public/InputMappingContext.h"
 
 
-
+class AInteractActor;
 // Sets default values
 AFireMan::AFireMan()
 {
@@ -79,6 +79,8 @@ AFireMan::AFireMan()
 	{
 		FireHoseAction = fireHoseActionRef.Object;
 	}
+
+	// ConstructorHelpers::FClassFinder<AInteractActor> 
 }
 
 // Called when the game starts or when spawned
@@ -123,6 +125,7 @@ void AFireMan::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 		playerInput->BindAction(InteractAction, ETriggerEvent::Started, this, &AFireMan::OnInteract);
 		playerInput->BindAction(AxeAction, ETriggerEvent::Started, this, &AFireMan::OnAxe);
 		playerInput->BindAction(FireHoseAction, ETriggerEvent::Started, this, &AFireMan::OnFireHose);
+		playerInput->BindAction(MaskOutAction, ETriggerEvent::Started, this, &AFireMan::OnMaskOut);
 	}
 }
 
@@ -150,6 +153,10 @@ void AFireMan::OnAxe(const struct FInputActionValue& value)
 }
 
 void AFireMan::OnFireHose(const struct FInputActionValue& value)
+{
+}
+
+void AFireMan::OnMaskOut(const struct FInputActionValue& value)
 {
 }
 
