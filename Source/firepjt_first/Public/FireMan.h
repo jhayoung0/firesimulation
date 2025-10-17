@@ -17,16 +17,14 @@ public:
 	AFireMan();
 
 protected:
-	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
 public:
-	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+	// Components
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TObjectPtr<class UCameraComponent> FiremanCamera;
 
@@ -35,8 +33,19 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TObjectPtr<class UChildActorComponent> WaterComp;
+
+	// Mask
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	TSubclassOf<class AInteractActor> MaskActor;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float PersonDist = 1000.f;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float MaskSpawnDist = 100.f;
 	
 private:
+	// Inputs
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<class UInputMappingContext> FiremanIMC;
 
@@ -60,6 +69,7 @@ private:
 	void OnFireHose(const struct FInputActionValue& value);
 	void OnMaskOut(const struct FInputActionValue& value);
 
+	// Movement Variables
 	FVector direction;
 	float WalkSpeed;
 	

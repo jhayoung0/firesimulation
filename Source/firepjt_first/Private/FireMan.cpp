@@ -6,9 +6,12 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "FireHose.h"
+#include "InteractActor.h"
+#include "PeopleBase.h"
 #include "Camera/CameraComponent.h"
 #include "Components/SceneComponent.h"
 #include "EnhancedInput/Public/InputMappingContext.h"
+#include "Kismet/GameplayStatics.h"
 
 
 class AInteractActor;
@@ -79,8 +82,17 @@ AFireMan::AFireMan()
 	{
 		FireHoseAction = fireHoseActionRef.Object;
 	}
+	ConstructorHelpers::FObjectFinder<UInputAction> maskOutActionRef(TEXT("/Script/EnhancedInput.InputAction'/Game/Input/Actions/Fireman/IA_MaskOut.IA_MaskOut'"));
+	if (maskOutActionRef.Succeeded())
+	{
+		MaskOutAction = maskOutActionRef.Object;
+	}
 
-	// ConstructorHelpers::FClassFinder<AInteractActor> 
+	ConstructorHelpers::FClassFinder<AInteractActor> maskRef(TEXT("/Game/CustomContents/People/Blueprints/BP_Mask.BP_Mask_C"));
+	if (maskRef.Succeeded())
+	{
+		MaskActor = maskRef.Class;
+	}
 }
 
 // Called when the game starts or when spawned
@@ -146,6 +158,7 @@ void AFireMan::OnLook(const struct FInputActionValue& value)
 
 void AFireMan::OnInteract(const struct FInputActionValue& value)
 {
+	
 }
 
 void AFireMan::OnAxe(const struct FInputActionValue& value)
@@ -158,5 +171,18 @@ void AFireMan::OnFireHose(const struct FInputActionValue& value)
 
 void AFireMan::OnMaskOut(const struct FInputActionValue& value)
 {
+	// 서버 상으로 상대 편의 액터를 가져올 수 있으면 그렇게 해도 됨
+	// if can get actor from other pc(server), you can get other actor that way
+	APeopleBase* person = Cast<APeopleBase>(UGameplayStatics::GetActorOfClass(GetWorld(), APeopleBase::StaticClass()));
+	if (person)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("찾았는데?"));
+		float dist = FVector::Distance(GetActorLocation(), person->GetActorLocation());
+		if (dist <= PersonDist)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("외않됀데?"));
+			GetWorld()->SpawnActor<AInteractActor>(MaskActor, FTransform(GetActorLocation() + GetActorForwardVector() * MaskSpawnDist));
+		}
+	}
 }
 
