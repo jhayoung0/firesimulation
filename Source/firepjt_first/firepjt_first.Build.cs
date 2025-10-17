@@ -21,7 +21,10 @@ public class firepjt_first : ModuleRules
 			"Slate",
 			"Sockets",
 			"Networking",
-			"Niagara"
+			"Niagara",
+			"MovieScene",
+			"MovieSceneTracks",
+			"LevelSequence"
 		});
 
 		PrivateDependencyModuleNames.AddRange(new string[] { });
