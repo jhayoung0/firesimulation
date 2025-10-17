@@ -103,7 +103,7 @@ void AHouseGameMode::StartMission(int32 MissionIndex)
 
 	if (MissionIndex >= TotalMissions) return;
 
-	ChangeGamePhase(EGamePhase::MissionStart);
+	//ChangeGamePhase(EGamePhase::MissionStart);
 	
 	// 미션 시작
 	HouseGS->CurrentMissionIndex = MissionIndex;
@@ -117,6 +117,8 @@ void AHouseGameMode::StartMission(int32 MissionIndex)
 			HousePS->ResetForNextMission();
 		}
 	}
+
+	ChangeGamePhase(EGamePhase::MissionStart);
 }
 
 void AHouseGameMode::CheckMissionProgress()
@@ -124,9 +126,12 @@ void AHouseGameMode::CheckMissionProgress()
 	AHouseGameState* HouseGS = GetGameState<AHouseGameState>();
 	if (!HouseGS) return;
 
+	UE_LOG(LogTemp, Warning, TEXT("[CheckMissionProgress] Called. Current mission: %d"), HouseGS->CurrentMissionIndex); 
+	
 	if (HouseGS->AreAllPlayersMissionComplete())
 	{
-		UE_LOG(LogTemp, Warning, TEXT("All mission complete"));
+		UE_LOG(LogTemp, Warning, TEXT("[CheckMissionProgress] All missions complete, advancing..."));
+		//UE_LOG(LogTemp, Warning, TEXT("All mission complete"));
 		AdvanceToNextMission();
 	}
 }
@@ -148,9 +153,14 @@ void AHouseGameMode::AdvanceToNextMission()
 	}
 	
 	// 다음 미션 시작
-	HouseGS->CurrentPhase = EGamePhase::MissionComplete;
-	
-	StartMission(NextMissionIndex);
+	ChangeGamePhase(EGamePhase::MissionComplete);
+
+	FTimerHandle TimerHandle;
+	GetWorldTimerManager().SetTimer(TimerHandle, FTimerDelegate::CreateLambda([this, NextMissionIndex]
+	{
+		StartMission(NextMissionIndex);
+		
+	}),1.f, false);
 }
 
 void AHouseGameMode::FailMission()

@@ -142,6 +142,7 @@ void Afirepjt_firstPlayerController::OnGamePhaseChanged(EGamePhase NewPhase)
 		AHouseGameState* HouseGS = GetWorld()->GetGameState<AHouseGameState>();
 		if (HouseGS)
 		{
+			UE_LOG(LogTemp, Warning, TEXT("Current mission idx : %d"), HouseGS->CurrentMissionIndex);
 			InGameWidget->SetMissionTextFromIndex(HouseGS->CurrentMissionIndex);
 		}
 	}
