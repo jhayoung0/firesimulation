@@ -25,6 +25,9 @@ public:
 	TObjectPtr<class USceneComponent> SceneRootComp;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TObjectPtr<class USkeletalMeshComponent> FirehoseComp;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TObjectPtr<class UNiagaraComponent> NiagaraParticleSystemComp;
 
 	UFUNCTION(BlueprintCallable)

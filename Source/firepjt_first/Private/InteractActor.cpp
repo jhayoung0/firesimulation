@@ -82,7 +82,12 @@ void AInteractActor::ToggleWidget(bool check)
 			meshComp->SetRenderCustomDepth(true);
 			boxComp->SetSimulatePhysics(true);
 		}
-
+		// 문 상호작용  (닫기)
+		if (ActorHasTag(FName("Door")))
+		{
+			this->ToggleDoor(false); 
+		}
+		
 	}
 	else
 	{
@@ -96,6 +101,12 @@ void AInteractActor::ToggleWidget(bool check)
 			meshComp->PlayAnimation(InteractAnim, true);
 			meshComp->SetRenderCustomDepth(false);
 			boxComp->SetSimulatePhysics(false);
+		}
+
+		// 문 상호작용  (열기)
+		if (ActorHasTag(FName("Door")))
+		{
+			this->ToggleDoor(true); 
 		}
 		
 	}
