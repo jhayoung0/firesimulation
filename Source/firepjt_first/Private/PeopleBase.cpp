@@ -2,6 +2,8 @@
 
 
 #include "PeopleBase.h"
+
+#include "ASequencePlayer.h"
 #include "EnhancedInputComponent.h"
 #include "InteractActor.h"
 #include "Blueprint/UserWidget.h"
@@ -44,7 +46,7 @@ void APeopleBase::BeginPlay()
 {
 	Super::BeginPlay();
 
-
+	
 	
 	// 레벨에 있는 모든 상호작용 액터를 찾자.
 	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AInteractActor::StaticClass(), allInteractActor);
@@ -86,6 +88,12 @@ void APeopleBase::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
 
+
+	// 시네마틱 재생 중에 산소 떨어지는거 막기
+	auto* seqplayer = Cast<AASequencePlayer>
+	(UGameplayStatics::GetActorOfClass(GetWorld(), AASequencePlayer::StaticClass()));
+	if (seqplayer && seqplayer->IsPlayingCinematic) {return;}
+	
 	// 상태별 계수 먼저 갱신
 	Posture = IsCrawl ? 0.8f : 1.0f;
 
@@ -169,7 +177,7 @@ void APeopleBase::crawlAction()
 		GetFirstPersonCameraComponent()->SetRelativeRotation(CamerRotationCrawl);
 
 		// mesh 높이 조정
-		GetMesh()->SetRelativeLocation(FVector(0.000000,0.000000,-45.000000));
+		GetMesh()->SetRelativeLocation(FVector(0.000000,0.000000,-35.000000));
 	}
 }
 

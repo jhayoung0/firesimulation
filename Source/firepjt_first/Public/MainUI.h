@@ -6,6 +6,8 @@
 #include "Blueprint/UserWidget.h"
 #include "MainUI.generated.h"
 
+class UTextureRenderTarget2D;
+
 /**
  * 
  */
@@ -38,6 +40,21 @@ public:
 	// 산소 바 산소 설정
 	UFUNCTION()
 	void SetOxygenPercent(float percent);
+
+
+	/*
+	UPROPERTY(meta=(BindWidget))
+	UUserWidget* cinematicWBP;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Cinematic")
+	TObjectPtr<UTextureRenderTarget2D> CinematicRenderTarget;
+
+	
+	UFUNCTION()
+	void ToggleCinematic(bool Open);
+	*/
+
+	
 
 	
 };

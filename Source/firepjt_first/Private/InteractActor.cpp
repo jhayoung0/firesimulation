@@ -81,6 +81,8 @@ void AInteractActor::ToggleWidget(bool check)
 			meshComp->SetAnimationMode(EAnimationMode::Type::AnimationBlueprint);
 			meshComp->SetRenderCustomDepth(true);
 			boxComp->SetSimulatePhysics(true);
+
+	
 		}
 		// 문 상호작용  (닫기)
 		if (ActorHasTag(FName("Door")))

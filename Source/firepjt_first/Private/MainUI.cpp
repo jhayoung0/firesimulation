@@ -24,3 +24,17 @@ void UMainUI::SetOxygenPercent(float percent)
 	OxygenBar->SetPercent(percent);
 }
 
+/*
+void UMainUI::ToggleCinematic(bool Open)
+{
+	if (Open)
+	{
+		cinematicWBP->SetVisibility(ESlateVisibility::Visible);
+	}
+	else
+	{
+		cinematicWBP->SetVisibility(ESlateVisibility::Hidden);
+	}
+}
+
+*/
