@@ -12,6 +12,7 @@
 #include "Cubee/InGameWidget.h"
 #include "Cubee/LobbyGameMode.h"
 #include "Cubee/LobbyWidget.h"
+#include "Cubee/VictoryWidget.h"
 #include "Widgets/Input/SVirtualJoystick.h"
 
 Afirepjt_firstPlayerController::Afirepjt_firstPlayerController()
@@ -43,7 +44,7 @@ void Afirepjt_firstPlayerController::BeginPlay()
 
 	}
 
-	// 여기서부터는 추후에 독립된 컨트롤러로 옮길 수 있음
+	// 로비 위젯 및 마우스 커서 관리
 	if (IsLocalController())
 	{
 		FString WorldName = GetWorld()->GetName();
@@ -144,6 +145,16 @@ void Afirepjt_firstPlayerController::OnGamePhaseChanged(EGamePhase NewPhase)
 		{
 			UE_LOG(LogTemp, Warning, TEXT("Current mission idx : %d"), HouseGS->CurrentMissionIndex);
 			InGameWidget->SetMissionTextFromIndex(HouseGS->CurrentMissionIndex);
+		}
+	}
+	else if (NewPhase == EGamePhase::Victory)
+	{
+		InGameWidget->RemoveFromParent();
+
+		VictoryWidget = CreateWidget<UVictoryWidget>(this, VictoryWidgetClass);
+		if (VictoryWidget)
+		{
+			VictoryWidget->AddToViewport();
 		}
 	}
 }

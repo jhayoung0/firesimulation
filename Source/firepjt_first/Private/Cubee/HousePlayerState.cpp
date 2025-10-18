@@ -10,6 +10,7 @@ AHousePlayerState::AHousePlayerState()
 {
 	PlayerRole = EPlayerRole::None;
 	bCurrentMissionComplete = false;
+	bIsOutOfOxygen = false;
 }
 
 void AHousePlayerState::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const
@@ -18,6 +19,7 @@ void AHousePlayerState::GetLifetimeReplicatedProps(TArray<class FLifetimePropert
 
 	DOREPLIFETIME(AHousePlayerState, PlayerRole);
 	DOREPLIFETIME(AHousePlayerState, bCurrentMissionComplete);
+	DOREPLIFETIME(AHousePlayerState, bIsOutOfOxygen);
 }
 
 void AHousePlayerState::SetMissionComplete()

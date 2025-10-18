@@ -46,6 +46,9 @@ public:
 	UPROPERTY(Replicated, BlueprintReadOnly, Category = "Player")
 	EPlayerRole PlayerRole = EPlayerRole::None;
 
+	UPROPERTY(Replicated, BlueprintReadOnly, Category = "Player")
+	bool bIsOutOfOxygen = false;
+	
 public:
 	// 미션 상태
 	UPROPERTY(Replicated, BlueprintReadOnly, Category = "Mission")
@@ -56,4 +59,5 @@ public:
 	// 미션 상태 리셋
 	UFUNCTION(BlueprintCallable, Category = "Mission")
 	void ResetForNextMission();
+	
 };

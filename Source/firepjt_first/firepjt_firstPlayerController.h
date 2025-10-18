@@ -62,6 +62,12 @@ protected:
 	UPROPERTY()
 	class UInGameWidget* InGameWidget;
 
+	UPROPERTY(EditDefaultsOnly, Category = "UI")
+	TSubclassOf<UUserWidget> VictoryWidgetClass;
+
+	UPROPERTY()
+	class UVictoryWidget* VictoryWidget;
+
 	// Mission DataTable(테스트용. 추후 위치 변경 가능)
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Mission")
 	class UDataTable* MissionDataTable;

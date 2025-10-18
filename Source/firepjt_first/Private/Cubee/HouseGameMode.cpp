@@ -145,8 +145,8 @@ void AHouseGameMode::AdvanceToNextMission()
 
 	if (NextMissionIndex >= TotalMissions)
 	{
-		// 승리!                                                                                                                                              
-		HouseGS->CurrentPhase = EGamePhase::Victory;
+		// 승리!
+		ChangeGamePhase(EGamePhase::Victory);
 
 		GetWorldTimerManager().ClearTimer(MissionTimerHandle);
 		return;
