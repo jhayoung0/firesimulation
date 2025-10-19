@@ -64,6 +64,11 @@ void UPhoneWidget::TryCall()
 	{
 		auto* peoplebase = Cast<APeopleBase>(UGameplayStatics::GetPlayerPawn(GetWorld(),0));
 		peoplebase->Interaction();
+
+		// 전화 sfx
+		UGameplayStatics::PlaySound2D(this, callSound);
+		// 다음 미션으로 넘기기
+		peoplebase->GoNextMission();
 	}
 	else
 	{

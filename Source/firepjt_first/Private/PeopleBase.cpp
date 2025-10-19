@@ -39,6 +39,10 @@ APeopleBase::APeopleBase()
 
 	compActorPeople = CreateDefaultSubobject<USceneComponent>(TEXT("InteractingPeople"));
 	compActorPeople ->SetupAttachment(GetMesh(), TEXT("hand_l"));
+
+	// 캡슐 hit
+	UCapsuleComponent* Cap = GetCapsuleComponent();
+	Cap->SetGenerateOverlapEvents(true);
 	
 }
 
@@ -46,6 +50,11 @@ void APeopleBase::BeginPlay()
 {
 	Super::BeginPlay();
 
+	// 콜리젼 이벤트 바인딩
+	if (UCapsuleComponent* Cap = GetCapsuleComponent())
+	{
+		Cap->OnComponentBeginOverlap.AddDynamic(this, &APeopleBase::OnCapsuleBeginOverlap);
+	}
 	
 	
 	// 레벨에 있는 모든 상호작용 액터를 찾자.
@@ -101,7 +110,7 @@ void APeopleBase::Tick(float DeltaSeconds)
 		Gear = 0.4f;
 	}
 	else if (HasWetTowel) {
-		Gear = 0.95f;
+		Gear = 0.8f;
 	}
 	else {
 		Gear = 1.0f;
@@ -371,6 +380,51 @@ void APeopleBase::DetachActor(AInteractActor* tempActor)
 	InteractingActor = nullptr;
 }
 
+
+void APeopleBase::GoNextMission()
+{
+	// 다음 미션으로 넘기기
+	auto* housePs = Cast<AHousePlayerState>(this->GetPlayerState());
+	housePs->SetMissionComplete();
+}
+
+void APeopleBase::OnCapsuleBeginOverlap(UPrimitiveComponent* OverlappedComp,
+	AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex,
+	bool bFromSweep, const FHitResult& SweepResult)
+{
+
+	if (!OtherActor || !OtherComp) return;
+	if (OtherActor == this) return; // 자기 자신 무시
+
+	// 원하는 Collision Profile과 일치하는지 체크
+	const FName Profile = OtherComp->GetCollisionProfileName();
+
+	if (AllowedProfiles.Contains(Profile))
+	{
+		if (UCapsuleComponent* Cap = GetCapsuleComponent())
+		{
+			Cap->SetGenerateOverlapEvents(false);
+		}
+
+		// 다음 미션으로 가기
+		this->GoNextMission();
+
+		// 5초뒤에 콜리젼 다시 켜기
+		FTimerHandle colhandle;
+		GetWorldTimerManager().SetTimer(
+			colhandle, this, &APeopleBase::CollisionActivate,
+			5.0f, false );
+	}
+	
+}
+
+void APeopleBase::CollisionActivate()
+{
+	if (UCapsuleComponent* Cap = GetCapsuleComponent())
+	{
+		Cap->SetGenerateOverlapEvents(true);
+	}
+}
 
 
 /*

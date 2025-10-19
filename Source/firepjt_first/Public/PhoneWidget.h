@@ -22,6 +22,9 @@ public:
 	UPROPERTY(meta=(BindWidget))
 	class UButton* callButton;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category= sfx)
+	class USoundBase* callSound;
+	
 	// 버튼 1~9
 	UPROPERTY(meta = (BindWidget)) UButton* Btn_1;
 	UPROPERTY(meta = (BindWidget)) UButton* Btn_2;

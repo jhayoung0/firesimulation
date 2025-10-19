@@ -121,6 +121,10 @@ public: // stat
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Stats)
 	bool HasMask = false;
 
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Stats)
+	bool RescuePeople  = false;
+	
 protected:
 	float PreviousGear = -1.f;
 	bool bPreviousHasMask = false;
@@ -134,10 +138,27 @@ public: // widget
 	UMainUI* mainui = nullptr;
 
 
+public: // 다음 미션으로 넘기는 함수
+	UFUNCTION()
+	void GoNextMission();
 
 
+	// 미션 넘기기
+	UFUNCTION()
+	void OnCapsuleBeginOverlap(
+		UPrimitiveComponent* OverlappedComp,
+		AActor* OtherActor,
+		UPrimitiveComponent* OtherComp,
+		int32 OtherBodyIndex,
+		bool bFromSweep,
+		const FHitResult& SweepResult);
+	
+	UPROPERTY(EditAnywhere, Category="Mission|Trigger")
+	TSet<FName> AllowedProfiles = { FName(TEXT("Mission")) };
 
 
+	UFUNCTION()
+	void CollisionActivate();
 	
 
 public:// 상호작용 액터
