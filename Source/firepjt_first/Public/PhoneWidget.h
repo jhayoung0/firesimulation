@@ -9,12 +9,20 @@
 /**
  * 
  */
+
+// 델리게이트 선언 (번호 전달)
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnDialCall, const FString&, DialNumber);
+
 UCLASS()
 class FIREPJT_FIRST_API UPhoneWidget : public UUserWidget
 {
 	GENERATED_BODY()
 
+public:
+	UPROPERTY(BlueprintAssignable, Category="Phone")
+	FOnDialCall OnDialCall;
 
+	
 public:
 	UPROPERTY(meta=(BindWidget))
 	class UTextBlock* callText;
@@ -25,6 +33,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category= sfx)
 	class USoundBase* callSound;
 	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category= sfx)
+    class USoundBase* callbuttonSound;
+		
 	// 버튼 1~9
 	UPROPERTY(meta = (BindWidget)) UButton* Btn_1;
 	UPROPERTY(meta = (BindWidget)) UButton* Btn_2;
@@ -69,5 +80,7 @@ public:
 	void OnNumberClicked_9();
 
 	virtual void NativeConstruct() override;
+
+
 
 };

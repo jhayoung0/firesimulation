@@ -3,8 +3,10 @@
 
 #include "PeopleOnePC.h"
 
+#include "ASequencePlayer.h"
 #include "PeopleBase.h"
 #include "GameFramework/GameModeBase.h"
+#include "Kismet/GameplayStatics.h"
 
 
 void APeopleOnePC::BeginPlay()
@@ -34,6 +36,13 @@ void APeopleOnePC::OpenPhoneUI()
 	SetIgnoreLookInput(true);
 	SetIgnoreMoveInput(true);
 	
+	AASequencePlayer* Seq = Cast<AASequencePlayer>(
+		UGameplayStatics::GetActorOfClass(GetWorld(), AASequencePlayer::StaticClass())
+	);
+	if (Seq && phoneUI)
+	{
+		Seq->BindToPhoneWidget(phoneUI); 
+	}
 	
 	
 }

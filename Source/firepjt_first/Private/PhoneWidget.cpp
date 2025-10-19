@@ -2,6 +2,8 @@
 
 
 #include "PhoneWidget.h"
+
+#include "ASequencePlayer.h"
 #include "PeopleBase.h"
 #include "Components/Button.h"
 #include "Components/TextBlock.h"
@@ -10,6 +12,9 @@
 void UPhoneWidget::AppendDigit(const FString& Digit)
 {
 
+	// 버튼 sfx
+	UGameplayStatics::PlaySound2D(this, callbuttonSound);
+		
 	// 숫자만 허용 
 	if (Digit.Len() == 1 && FChar::IsDigit(Digit[0]))
 	{
@@ -18,7 +23,7 @@ void UPhoneWidget::AppendDigit(const FString& Digit)
 			RawNumber += Digit;
 			if (callText)
 				callText->SetText(FText::FromString(RawNumber));
-				UE_LOG(LogTemp, Warning, TEXT("SetText -> %s"), *RawNumber);
+			
 			
 		}
 	}
@@ -28,7 +33,7 @@ void UPhoneWidget::AppendDigit(const FString& Digit)
 
 
 // 버튼 클릭 시 숫자 추가
-void UPhoneWidget::OnNumberClicked_1() { UE_LOG(LogTemp, Warning, TEXT("Btn_1 clicked")); AppendDigit(TEXT("1")); }
+void UPhoneWidget::OnNumberClicked_1() { AppendDigit(TEXT("1")); }
 void UPhoneWidget::OnNumberClicked_2() { AppendDigit(TEXT("2")); }
 void UPhoneWidget::OnNumberClicked_3() { AppendDigit(TEXT("3")); }
 void UPhoneWidget::OnNumberClicked_4() { AppendDigit(TEXT("4")); }
@@ -60,9 +65,12 @@ void UPhoneWidget::NativeConstruct()
 
 void UPhoneWidget::TryCall()
 {
+	OnDialCall.Broadcast(RawNumber);
+	
 	if (RawNumber== TEXT("119"))
 	{
-		auto* peoplebase = Cast<APeopleBase>(UGameplayStatics::GetPlayerPawn(GetWorld(),0));
+		auto* world = GetWorld();
+		auto* peoplebase = Cast<APeopleBase>(UGameplayStatics::GetPlayerPawn(world,0));
 		peoplebase->Interaction();
 
 		// 전화 sfx

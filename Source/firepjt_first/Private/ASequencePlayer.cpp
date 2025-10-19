@@ -28,9 +28,12 @@ void AASequencePlayer::Tick(float DeltaTime)
 void AASequencePlayer::BeginPlay()
 {
 	Super::BeginPlay();
-
+	
+	
+	
+	 
 	// cinematic UI를 만들자
-	if (cinematicwidget)
+	if (!cinematicUI && cinematicwidget)
 	{
 		cinematicUI = CreateWidget<UCinematicUI>(GetWorld(), cinematicwidget);
 		if (cinematicUI)
@@ -39,8 +42,13 @@ void AASequencePlayer::BeginPlay()
 		}
 	}
 
+
 	
-	cinematicUI->OpenWidgetToggle(false);
+	
+	if (cinematicUI)
+	{
+		cinematicUI->OpenWidgetToggle(false);
+	}
 
 	
 	if (FirstSequence)
@@ -61,7 +69,10 @@ void AASequencePlayer::BeginPlay()
 
 void AASequencePlayer::OnFirstSequenceFinished()
 {
-	cinematicUI->NextWidgetStart();
+	if (cinematicUI)
+	{
+		cinematicUI->NextWidgetStart();
+	}
 	
 	// 2번째 시퀀스 재생
 	if (SecondSequence)
@@ -73,14 +84,103 @@ void AASequencePlayer::OnFirstSequenceFinished()
 		if (!SecondPlayer) return;
 
 		// 이건 시퀀스 끝나면 호출
-		SecondPlayer->OnFinished.AddDynamic(this, &AASequencePlayer::OnSecondSequenceFinished);
+		SecondPlayer->OnFinished.AddDynamic(this, &AASequencePlayer::OnSequenceFinished);
 		SecondPlayer->Play();
 	}
 }
 
-void AASequencePlayer::OnSecondSequenceFinished()
+void AASequencePlayer::OnSequenceFinished()
 {
 	IsPlayingCinematic = false;
-	cinematicUI->CloseWidget();
+	if (cinematicUI)
+	{
+		cinematicUI->CloseWidget();
+	}
+	
+}
+
+void AASequencePlayer::MissionOneSequencePlay()
+{
+
+	// cinematic UI를 만들자
+	UE_LOG(LogTemp, Log, TEXT("MissionOneSequencePlay called"));
+
+
+	if (!cinematicUI && cinematicwidget)
+	{
+		cinematicUI = CreateWidget<UCinematicUI>(GetWorld(), cinematicwidget);
+		if (cinematicUI)
+		{
+			cinematicUI->AddToViewport();
+		}
+	}
+
+
+	// 듀얼 화면 띄우기
+	if (cinematicUI)
+	{
+		cinematicUI->OpenWidgetToggle(true);
+	}
+
+	
+	if (Mission1_Fireman_Sequence && Mission1_People_Sequence)
+	{
+		FMovieSceneSequencePlaybackSettings Settings;
+		ALevelSequenceActor* SeqActor = nullptr;
+		Mission1_Fireman_Player =
+			ULevelSequencePlayer::CreateLevelSequencePlayer(GetWorld(), Mission1_Fireman_Sequence, Settings, SeqActor);
+		if (!Mission1_Fireman_Player)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("MissionOneSequencePlay: Failed to create Fireman sequence player"));
+			return;
+		}
+
+		Mission1_People_Player =
+			ULevelSequencePlayer::CreateLevelSequencePlayer(GetWorld(), Mission1_People_Sequence, Settings, SeqActor);
+		if (!Mission1_People_Player)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("MissionOneSequencePlay: Failed to create People sequence player"));
+			return;
+		}
+		
+		// 이건 시퀀스 끝나면 호출
+		Mission1_Fireman_Player->OnFinished.AddDynamic(this, &AASequencePlayer::OnSequenceFinished);
+		Mission1_Fireman_Player->Play();
+		Mission1_People_Player->Play();
+		
+		IsPlayingCinematic = true;
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("MissionOneSequencePlay: Sequence assets are missing"));
+	}
+	
+}
+
+static FString NormalizeDial(FString S)
+{
+	S.ReplaceInline(TEXT(" "), TEXT(""));
+	S.ReplaceInline(TEXT("-"), TEXT(""));
+	S.ReplaceInline(TEXT("("), TEXT(""));
+	S.ReplaceInline(TEXT(")"), TEXT(""));
+	return S;
+}
+
+
+void AASequencePlayer::HandleDialCall(const FString& DialNumber)
+{
+	const FString Dial = NormalizeDial(DialNumber);
+	if (Dial != TEXT("119")) return;
+
+	// 듀얼 시네마틱 재생
+	MissionOneSequencePlay();
+	
+}
+
+void AASequencePlayer::BindToPhoneWidget(class UPhoneWidget* InWidget)
+{
+	if (!InWidget) return;
+	InWidget->OnDialCall.AddDynamic(this, &AASequencePlayer::HandleDialCall);
+	
 }
 

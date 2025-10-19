@@ -55,7 +55,9 @@ void APeopleBase::BeginPlay()
 	{
 		Cap->OnComponentBeginOverlap.AddDynamic(this, &APeopleBase::OnCapsuleBeginOverlap);
 	}
-	
+
+	// sequence actor 찾기
+	SequenceActor = Cast<AASequencePlayer>(UGameplayStatics::GetActorOfClass(GetWorld(), AASequencePlayer::StaticClass()));
 	
 	// 레벨에 있는 모든 상호작용 액터를 찾자.
 	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AInteractActor::StaticClass(), allInteractActor);
@@ -130,13 +132,7 @@ void APeopleBase::Tick(float DeltaSeconds)
 	// 산소 소모 계산
 	const float OxygenDrain = BaseRate * Posture * Gear * DeltaSeconds;
 	currOxygen -= OxygenDrain;
-	UE_LOG(LogTemp, Log, TEXT("OxygenTick - BaseRate: %.2f, Posture: %.2f, Gear: %.2f, DeltaSeconds: %.3f, Drain: %.3f, currOxygen: %.2f"),
-		BaseRate,
-		Posture,
-		Gear,
-		DeltaSeconds,
-		OxygenDrain,
-		currOxygen);
+	
 
 	// 0 이하 방지
 	currOxygen = FMath::Clamp(currOxygen, 0.0f, maxOxygen);
@@ -357,13 +353,13 @@ void APeopleBase::DetachActor(AInteractActor* tempActor)
 	{
 		if (tempActor->ActorHasTag(FName("Mask")))
 		{
-			UE_LOG(LogTemp, Log, TEXT("mask!"));
+		
 			HasMask = false;
 			mainui->ShowMaskUI(false);
 		}
 		else if (tempActor->ActorHasTag(FName("WetTowel")))
 		{
-			UE_LOG(LogTemp, Log, TEXT("WetTowel!"));
+			
 			HasWetTowel = false;
 			InteractingActor->ChangeTowel(false);
 		}
@@ -434,18 +430,3 @@ void APeopleBase::CollisionActivate()
 	}
 }
 
-
-/*
-
-	const FMotionRow* Row = MotionTable->FindRow<FMotionRow>(Rowkey, TEXT("PlaySignAnimByKey"));
-	if (USkeletalMeshComponent* MeshComp = GetMesh())
-	{
-		// AnimBP를 거치지 않고 단일 애니메이션 모드로 전환
-		MeshComp->SetAnimationMode(EAnimationMode::AnimationSingleNode);
-
-		// 루프 재생
-		MeshComp->PlayAnimation(Row->signAnim, true);
-		return true;
-	}
-	return false;
-*/
