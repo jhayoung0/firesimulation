@@ -30,6 +30,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TObjectPtr<class UNiagaraComponent> NiagaraParticleSystemComp;
 
+	// Water Shot
 	UFUNCTION(BlueprintCallable)
 	void OnWaterShot();
 	
@@ -39,5 +40,12 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void OnSprayShotMode();
 
+	bool GetDoesWaterShotNow();
+
 	virtual void ReceiveParticleData_Implementation(const TArray<FBasicParticleData>& Data, UNiagaraSystem* NiagaraSystem, const FVector& SimulationPositionOffset) override;
+
+private:
+	bool bDoesWaterShotNow = false;
+	bool bDoesSprayShotNow = false;
+	bool bDoesDirectShotNow = false;
 };

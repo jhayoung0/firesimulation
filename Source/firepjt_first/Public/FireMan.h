@@ -34,6 +34,19 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TObjectPtr<class UChildActorComponent> WaterComp;
 
+	// FireHose
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	TObjectPtr<class AFireHose> FireHoseActor;
+	bool bDoesEquipFireHose = false;
+	
+	// Crowbar
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	TObjectPtr<class USkeletalMeshComponent> CrowbarMeshComp;
+	bool bDoesEquipCrowbar = false;
+
+	// Carry Person
+	bool bDoesCarryingPerson = false;
+
 	// Mask
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	TSubclassOf<class AInteractActor> MaskActor;
@@ -56,21 +69,27 @@ private:
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<class UInputAction> InteractAction;
 	UPROPERTY(VisibleAnywhere)
-	TObjectPtr<class UInputAction> AxeAction;
+	TObjectPtr<class UInputAction> EquipFireHoseAction;
 	UPROPERTY(VisibleAnywhere)
-	TObjectPtr<class UInputAction> FireHoseAction;
+	TObjectPtr<class UInputAction> EquipCrowbarAction;
+	UPROPERTY(VisibleAnywhere)
+	TObjectPtr<class UInputAction> UseToolAction;
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<class UInputAction> MaskOutAction;
 
 	void OnMove(const struct FInputActionValue& value);
 	void OnLook(const struct FInputActionValue& value);
-	void OnInteract(const struct FInputActionValue& value);
-	void OnAxe(const struct FInputActionValue& value);
-	void OnFireHose(const struct FInputActionValue& value);
-	void OnMaskOut(const struct FInputActionValue& value);
+	void OnInteract();
+	void OnEquipFireHose();
+	void OnEquipCrowbar();
+	void OnUseTool();
+	void OnMaskOut();
+	void OnCarryPerson();
 
 	// Movement Variables
 	FVector direction;
 	float WalkSpeed;
-	
+
+	// FireHose Off
+	void OffFireHose();
 };

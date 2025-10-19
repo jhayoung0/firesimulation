@@ -16,9 +16,11 @@ AFireHose::AFireHose()
 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
+	// Root Component
 	SceneRootComp = CreateDefaultSubobject<USceneComponent>("SceneRoot");
 	SetRootComponent(SceneRootComp);
 
+	// Firehose Component
 	FirehoseComp = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("FirehoseComp"));
 	ConstructorHelpers::FObjectFinder<USkeletalMesh> FirehoseMeshRef(TEXT("/Script/Engine.SkeletalMesh'/Game/CustomContents/Fireman/Water/firefighter_vision_fire_nozzle_turbo/StaticMeshes/SKM_firefighter_vision_fire_nozzle_turbo.SKM_firefighter_vision_fire_nozzle_turbo'"));
 	if (FirehoseMeshRef.Succeeded())
@@ -27,6 +29,7 @@ AFireHose::AFireHose()
 	}
 	FirehoseComp->SetupAttachment(RootComponent);
 
+	// Niagara Component
 	NiagaraParticleSystemComp = CreateDefaultSubobject<UNiagaraComponent>("ParticleSystemComponent");
 	ConstructorHelpers::FObjectFinder<UNiagaraSystem> niagaraCompRef(TEXT("/Script/Niagara.NiagaraSystem'/Game/CustomContents/Fireman/Water/NS_Water.NS_Water'"));
 	if (niagaraCompRef.Succeeded())
@@ -53,22 +56,50 @@ void AFireHose::Tick(float DeltaTime)
  
 void AFireHose::OnWaterShot()
 {
-	NiagaraParticleSystemComp->SetAutoActivate(true);
+	// activate or deactivate water effect
+	if (bDoesWaterShotNow)
+	{
+		NiagaraParticleSystemComp->Deactivate();
+		bDoesWaterShotNow = false;
+	}
+	else
+	{
+		NiagaraParticleSystemComp->Activate(true);
+		bDoesWaterShotNow = true;
+	}
 }
 
 void AFireHose::OnDirectShotMode()
 {
+	if (bDoesSprayShotNow)
+	{
+		// direct shot
+		bDoesSprayShotNow = false;
+		bDoesDirectShotNow = true;
+	}
 }
 
 void AFireHose::OnSprayShotMode()
 {
+	if (bDoesDirectShotNow)
+	{
+		// spray shot
+		bDoesSprayShotNow = true;
+		bDoesDirectShotNow = false;
+	}
+}
+
+bool AFireHose::GetDoesWaterShotNow()
+{
+	return bDoesWaterShotNow;
 }
 
 void AFireHose::ReceiveParticleData_Implementation(const TArray<FBasicParticleData>& Data,
-	UNiagaraSystem* NiagaraSystem, const FVector& SimulationPositionOffset)
+                                                   UNiagaraSystem* NiagaraSystem, const FVector& SimulationPositionOffset)
 {
 	INiagaraParticleCallbackHandler::ReceiveParticleData_Implementation(Data, NiagaraSystem, SimulationPositionOffset);
 
+	// for end pos
 	FVector offset = FVector(1, 1, 1);
 
 	FCollisionQueryParams params;
@@ -78,7 +109,8 @@ void AFireHose::ReceiveParticleData_Implementation(const TArray<FBasicParticleDa
 	{
 		FVector start = data.Position;
 		FVector end = start + offset;
-		
+
+		// make sphere trace by channel
 		FHitResult hitResult;
 		bool bHit = GetWorld()->SweepSingleByChannel(
 			hitResult,
@@ -93,6 +125,7 @@ void AFireHose::ReceiveParticleData_Implementation(const TArray<FBasicParticleDa
 		
 		if (bHit)
 		{
+			// if fire hit
 			if (AFireActor* fire = Cast<AFireActor>(hitResult.GetActor()))
 			{
 				fire->PutOutFire();
