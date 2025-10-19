@@ -46,7 +46,6 @@ public: // 인터랙트 컴포넌트 붙이기 (아웃라인, 가까이 갔을 �
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	class UInteractWidget* InteractUI;
 
-
 	
 
 	UFUNCTION(BlueprintImplementableEvent)
