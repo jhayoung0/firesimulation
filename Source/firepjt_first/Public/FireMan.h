@@ -42,6 +42,10 @@ public:
 	// Crowbar
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	TObjectPtr<class USkeletalMeshComponent> CrowbarMeshComp;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	TSubclassOf<class AInteractActor> DoorClass;
+	UPROPERTY()
+	TObjectPtr<AActor> DoorActor;
 	bool bDoesEquipCrowbar = false;
 
 	// Carry Person
@@ -52,10 +56,11 @@ public:
 	TSubclassOf<class AInteractActor> MaskActor;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float PersonDist = 1000.f;
-	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float MaskSpawnDist = 100.f;
+
+	// Interact
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float InteractDist = 1000.f;
 	
 private:
 	// Inputs
@@ -67,11 +72,11 @@ private:
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<class UInputAction> LookAction;
 	UPROPERTY(VisibleAnywhere)
-	TObjectPtr<class UInputAction> InteractAction;
-	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<class UInputAction> EquipFireHoseAction;
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<class UInputAction> EquipCrowbarAction;
+	UPROPERTY(VisibleAnywhere)
+	TObjectPtr<class UInputAction> FireHoseAction;
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<class UInputAction> UseToolAction;
 	UPROPERTY(VisibleAnywhere)
@@ -79,9 +84,9 @@ private:
 
 	void OnMove(const struct FInputActionValue& value);
 	void OnLook(const struct FInputActionValue& value);
-	void OnInteract();
 	void OnEquipFireHose();
 	void OnEquipCrowbar();
+	void OnFireHoseShot();
 	void OnUseTool();
 	void OnMaskOut();
 	void OnCarryPerson();
