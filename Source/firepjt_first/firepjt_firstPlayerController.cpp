@@ -2,6 +2,8 @@
 
 
 #include "firepjt_firstPlayerController.h"
+
+#include "ASequencePlayer.h"
 #include "EnhancedInputSubsystems.h"
 #include "Engine/LocalPlayer.h"
 #include "InputMappingContext.h"
@@ -13,6 +15,7 @@
 #include "Cubee/LobbyGameMode.h"
 #include "Cubee/LobbyWidget.h"
 #include "Cubee/VictoryWidget.h"
+#include "Kismet/GameplayStatics.h"
 #include "Widgets/Input/SVirtualJoystick.h"
 
 Afirepjt_firstPlayerController::Afirepjt_firstPlayerController()
@@ -125,6 +128,23 @@ void Afirepjt_firstPlayerController::BindToGameStateEvents()
 
 void Afirepjt_firstPlayerController::OnGamePhaseChanged(EGamePhase NewPhase)
 {
+	if (NewPhase == EGamePhase::Intro)
+	{
+		// 맵에 있는 Sequence player 준비
+		SequenceActor = UGameplayStatics::GetActorOfClass(GetWorld(), AASequencePlayer::StaticClass());
+		if (SequenceActor)
+		{
+			AASequencePlayer* SequencePlayer = Cast<AASequencePlayer>(SequenceActor);
+			if (SequencePlayer)
+			{
+				SequencePlayer->PlayIntroSequence();
+			}
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("SequencePlayer not found!"));
+		}
+	}
 	if (NewPhase == EGamePhase::GameStart)
 	{
 		if (InGameWidgetClass)

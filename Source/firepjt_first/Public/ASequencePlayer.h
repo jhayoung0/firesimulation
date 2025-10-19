@@ -61,6 +61,7 @@ public:
 	UPROPERTY()
 	TObjectPtr<ULevelSequencePlayer> Mission1_Fireman_Player;
 
+	void PlayIntroSequence();
 
 	// 미션 2 ..
 

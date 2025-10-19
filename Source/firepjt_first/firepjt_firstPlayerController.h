@@ -87,4 +87,8 @@ protected:
 
 	UFUNCTION()
 	void OnGamePhaseChanged(EGamePhase NewPhase);
+
+protected:
+	// Cinematic
+	class AActor* SequenceActor;
 };
