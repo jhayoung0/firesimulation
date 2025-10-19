@@ -31,12 +31,12 @@ void AHouseGameMode::BeginPlay()
 		UE_LOG(LogTemp, Warning, TEXT("[HouseGameMode] Waiting to start"));
 
 		// 시작 시네마틱
-		UE_LOG(LogTemp, Warning, TEXT("[HouseGameMode] Cinematic"));
-
-		// 델리게이트 설정 전 바인딩 방지
 		FTimerHandle TimerHandle;
-		GetWorldTimerManager().SetTimer(TimerHandle, this, &AHouseGameMode::StartGame,
-		1.f, false);
+		GetWorldTimerManager().SetTimer(TimerHandle, FTimerDelegate::CreateLambda([&]
+		{
+			ChangeGamePhase(EGamePhase::Intro);
+			
+		}), 1.f, false);
 	}
 }
 

@@ -10,6 +10,7 @@
 #include "Engine/SceneCapture2D.h"
 #include "Engine/TextureRenderTarget2D.h"
 #include "Components/SceneCaptureComponent2D.h"
+#include "Cubee/HouseGameMode.h"
 
 // Sets default values
 AASequencePlayer::AASequencePlayer()
@@ -28,7 +29,11 @@ void AASequencePlayer::Tick(float DeltaTime)
 void AASequencePlayer::BeginPlay()
 {
 	Super::BeginPlay();
+	
+}
 
+void AASequencePlayer::PlayIntroSequence()
+{
 	// cinematic UI를 만들자
 	if (cinematicwidget)
 	{
@@ -56,7 +61,6 @@ void AASequencePlayer::BeginPlay()
 		FirstPlayer->Play();
 		IsPlayingCinematic = true;
 	}
-	
 }
 
 void AASequencePlayer::OnFirstSequenceFinished()
@@ -82,5 +86,15 @@ void AASequencePlayer::OnSecondSequenceFinished()
 {
 	IsPlayingCinematic = false;
 	cinematicUI->CloseWidget();
+
+	// 두번쨰까지 끝나면 게임 시작
+	if (HasAuthority())
+	{
+		AHouseGameMode* GM = Cast<AHouseGameMode>(GetWorld()->GetAuthGameMode());
+		if (GM)
+		{
+			GM->StartGame();
+		}
+	}
 }
 
