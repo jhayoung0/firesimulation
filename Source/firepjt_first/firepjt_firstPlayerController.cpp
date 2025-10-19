@@ -8,7 +8,11 @@
 #include "firepjt_firstCameraManager.h"
 #include "Blueprint/UserWidget.h"
 #include "firepjt_first.h"
+#include "Cubee/HouseGameState.h"
+#include "Cubee/InGameWidget.h"
+#include "Cubee/LobbyGameMode.h"
 #include "Cubee/LobbyWidget.h"
+#include "Cubee/VictoryWidget.h"
 #include "Widgets/Input/SVirtualJoystick.h"
 
 Afirepjt_firstPlayerController::Afirepjt_firstPlayerController()
@@ -20,7 +24,6 @@ Afirepjt_firstPlayerController::Afirepjt_firstPlayerController()
 void Afirepjt_firstPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
-
 	
 	// only spawn touch controls on local player controllers
 	if (SVirtualJoystick::ShouldDisplayTouchInterface() && IsLocalPlayerController())
@@ -41,7 +44,7 @@ void Afirepjt_firstPlayerController::BeginPlay()
 
 	}
 
-	// 여기서부터는 추후에 독립된 컨트롤러로 옮길 수 있음
+	// 로비 위젯 및 마우스 커서 관리
 	if (IsLocalController())
 	{
 		FString WorldName = GetWorld()->GetName();
@@ -51,12 +54,14 @@ void Afirepjt_firstPlayerController::BeginPlay()
 		{
 			SetShowMouseCursor(false);
 			SetInputMode(FInputModeGameOnly());
+
+			BindToGameStateEvents();
 		}
 		else if (WorldName.Contains(TEXT("Lobby")))
 		{
 			SetShowMouseCursor(true);
 			SetInputMode(FInputModeUIOnly());
-			
+
 			// Create Lobby widget
 			if (LobbyWidgetClass)
 			{
@@ -64,6 +69,9 @@ void Afirepjt_firstPlayerController::BeginPlay()
 				if (LobbyWidget)
 				{
 					LobbyWidget->AddToViewport();
+
+					// Request initial player count from server
+					Server_RequestPlayerCount();
 				}
 			}
 		}
@@ -95,5 +103,78 @@ void Afirepjt_firstPlayerController::SetupInputComponent()
 			}
 		}
 	}
-	
+
 }
+
+void Afirepjt_firstPlayerController::BindToGameStateEvents()
+{
+	AHouseGameState* HouseGS = GetWorld()->GetGameState<AHouseGameState>();
+	if (HouseGS)
+	{
+		HouseGS->OnPhaseChanged.AddDynamic(this, &Afirepjt_firstPlayerController::OnGamePhaseChanged);
+		//UE_LOG(LogTemp, Warning, TEXT("[PlayerController] Successfully bound to GameState events! %d"), HasAuthority())
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("[PlayerController] GameState not ready, retrying..."));
+		FTimerHandle RetryHandle;
+		GetWorldTimerManager().SetTimer(RetryHandle, this, &Afirepjt_firstPlayerController::BindToGameStateEvents,
+			0.1f, false);
+	}
+}
+
+void Afirepjt_firstPlayerController::OnGamePhaseChanged(EGamePhase NewPhase)
+{
+	if (NewPhase == EGamePhase::GameStart)
+	{
+		if (InGameWidgetClass)
+		{
+			InGameWidget = CreateWidget<UInGameWidget>(this, InGameWidgetClass);
+			if (InGameWidget)
+			{
+				// DataTable 할당(추후 위치 변경 가능)
+				InGameWidget->AddToViewport();
+				InGameWidget->SetMissionDataTable(MissionDataTable);
+			}
+		}
+	}
+	else if (NewPhase == EGamePhase::MissionStart)
+	{
+		AHouseGameState* HouseGS = GetWorld()->GetGameState<AHouseGameState>();
+		if (HouseGS)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Current mission idx : %d"), HouseGS->CurrentMissionIndex);
+			InGameWidget->SetMissionTextFromIndex(HouseGS->CurrentMissionIndex);
+		}
+	}
+	else if (NewPhase == EGamePhase::Victory)
+	{
+		InGameWidget->RemoveFromParent();
+
+		VictoryWidget = CreateWidget<UVictoryWidget>(this, VictoryWidgetClass);
+		if (VictoryWidget)
+		{
+			VictoryWidget->AddToViewport();
+		}
+	}
+}
+
+void Afirepjt_firstPlayerController::Client_UpdatePlayerCount_Implementation(int32 CurrentPlayers, int32 MaxPlayers)
+{
+	if (LobbyWidget)
+	{
+		LobbyWidget->UpdatePlayerCount(CurrentPlayers, MaxPlayers);
+	}
+}
+
+void Afirepjt_firstPlayerController::Server_RequestPlayerCount_Implementation()
+{
+	ALobbyGameMode* LobbyGM = Cast<ALobbyGameMode>(GetWorld()->GetAuthGameMode());
+	if (LobbyGM)
+	{
+		LobbyGM->BroadcastPlayerCount();
+	}
+}
+
+
+

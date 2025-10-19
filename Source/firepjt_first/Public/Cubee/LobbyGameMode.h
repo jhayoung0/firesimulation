@@ -6,6 +6,7 @@
 #include "GameFramework/GameModeBase.h"
 #include "LobbyGameMode.generated.h"
 
+
 /**
  * 
  */
@@ -23,11 +24,15 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void StartGame();
 
+	// Broadcast player count to all clients
+	void BroadcastPlayerCount();
+
 protected:
 	// 접속해 있는 컨트롤러 array
 	UPROPERTY()
 	TArray<APlayerController*> ConnectedPlayers;
 
 	const int32 MaxPlayers = 2;
+
 	
 };

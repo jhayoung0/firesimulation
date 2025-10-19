@@ -74,9 +74,10 @@ Plugins/**/Intermediate/*
 DerivedDataCache/*
 Content/Gustav/Gustav__1_.uasset
 
-
 # JetBrains Rider / IntelliJ IDEA project files
 .idea/
+/AgentLog
+CLAUDE.md
 
 # Codex Agent
 AGENTS.md

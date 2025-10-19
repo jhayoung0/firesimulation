@@ -20,6 +20,9 @@ protected:
 public:
 	UPROPERTY(meta = (BindWidget))
 	class UButton* Btn_Start;
+
+	UPROPERTY(meta = (BindWidget))
+	class UTextBlock* Txt_PlayerCount;
 	
 	UPROPERTY(meta = (BindWidget))
 	class UButton* Btn_Firefighter;
@@ -35,4 +38,8 @@ public:
 	
 	UFUNCTION()
 	void OnCitizenClicked();
+
+public:
+	// Player count
+	void UpdatePlayerCount(int32 Current, int32 Max);
 };
