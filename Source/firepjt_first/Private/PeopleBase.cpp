@@ -128,7 +128,15 @@ void APeopleBase::Tick(float DeltaSeconds)
 	}
 
 	// 산소 소모 계산
-	currOxygen -= BaseRate * Posture * Gear * DeltaSeconds;
+	const float OxygenDrain = BaseRate * Posture * Gear * DeltaSeconds;
+	currOxygen -= OxygenDrain;
+	UE_LOG(LogTemp, Log, TEXT("OxygenTick - BaseRate: %.2f, Posture: %.2f, Gear: %.2f, DeltaSeconds: %.3f, Drain: %.3f, currOxygen: %.2f"),
+		BaseRate,
+		Posture,
+		Gear,
+		DeltaSeconds,
+		OxygenDrain,
+		currOxygen);
 
 	// 0 이하 방지
 	currOxygen = FMath::Clamp(currOxygen, 0.0f, maxOxygen);
