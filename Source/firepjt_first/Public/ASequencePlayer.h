@@ -81,7 +81,10 @@ public: // widget
 	UPROPERTY(Transient)
 	UCinematicUI* cinematicUI = nullptr;
 
-	
+
+public: // 스킵
+	UFUNCTION()
+	void DoSkip();
 
 	
 };

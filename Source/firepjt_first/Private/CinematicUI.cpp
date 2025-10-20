@@ -3,8 +3,10 @@
 
 #include "CinematicUI.h"
 
+#include "ASequencePlayer.h"
 #include "Components/Button.h"
 #include "Components/SizeBox.h"
+#include "Kismet/GameplayStatics.h"
 
 void UCinematicUI::OpenWidgetToggle(bool isdual)
 {
@@ -48,4 +50,12 @@ void UCinematicUI::OnSkipClicked()
 {
 	// 스킵 버튼 클릭
 	UE_LOG(LogTemp, Warning, TEXT("skip btn"));
+
+	auto* seq = Cast<AASequencePlayer>(UGameplayStatics::GetActorOfClass(GetWorld(), AASequencePlayer::StaticClass()));
+	if (seq)
+	{
+		seq->DoSkip();
+	}
+
+	
 }
