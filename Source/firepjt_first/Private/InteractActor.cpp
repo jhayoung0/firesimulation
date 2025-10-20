@@ -85,11 +85,6 @@ void AInteractActor::ToggleWidget(bool check)
 
 	
 		}
-		// 문 상호작용  (닫기)
-		if (ActorHasTag(FName("Door")))
-		{
-			this->ToggleDoor(); 
-		}
 		
 	}
 	else
@@ -105,12 +100,7 @@ void AInteractActor::ToggleWidget(bool check)
 			meshComp->SetRenderCustomDepth(false);
 			boxComp->SetSimulatePhysics(false);
 		}
-
-		// 문 상호작용  (열기)
-		if (ActorHasTag(FName("Door")))
-		{
-			this->ToggleDoor(); 
-		}
+		
 		
 	}
 	
