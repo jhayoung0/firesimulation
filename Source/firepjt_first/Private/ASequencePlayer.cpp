@@ -1,9 +1,8 @@
 ﻿// Fill out your copyright notice in the Description page of Project Settings.
 
-
+#include "ASequencePlayer.h"
 #include "LevelSequencePlayer.h"       
 #include "MovieSceneSequencePlayer.h" 
-#include "ASequencePlayer.h"
 #include "LevelSequencePlayer.h"
 #include "Kismet/GameplayStatics.h"
 #include "LevelSequenceActor.h"
