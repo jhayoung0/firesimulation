@@ -4,9 +4,6 @@
 
 #include "CoreMinimal.h"
 #include "CinematicUI.h"
-#include "UObject/WeakObjectPtrTemplates.h"
-
-class APeopleBase;
 #include "LevelSequence.h"
 #include "MainUI.h"
 #include "GameFramework/Actor.h"
@@ -51,13 +48,6 @@ public:
 	UPROPERTY()
 	TObjectPtr<ULevelSequencePlayer> SecondPlayer;
 
-
-	UFUNCTION()
-	void OnFirstSequenceFinished();
-	UFUNCTION()
-	void OnSequenceFinished();
-
-	
 	// 미션 1 CINEMATIC
 	UPROPERTY(EditAnywhere, Category = "Sequence")
 	TObjectPtr<ULevelSequence> Mission1_People_Sequence;
@@ -71,20 +61,16 @@ public:
 	UPROPERTY()
 	TObjectPtr<ULevelSequencePlayer> Mission1_Fireman_Player;
 
+	void PlayIntroSequence();
+
+	// 미션 2 ..
+
+
 	
-
 	UFUNCTION()
-	void MissionOneSequencePlay();
-
-
-	// 델리게이트
+	void OnFirstSequenceFinished();
 	UFUNCTION()
-	void HandleDialCall(const FString& DialNumber);
-
-	// 위젯 참조를 주입받아 바인딩
-	UFUNCTION(BlueprintCallable)
-	void BindToPhoneWidget(class UPhoneWidget* InWidget);
-	
+	void OnSecondSequenceFinished();
 
 
 
@@ -95,9 +81,7 @@ public: // widget
 	UPROPERTY(Transient)
 	UCinematicUI* cinematicUI = nullptr;
 
-
-
-
 	
+
 	
 };

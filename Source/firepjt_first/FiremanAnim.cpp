@@ -20,7 +20,11 @@ void UFiremanAnim::NativeUpdateAnimation(float DeltaSeconds)
 		return;
 	}
 
+	// Movement
 	Velocity = pawnOwner->GetVelocity();
 	Horizontal = FVector::DotProduct(pawnOwner->GetActorRightVector(), Velocity);
 	Vertical = FVector::DotProduct(pawnOwner->GetActorForwardVector(), Velocity);
+
+	// Tool
+	bDoesEquipFireHose = pawnOwner->bDoesEquipFireHose;
 }

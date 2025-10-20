@@ -10,6 +10,7 @@
 #include "Engine/SceneCapture2D.h"
 #include "Engine/TextureRenderTarget2D.h"
 #include "Components/SceneCaptureComponent2D.h"
+#include "Cubee/HouseGameMode.h"
 
 // Sets default values
 AASequencePlayer::AASequencePlayer()
@@ -29,11 +30,12 @@ void AASequencePlayer::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	
-	
-	 
+}
+
+void AASequencePlayer::PlayIntroSequence()
+{
 	// cinematic UI를 만들자
-	if (!cinematicUI && cinematicwidget)
+	if (cinematicwidget)
 	{
 		cinematicUI = CreateWidget<UCinematicUI>(GetWorld(), cinematicwidget);
 		if (cinematicUI)
@@ -42,13 +44,8 @@ void AASequencePlayer::BeginPlay()
 		}
 	}
 
-
 	
-	
-	if (cinematicUI)
-	{
-		cinematicUI->OpenWidgetToggle(false);
-	}
+	cinematicUI->OpenWidgetToggle(false);
 
 	
 	if (FirstSequence)
@@ -64,15 +61,11 @@ void AASequencePlayer::BeginPlay()
 		FirstPlayer->Play();
 		IsPlayingCinematic = true;
 	}
-	
 }
 
 void AASequencePlayer::OnFirstSequenceFinished()
 {
-	if (cinematicUI)
-	{
-		cinematicUI->NextWidgetStart();
-	}
+	cinematicUI->NextWidgetStart();
 	
 	// 2번째 시퀀스 재생
 	if (SecondSequence)
@@ -84,103 +77,24 @@ void AASequencePlayer::OnFirstSequenceFinished()
 		if (!SecondPlayer) return;
 
 		// 이건 시퀀스 끝나면 호출
-		SecondPlayer->OnFinished.AddDynamic(this, &AASequencePlayer::OnSequenceFinished);
+		SecondPlayer->OnFinished.AddDynamic(this, &AASequencePlayer::OnSecondSequenceFinished);
 		SecondPlayer->Play();
 	}
 }
 
-void AASequencePlayer::OnSequenceFinished()
+void AASequencePlayer::OnSecondSequenceFinished()
 {
 	IsPlayingCinematic = false;
-	if (cinematicUI)
+	cinematicUI->CloseWidget();
+
+	// 두번쨰까지 끝나면 게임 시작
+	if (HasAuthority())
 	{
-		cinematicUI->CloseWidget();
-	}
-	
-}
-
-void AASequencePlayer::MissionOneSequencePlay()
-{
-
-	// cinematic UI를 만들자
-	UE_LOG(LogTemp, Log, TEXT("MissionOneSequencePlay called"));
-
-
-	if (!cinematicUI && cinematicwidget)
-	{
-		cinematicUI = CreateWidget<UCinematicUI>(GetWorld(), cinematicwidget);
-		if (cinematicUI)
+		AHouseGameMode* GM = Cast<AHouseGameMode>(GetWorld()->GetAuthGameMode());
+		if (GM)
 		{
-			cinematicUI->AddToViewport();
+			GM->StartGame();
 		}
 	}
-
-
-	// 듀얼 화면 띄우기
-	if (cinematicUI)
-	{
-		cinematicUI->OpenWidgetToggle(true);
-	}
-
-	
-	if (Mission1_Fireman_Sequence && Mission1_People_Sequence)
-	{
-		FMovieSceneSequencePlaybackSettings Settings;
-		ALevelSequenceActor* SeqActor = nullptr;
-		Mission1_Fireman_Player =
-			ULevelSequencePlayer::CreateLevelSequencePlayer(GetWorld(), Mission1_Fireman_Sequence, Settings, SeqActor);
-		if (!Mission1_Fireman_Player)
-		{
-			UE_LOG(LogTemp, Warning, TEXT("MissionOneSequencePlay: Failed to create Fireman sequence player"));
-			return;
-		}
-
-		Mission1_People_Player =
-			ULevelSequencePlayer::CreateLevelSequencePlayer(GetWorld(), Mission1_People_Sequence, Settings, SeqActor);
-		if (!Mission1_People_Player)
-		{
-			UE_LOG(LogTemp, Warning, TEXT("MissionOneSequencePlay: Failed to create People sequence player"));
-			return;
-		}
-		
-		// 이건 시퀀스 끝나면 호출
-		Mission1_Fireman_Player->OnFinished.AddDynamic(this, &AASequencePlayer::OnSequenceFinished);
-		Mission1_Fireman_Player->Play();
-		Mission1_People_Player->Play();
-		
-		IsPlayingCinematic = true;
-	}
-	else
-	{
-		UE_LOG(LogTemp, Warning, TEXT("MissionOneSequencePlay: Sequence assets are missing"));
-	}
-	
-}
-
-static FString NormalizeDial(FString S)
-{
-	S.ReplaceInline(TEXT(" "), TEXT(""));
-	S.ReplaceInline(TEXT("-"), TEXT(""));
-	S.ReplaceInline(TEXT("("), TEXT(""));
-	S.ReplaceInline(TEXT(")"), TEXT(""));
-	return S;
-}
-
-
-void AASequencePlayer::HandleDialCall(const FString& DialNumber)
-{
-	const FString Dial = NormalizeDial(DialNumber);
-	if (Dial != TEXT("119")) return;
-
-	// 듀얼 시네마틱 재생
-	MissionOneSequencePlay();
-	
-}
-
-void AASequencePlayer::BindToPhoneWidget(class UPhoneWidget* InWidget)
-{
-	if (!InWidget) return;
-	InWidget->OnDialCall.AddDynamic(this, &AASequencePlayer::HandleDialCall);
-	
 }
 

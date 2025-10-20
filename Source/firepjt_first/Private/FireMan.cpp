@@ -6,6 +6,7 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "FireHose.h"
+#include "Crowbar.h"
 #include "InteractActor.h"
 #include "PeopleBase.h"
 #include "Camera/CameraComponent.h"
@@ -21,6 +22,7 @@ AFireMan::AFireMan()
 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
+	// Fireman Mesh
 	ConstructorHelpers::FObjectFinder<USkeletalMesh> firemanMeshRef(TEXT("/Script/Engine.SkeletalMesh'/Game/PROJECTS/HELLDIVERS_2/CHARACTERS/PLAYER/B-01_TACTICAL/fix_v2/SKM_B-01_v4_BRAWNY_SIMPLE.SKM_B-01_v4_BRAWNY_SIMPLE'"));
 	if (firemanMeshRef.Succeeded())
 	{
@@ -29,29 +31,47 @@ AFireMan::AFireMan()
 	GetMesh()->SetRelativeRotation(FRotator(0, -90, 0));
 	GetMesh()->SetRelativeLocation(FVector(0, 0, -90));
 
+	// Fireman Camera
 	FiremanCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("FiremanCamera"));
 	FiremanCamera->SetupAttachment(GetMesh(), TEXT("head"));
 	FiremanCamera->SetRelativeLocationAndRotation(FVector(31.610969,0.863677,0), FRotator(0,20,-90));
 	FiremanCamera->bUsePawnControlRotation = true;
 
+	// Firehose Attach Position
 	FirehosePos = CreateDefaultSubobject<USceneComponent>(TEXT("FirehosePos"));
-	FirehosePos->SetupAttachment(FiremanCamera);
-	FirehosePos->SetRelativeLocation(FVector(60.000000,20.000000,-30.000000));
-	
+	FirehosePos->SetupAttachment(GetMesh(), TEXT("cc_weaponbone_r"));
+	FirehosePos->SetRelativeLocationAndRotation(FVector(-6.5,-10.5,1), FRotator(0,-75,-90));
+
+	// Water Niagara System
 	WaterComp = CreateDefaultSubobject<UChildActorComponent>(TEXT("WaterComp"));
 	ConstructorHelpers::FClassFinder<AFireHose> WaterRef(TEXT("/Game/CustomContents/Fireman/Water/BP_FireHose.BP_FireHose_C"));
 	if (WaterRef.Succeeded())
 	{
 		WaterComp->SetChildActorClass(WaterRef.Class);
+		WaterComp->SetupAttachment(FirehosePos);
+		WaterComp->SetVisibility(false);
 	}
-	WaterComp->SetupAttachment(FirehosePos);
 
+	// Crowbar Mesh
+	CrowbarMeshComp = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("CrowbarMeshComp"));
+	ConstructorHelpers::FObjectFinder<USkeletalMesh> crowbarRef(TEXT("/Script/Engine.SkeletalMesh'/Game/Fab/Crowbar_Low-poly/crowbar/StaticMeshes/SKM_crowbar.SKM_crowbar'"));
+	if (crowbarRef.Succeeded())
+	{
+		CrowbarMeshComp->SetSkeletalMesh(crowbarRef.Object);
+		CrowbarMeshComp->SetupAttachment(GetMesh(), TEXT("cc_weaponbone_r"));
+		CrowbarMeshComp->SetVisibility(false);
+		CrowbarMeshComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		CrowbarMeshComp->SetRelativeLocationAndRotation(FVector(22.5,-19,10.5), FRotator(19,-97.,-102.5));
+	}
+	
+	// Aniimation Blueprint
 	ConstructorHelpers::FClassFinder<UAnimInstance> animInstanceRef(TEXT("/Game/CustomContents/Fireman/Blueprints/ABP_Fireman.ABP_Fireman_C"));
 	if (animInstanceRef.Succeeded())
 	{
 		GetMesh()->SetAnimInstanceClass(animInstanceRef.Class);
 	}
-	
+
+	// Inputs
 	ConstructorHelpers::FObjectFinder<UInputMappingContext> IMCRef(TEXT("/Script/EnhancedInput.InputMappingContext'/Game/Input/IMC_Fireman.IMC_Fireman'"));
 	if (IMCRef.Succeeded())
 	{
@@ -67,20 +87,25 @@ AFireMan::AFireMan()
 	{
 		LookAction = lookActionRef.Object;
 	}
-	ConstructorHelpers::FObjectFinder<UInputAction> interactActionRef(TEXT("/Script/EnhancedInput.InputAction'/Game/Input/Actions/IA_Interact.IA_Interact'"));
-	if (interactActionRef.Succeeded())
+	ConstructorHelpers::FObjectFinder<UInputAction> equipFireHoseActionRef(TEXT("/Script/EnhancedInput.InputAction'/Game/Input/Actions/Fireman/IA_EquipFireHose.IA_EquipFireHose'"));
+	if (equipFireHoseActionRef.Succeeded())
 	{
-		InteractAction = interactActionRef.Object;
+		EquipFireHoseAction = equipFireHoseActionRef.Object;
 	}
-	ConstructorHelpers::FObjectFinder<UInputAction> AxeActionRef(TEXT("/Script/EnhancedInput.InputAction'/Game/Input/Actions/Fireman/IA_Axe.IA_Axe'"));
-	if (AxeActionRef.Succeeded())
+	ConstructorHelpers::FObjectFinder<UInputAction> equipCrowbarActionRef(TEXT("/Script/EnhancedInput.InputAction'/Game/Input/Actions/Fireman/IA_EquipCrowbar.IA_EquipCrowbar'"));
+	if (equipCrowbarActionRef.Succeeded())
 	{
-		AxeAction = AxeActionRef.Object;
+		EquipCrowbarAction = equipCrowbarActionRef.Object;
 	}
 	ConstructorHelpers::FObjectFinder<UInputAction> fireHoseActionRef(TEXT("/Script/EnhancedInput.InputAction'/Game/Input/Actions/Fireman/IA_FireHose.IA_FireHose'"));
 	if (fireHoseActionRef.Succeeded())
 	{
 		FireHoseAction = fireHoseActionRef.Object;
+	}
+	ConstructorHelpers::FObjectFinder<UInputAction> useToolActionRef(TEXT("/Script/EnhancedInput.InputAction'/Game/Input/Actions/Fireman/IA_UseTool.IA_UseTool'"));
+	if (useToolActionRef.Succeeded())
+	{
+		UseToolAction = useToolActionRef.Object;
 	}
 	ConstructorHelpers::FObjectFinder<UInputAction> maskOutActionRef(TEXT("/Script/EnhancedInput.InputAction'/Game/Input/Actions/Fireman/IA_MaskOut.IA_MaskOut'"));
 	if (maskOutActionRef.Succeeded())
@@ -88,6 +113,14 @@ AFireMan::AFireMan()
 		MaskOutAction = maskOutActionRef.Object;
 	}
 
+	// Door Class
+	ConstructorHelpers::FClassFinder<AInteractActor> doorClassRef(TEXT("/Game/CustomContents/People/Blueprints/BP_Door.BP_Door_C"));
+	if (doorClassRef.Succeeded())
+	{
+		DoorClass = doorClassRef.Class;
+	}
+	
+	// Mask Actor
 	ConstructorHelpers::FClassFinder<AInteractActor> maskRef(TEXT("/Game/CustomContents/People/Blueprints/BP_Mask.BP_Mask_C"));
 	if (maskRef.Succeeded())
 	{
@@ -109,6 +142,8 @@ void AFireMan::BeginPlay()
 			subsys->AddMappingContext(FiremanIMC, 0);
 		}
 	}
+
+	DoorActor = UGameplayStatics::GetActorOfClass(GetWorld(), DoorClass);
 }
 
 // Called every frame
@@ -134,9 +169,10 @@ void AFireMan::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 	{
 		playerInput->BindAction(MoveAction, ETriggerEvent::Triggered, this, &AFireMan::OnMove);
 		playerInput->BindAction(LookAction, ETriggerEvent::Triggered, this, &AFireMan::OnLook);
-		playerInput->BindAction(InteractAction, ETriggerEvent::Started, this, &AFireMan::OnInteract);
-		playerInput->BindAction(AxeAction, ETriggerEvent::Started, this, &AFireMan::OnAxe);
-		playerInput->BindAction(FireHoseAction, ETriggerEvent::Started, this, &AFireMan::OnFireHose);
+		playerInput->BindAction(EquipFireHoseAction, ETriggerEvent::Started, this, &AFireMan::OnEquipFireHose);
+		playerInput->BindAction(EquipCrowbarAction, ETriggerEvent::Started, this, &AFireMan::OnEquipCrowbar);
+		playerInput->BindAction(FireHoseAction, ETriggerEvent::Started, this, &AFireMan::OnFireHoseShot);
+		playerInput->BindAction(UseToolAction, ETriggerEvent::Started, this, &AFireMan::OnUseTool);
 		playerInput->BindAction(MaskOutAction, ETriggerEvent::Started, this, &AFireMan::OnMaskOut);
 	}
 }
@@ -156,33 +192,137 @@ void AFireMan::OnLook(const struct FInputActionValue& value)
 	AddControllerPitchInput(pitch);
 }
 
-void AFireMan::OnInteract(const struct FInputActionValue& value)
+void AFireMan::OnEquipFireHose()
 {
+	if (bDoesCarryingPerson) return;
+
+	if (bDoesEquipFireHose)
+	{
+		// off
+		OffFireHose();
+		bDoesEquipFireHose = false;
+		WaterComp->SetVisibility(false);
+	}
+	else
+	{
+		// crowbar off
+		if (bDoesEquipCrowbar)
+		{
+			bDoesEquipCrowbar = false;
+			CrowbarMeshComp->SetVisibility(false);
+		}
+		// firehose on
+		bDoesEquipFireHose = true;
+		WaterComp->SetVisibility(true);
+		UE_LOG(LogTemp, Warning, TEXT("%d"), WaterComp->IsVisible());
+	}
+}
+
+void AFireMan::OnEquipCrowbar()
+{
+	if (bDoesCarryingPerson) return;
 	
+	if (bDoesEquipCrowbar)
+	{
+		// off
+		bDoesEquipCrowbar = false;
+		CrowbarMeshComp->SetVisibility(false);
+	}
+	else
+	{
+		// firehose off
+		if (bDoesEquipFireHose)
+		{
+			OffFireHose();
+			bDoesEquipFireHose = false;
+			WaterComp->SetVisibility(false);
+		}
+		// crowbar on
+		bDoesEquipCrowbar = true;
+		CrowbarMeshComp->SetVisibility(true);
+	}
 }
 
-void AFireMan::OnAxe(const struct FInputActionValue& value)
+void AFireMan::OnFireHoseShot()
 {
+	if (bDoesCarryingPerson) return;
+	
+	if (bDoesEquipFireHose)
+	{
+		// shoot water
+		if (AFireHose* fireHose = Cast<AFireHose>(WaterComp->GetChildActor()))
+		{
+			fireHose->OnWaterShot();
+		}
+	}
 }
 
-void AFireMan::OnFireHose(const struct FInputActionValue& value)
+void AFireMan::OnUseTool()
 {
+	if (bDoesCarryingPerson) return;
+
+	if (bDoesEquipCrowbar)
+	{
+		// force open the door
+		if (AInteractActor* door = Cast<AInteractActor>(DoorActor))
+		{
+			float dist = FVector::Distance(GetActorLocation(), door->GetActorLocation());
+			if (dist <= InteractDist)
+			{
+				door->ToggleDoor(true);
+			}
+		}
+	}
 }
 
-void AFireMan::OnMaskOut(const struct FInputActionValue& value)
+void AFireMan::OnMaskOut()
 {
 	// 서버 상으로 상대 편의 액터를 가져올 수 있으면 그렇게 해도 됨
 	// if can get actor from other pc(server), you can get other actor that way
 	APeopleBase* person = Cast<APeopleBase>(UGameplayStatics::GetActorOfClass(GetWorld(), APeopleBase::StaticClass()));
 	if (person)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("찾았는데?"));
 		float dist = FVector::Distance(GetActorLocation(), person->GetActorLocation());
-		if (dist <= PersonDist)
+		if (dist <= InteractDist)
 		{
-			UE_LOG(LogTemp, Warning, TEXT("외않됀데?"));
 			GetWorld()->SpawnActor<AInteractActor>(MaskActor, FTransform(GetActorLocation() + GetActorForwardVector() * MaskSpawnDist));
 		}
 	}
 }
 
+void AFireMan::OnCarryPerson()
+{
+	// if now equip firehose or crowbar
+	if (bDoesEquipFireHose)
+	{
+		bDoesEquipFireHose = false;
+	}
+	else if (bDoesEquipCrowbar)
+	{
+		bDoesEquipCrowbar = false;
+	}
+
+	// if now carrying person
+	if (bDoesCarryingPerson)
+	{
+		bDoesCarryingPerson = false;
+	}
+	else
+	{
+		bDoesCarryingPerson = true;
+	}
+}
+
+void AFireMan::OffFireHose()
+{
+	if (!bDoesEquipFireHose) return;
+		
+	if (AFireHose* fireHose = Cast<AFireHose>(WaterComp->GetChildActor()))
+	{
+		if (fireHose->GetDoesWaterShotNow())
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Off WaterShot"));
+			fireHose->OnWaterShot();
+		}
+	}
+}
