@@ -34,5 +34,5 @@ void UFiremanAnim::NativeUpdateAnimation(float DeltaSeconds)
 void UFiremanAnim::AddPitchInputToSpine(float pitch)
 {
 	Rotation_Spine02 += pitch;
-	UE_LOG(LogTemp, Warning, TEXT("rot spine : %f"), Rotation_Spine02);
+	// UE_LOG(LogTemp, Warning, TEXT("rot spine : %f"), Rotation_Spine02);
 }

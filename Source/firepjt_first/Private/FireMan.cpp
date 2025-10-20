@@ -10,6 +10,7 @@
 #include "InteractActor.h"
 #include "PeopleBase.h"
 #include "Camera/CameraComponent.h"
+#include "Components/BoxComponent.h"
 #include "Components/SceneComponent.h"
 #include "EnhancedInput/Public/InputMappingContext.h"
 #include "Kismet/GameplayStatics.h"
@@ -31,10 +32,16 @@ AFireMan::AFireMan()
 	GetMesh()->SetRelativeRotation(FRotator(0, -90, 0));
 	GetMesh()->SetRelativeLocation(FVector(0, 0, -90));
 
+	// Camera Collision
+	BoxCollision = CreateDefaultSubobject<UBoxComponent>(TEXT("BoxCollision"));
+	BoxCollision->SetupAttachment(GetMesh(), TEXT("head"));
+	BoxCollision->SetRelativeLocationAndRotation(FVector(-9.396923,-3.420199,0),FRotator(0,20,-90));
+
 	// Fireman Camera
 	FiremanCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("FiremanCamera"));
-	FiremanCamera->SetupAttachment(GetMesh(), TEXT("head"));
-	FiremanCamera->SetRelativeLocationAndRotation(FVector(31.610969,0.863677,0), FRotator(0,20,-90));
+	FiremanCamera->SetupAttachment(BoxCollision);
+	FiremanCamera->SetRelativeLocation(FVector(47,1,0));
+	// FiremanCamera->SetRelativeLocationAndRotation(FVector(31.610969,0.863677,0), FRotator(0,20,-90));
 	FiremanCamera->bUsePawnControlRotation = true;
 
 	// Firehose Attach Position
@@ -278,17 +285,6 @@ void AFireMan::OnUseTool()
 			}
 		}
 	}
-	// else
-	// {
-	// 	if (AInteractActor* door = Cast<AInteractActor>(DoorActor))
-	// 	{
-	// 		float dist = FVector::Distance(GetActorLocation(), door->GetActorLocation());
-	// 		if (dist <= InteractDist)
-	// 		{
-	// 			door->ToggleDoor(true);
-	// 		}
-	// 	}
-	// }
 }
 
 void AFireMan::OnMaskOut()

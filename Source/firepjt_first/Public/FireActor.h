@@ -36,6 +36,10 @@ public:
 	UFUNCTION()
 	void PutOutFire();
 
+	// Fire Vanish Rate Variable
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=PutOutFire)
+	float vanishAlpha = 0.2f;
+
 	// PutOutFire
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="NiagaraVariable|PutOutFire")
 	float FlameScale = 1.f;
@@ -79,6 +83,4 @@ public:
 private:
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<class USceneComponent> SceneRootComp;
-	
-	
 };

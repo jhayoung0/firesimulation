@@ -26,6 +26,9 @@ public:
 
 	// Components
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TObjectPtr<class UBoxComponent> BoxCollision;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TObjectPtr<class UCameraComponent> FiremanCamera;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
