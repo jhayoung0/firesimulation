@@ -3,6 +3,7 @@
 
 #include "CinematicUI.h"
 
+#include "Components/Button.h"
 #include "Components/SizeBox.h"
 
 void UCinematicUI::OpenWidgetToggle(bool isdual)
@@ -33,4 +34,18 @@ void UCinematicUI::NextWidgetStart()
 void UCinematicUI::CloseWidget()
 {
 	RemoveFromParent();
+}
+
+void UCinematicUI::NativeConstruct()
+{
+	Super::NativeConstruct();
+
+	// 버튼 바인딩
+	if (Skipbtn) Skipbtn->OnClicked.AddDynamic(this, &UCinematicUI::OnSkipClicked);
+}
+
+void UCinematicUI::OnSkipClicked()
+{
+	// 스킵 버튼 클릭
+	UE_LOG(LogTemp, Warning, TEXT("skip btn"));
 }

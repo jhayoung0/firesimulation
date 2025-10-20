@@ -88,7 +88,7 @@ void AInteractActor::ToggleWidget(bool check)
 		// 문 상호작용  (닫기)
 		if (ActorHasTag(FName("Door")))
 		{
-			this->ToggleDoor(false); 
+			this->ToggleDoor(); 
 		}
 		
 	}
@@ -109,7 +109,7 @@ void AInteractActor::ToggleWidget(bool check)
 		// 문 상호작용  (열기)
 		if (ActorHasTag(FName("Door")))
 		{
-			this->ToggleDoor(true); 
+			this->ToggleDoor(); 
 		}
 		
 	}

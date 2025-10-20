@@ -52,9 +52,10 @@ public: // 인터랙트 컴포넌트 붙이기 (아웃라인, 가까이 갔을 �
 	void ChangeTowel(bool visiblility);
 	
 	UFUNCTION(BlueprintImplementableEvent)
-    void ToggleDoor(bool visiblility);
-    	
-
+    void ToggleDoor();
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool DoorOpened;
+	
 	UFUNCTION() // 위젯 노출/미노출
 	void ToggleWidget(bool check);
 

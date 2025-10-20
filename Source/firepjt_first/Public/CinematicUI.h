@@ -36,6 +36,9 @@ public:
 	UPROPERTY(meta=(BindWidget))
 	class USizeBox* sizebox_one_Fireman;
 	
+	// 스킵 버튼 
+	UPROPERTY(meta=(BindWidget))
+	class UButton* Skipbtn;
 	//토글
 	UFUNCTION()
 	void OpenWidgetToggle(bool isdual);
@@ -45,5 +48,9 @@ public:
 	
 	UFUNCTION()
 	void CloseWidget();
-	
+
+	virtual void NativeConstruct() override;
+
+	UFUNCTION()
+	void OnSkipClicked();
 };

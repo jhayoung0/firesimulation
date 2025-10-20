@@ -314,7 +314,7 @@ void APeopleBase::AttachActor()
 		}
 		else if (InteractingActor->ActorHasTag(FName("Door")))
     		{
-				InteractingActor->ToggleDoor(true);
+				InteractingActor->ToggleDoor();
     		}
 		else
 		{
@@ -371,7 +371,7 @@ void APeopleBase::DetachActor(AInteractActor* tempActor)
 		}
 		else if (tempActor->ActorHasTag(FName("Door")))
 		{
-			InteractingActor->ToggleDoor(false);
+			InteractingActor->ToggleDoor();
 		}
 		else
 		{
@@ -389,6 +389,7 @@ void APeopleBase::GoNextMission()
 {
 	// 다음 미션으로 넘기기
 	auto* housePs = Cast<AHousePlayerState>(this->GetPlayerState());
+	if (!housePs){return;}
 	housePs->SetMissionComplete();
 }
 

@@ -39,11 +39,6 @@ void APeopleOnePC::OpenPhoneUI()
 	AASequencePlayer* Seq = Cast<AASequencePlayer>(
 		UGameplayStatics::GetActorOfClass(GetWorld(), AASequencePlayer::StaticClass())
 	);
-	if (Seq && phoneUI)
-	{
-		Seq->BindToPhoneWidget(phoneUI); 
-	}
-	
 	
 }
 
