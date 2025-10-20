@@ -22,10 +22,15 @@ public:
 	UPROPERTY()
 	TObjectPtr<class AFireMan> pawnOwner;
 
+	// Movement
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Move)
 	FVector Velocity;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Move)
 	float Horizontal;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Move)
 	float Vertical;
+
+	// Tool
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Tool)
+	bool bDoesEquipFireHose = false;
 };
