@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "CinematicUI.h"
 #include "LevelSequence.h"
+#include "LevelSequenceActor.h"
 #include "MainUI.h"
 #include "GameFramework/Actor.h"
 #include "ASequencePlayer.generated.h"
@@ -36,6 +37,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool IsPlayingCinematic;
 
+	// intro cinematic
+	void PlayIntroSequence();
+
 	UPROPERTY(EditAnywhere, Category = "Sequence")
 	TObjectPtr<ULevelSequence> FirstSequence;
 
@@ -47,6 +51,12 @@ public:
 
 	UPROPERTY()
 	TObjectPtr<ULevelSequencePlayer> SecondPlayer;
+
+	UFUNCTION()
+	void OnFirstSequenceFinished();
+	UFUNCTION()
+	void OnSecondSequenceFinished();
+	
 
 	// 미션 1 CINEMATIC
 	UPROPERTY(EditAnywhere, Category = "Sequence")
@@ -61,18 +71,27 @@ public:
 	UPROPERTY()
 	TObjectPtr<ULevelSequencePlayer> Mission1_Fireman_Player;
 
-	void PlayIntroSequence();
+	void MissionOneSequencePlay();
 
-	// 미션 2 ..
 
+	// 모든 시퀀스 시작 및 종료 시 호출
+	UFUNCTION()
+	void SequencePlay();
+	UFUNCTION()
+	void SequenceEnd();
+
+
+	// 델리게이트
+	UFUNCTION(BlueprintCallable) 
+	void BindToPhoneWidget(UPhoneWidget* InWidget);
+
+	UFUNCTION() 
+	void HandleDialCall(const FString& Dial);
+	
+	UPROPERTY(EditInstanceOnly, Category="Sequence")
+	TWeakObjectPtr<ALevelSequenceActor> LevelSequenceActor;
 
 	
-	UFUNCTION()
-	void OnFirstSequenceFinished();
-	UFUNCTION()
-	void OnSecondSequenceFinished();
-
-
 
 public: // widget
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = UI)
