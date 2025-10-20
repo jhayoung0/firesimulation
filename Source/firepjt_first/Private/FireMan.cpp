@@ -6,7 +6,7 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "FireHose.h"
-#include "Crowbar.h"
+#include "FiremanAnim.h"
 #include "InteractActor.h"
 #include "PeopleBase.h"
 #include "Camera/CameraComponent.h"
@@ -143,6 +143,7 @@ void AFireMan::BeginPlay()
 		}
 	}
 
+	FiremanAnimInstance = Cast<UFiremanAnim>(GetMesh()->GetAnimInstance());
 	DoorActor = UGameplayStatics::GetActorOfClass(GetWorld(), DoorClass);
 }
 
@@ -190,6 +191,7 @@ void AFireMan::OnLook(const struct FInputActionValue& value)
 	float pitch = value.Get<FVector2D>().Y;
 	AddControllerYawInput(yaw);
 	AddControllerPitchInput(pitch);
+	FiremanAnimInstance->AddPitchInputToSpine(pitch);
 }
 
 void AFireMan::OnEquipFireHose()
@@ -202,6 +204,7 @@ void AFireMan::OnEquipFireHose()
 		OffFireHose();
 		bDoesEquipFireHose = false;
 		WaterComp->SetVisibility(false);
+		FiremanCamera->bUsePawnControlRotation = true;
 	}
 	else
 	{
@@ -214,7 +217,7 @@ void AFireMan::OnEquipFireHose()
 		// firehose on
 		bDoesEquipFireHose = true;
 		WaterComp->SetVisibility(true);
-		UE_LOG(LogTemp, Warning, TEXT("%d"), WaterComp->IsVisible());
+		FiremanCamera->bUsePawnControlRotation = false;
 	}
 }
 
@@ -227,6 +230,7 @@ void AFireMan::OnEquipCrowbar()
 		// off
 		bDoesEquipCrowbar = false;
 		CrowbarMeshComp->SetVisibility(false);
+		FiremanCamera->bUsePawnControlRotation = true;
 	}
 	else
 	{
@@ -240,6 +244,7 @@ void AFireMan::OnEquipCrowbar()
 		// crowbar on
 		bDoesEquipCrowbar = true;
 		CrowbarMeshComp->SetVisibility(true);
+		FiremanCamera->bUsePawnControlRotation = false;
 	}
 }
 

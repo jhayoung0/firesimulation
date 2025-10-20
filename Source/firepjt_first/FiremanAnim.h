@@ -13,12 +13,11 @@ UCLASS()
 class FIREPJT_FIRST_API UFiremanAnim : public UAnimInstance
 {
 	GENERATED_BODY()
-
+	
 protected:
 	virtual void NativeInitializeAnimation() override;
 	virtual void NativeUpdateAnimation(float DeltaSeconds) override;
 	
-public:
 	UPROPERTY()
 	TObjectPtr<class AFireMan> pawnOwner;
 
@@ -35,4 +34,11 @@ public:
 	bool bDoesEquipFireHose = false;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Tool)
 	bool bDoesEquipCrowbar = false;
+
+	// Spine Rotation
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Spine)
+	float Rotation_Spine02;
+
+public:
+	void AddPitchInputToSpine(float pitch);
 };
