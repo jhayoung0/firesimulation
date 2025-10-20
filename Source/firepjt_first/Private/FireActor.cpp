@@ -94,18 +94,19 @@ void AFireActor::PostEditChangeProperty(struct FPropertyChangedEvent& PropertyCh
 
 void AFireActor::PutOutFire()
 {
-	// 알파값 하나로 0~1 동일한 비율로 줄게 수정하기
-	FlameScale -= 0.0025f;
-	SmokeScale -= 0.0025f;
-	DistortionScale -= 0.0025f;
-	DebrisRate -= 0.125f;
+	// Use Alpha Value for synchronizing variable Scale Rates 
+	FlameScale = FMath::FInterpConstantTo(FlameScale, 0.f, GetWorld()->DeltaTimeSeconds, vanishAlpha);
+	SmokeScale = FMath::FInterpConstantTo(SmokeScale, 0.f, GetWorld()->DeltaTimeSeconds, vanishAlpha);;
+	DistortionScale = FMath::FInterpConstantTo(DistortionScale, 0.f, GetWorld()->DeltaTimeSeconds, vanishAlpha);
+	DebrisRate = FMath::FInterpConstantTo(DebrisRate, 0.f, GetWorld()->DeltaTimeSeconds, vanishAlpha);;
 	
 	FireComp->SetVariableFloat(FName("FlameScale"), FlameScale);
 	FireComp->SetVariableFloat(FName("SmokeScale"), SmokeScale);
 	FireComp->SetVariableFloat(FName("DistortionScale"), DistortionScale);
 	FireComp->SetVariableFloat(FName("DebrisRate"), DebrisRate);
-	
-	if (FlameScale <= 0.f)
+
+	UE_LOG(LogTemp, Warning, TEXT("FlameScale : %f"), FlameScale);
+	if (FlameScale <= 0.001f)
 	{
 		Destroy();
 	}

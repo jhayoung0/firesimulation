@@ -26,6 +26,9 @@ public:
 
 	// Components
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TObjectPtr<class UBoxComponent> BoxCollision;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TObjectPtr<class UCameraComponent> FiremanCamera;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
@@ -63,6 +66,10 @@ public:
 	float InteractDist = 1000.f;
 	
 private:
+	// Animation Blueprint
+	UPROPERTY()
+	TObjectPtr<class UFiremanAnim> FiremanAnimInstance;
+	
 	// Inputs
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<class UInputMappingContext> FiremanIMC;

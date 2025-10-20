@@ -6,10 +6,11 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "FireHose.h"
-#include "Crowbar.h"
+#include "FiremanAnim.h"
 #include "InteractActor.h"
 #include "PeopleBase.h"
 #include "Camera/CameraComponent.h"
+#include "Components/BoxComponent.h"
 #include "Components/SceneComponent.h"
 #include "EnhancedInput/Public/InputMappingContext.h"
 #include "Kismet/GameplayStatics.h"
@@ -31,10 +32,16 @@ AFireMan::AFireMan()
 	GetMesh()->SetRelativeRotation(FRotator(0, -90, 0));
 	GetMesh()->SetRelativeLocation(FVector(0, 0, -90));
 
+	// Camera Collision
+	BoxCollision = CreateDefaultSubobject<UBoxComponent>(TEXT("BoxCollision"));
+	BoxCollision->SetupAttachment(GetMesh(), TEXT("head"));
+	BoxCollision->SetRelativeLocationAndRotation(FVector(-9.396923,-3.420199,0),FRotator(0,20,-90));
+
 	// Fireman Camera
 	FiremanCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("FiremanCamera"));
-	FiremanCamera->SetupAttachment(GetMesh(), TEXT("head"));
-	FiremanCamera->SetRelativeLocationAndRotation(FVector(31.610969,0.863677,0), FRotator(0,20,-90));
+	FiremanCamera->SetupAttachment(BoxCollision);
+	FiremanCamera->SetRelativeLocation(FVector(47,1,0));
+	// FiremanCamera->SetRelativeLocationAndRotation(FVector(31.610969,0.863677,0), FRotator(0,20,-90));
 	FiremanCamera->bUsePawnControlRotation = true;
 
 	// Firehose Attach Position
@@ -143,6 +150,7 @@ void AFireMan::BeginPlay()
 		}
 	}
 
+	FiremanAnimInstance = Cast<UFiremanAnim>(GetMesh()->GetAnimInstance());
 	DoorActor = UGameplayStatics::GetActorOfClass(GetWorld(), DoorClass);
 }
 
@@ -190,6 +198,7 @@ void AFireMan::OnLook(const struct FInputActionValue& value)
 	float pitch = value.Get<FVector2D>().Y;
 	AddControllerYawInput(yaw);
 	AddControllerPitchInput(pitch);
+	FiremanAnimInstance->AddPitchInputToSpine(pitch);
 }
 
 void AFireMan::OnEquipFireHose()
@@ -202,6 +211,7 @@ void AFireMan::OnEquipFireHose()
 		OffFireHose();
 		bDoesEquipFireHose = false;
 		WaterComp->SetVisibility(false);
+		FiremanCamera->bUsePawnControlRotation = true;
 	}
 	else
 	{
@@ -214,7 +224,7 @@ void AFireMan::OnEquipFireHose()
 		// firehose on
 		bDoesEquipFireHose = true;
 		WaterComp->SetVisibility(true);
-		UE_LOG(LogTemp, Warning, TEXT("%d"), WaterComp->IsVisible());
+		FiremanCamera->bUsePawnControlRotation = false;
 	}
 }
 
@@ -227,6 +237,7 @@ void AFireMan::OnEquipCrowbar()
 		// off
 		bDoesEquipCrowbar = false;
 		CrowbarMeshComp->SetVisibility(false);
+		FiremanCamera->bUsePawnControlRotation = true;
 	}
 	else
 	{
@@ -240,6 +251,7 @@ void AFireMan::OnEquipCrowbar()
 		// crowbar on
 		bDoesEquipCrowbar = true;
 		CrowbarMeshComp->SetVisibility(true);
+		FiremanCamera->bUsePawnControlRotation = false;
 	}
 }
 
