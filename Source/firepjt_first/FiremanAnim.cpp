@@ -27,4 +27,5 @@ void UFiremanAnim::NativeUpdateAnimation(float DeltaSeconds)
 
 	// Tool
 	bDoesEquipFireHose = pawnOwner->bDoesEquipFireHose;
+	bDoesEquipCrowbar = pawnOwner->bDoesEquipCrowbar;
 }

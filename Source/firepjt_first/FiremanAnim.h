@@ -33,4 +33,6 @@ public:
 	// Tool
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Tool)
 	bool bDoesEquipFireHose = false;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Tool)
+	bool bDoesEquipCrowbar = false;
 };

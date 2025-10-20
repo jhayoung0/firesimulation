@@ -273,6 +273,17 @@ void AFireMan::OnUseTool()
 			}
 		}
 	}
+	// else
+	// {
+	// 	if (AInteractActor* door = Cast<AInteractActor>(DoorActor))
+	// 	{
+	// 		float dist = FVector::Distance(GetActorLocation(), door->GetActorLocation());
+	// 		if (dist <= InteractDist)
+	// 		{
+	// 			door->ToggleDoor(true);
+	// 		}
+	// 	}
+	// }
 }
 
 void AFireMan::OnMaskOut()
