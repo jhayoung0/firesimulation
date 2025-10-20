@@ -274,7 +274,7 @@ void AFireMan::OnUseTool()
 			float dist = FVector::Distance(GetActorLocation(), door->GetActorLocation());
 			if (dist <= InteractDist)
 			{
-				door->ToggleDoor(true);
+				door->ToggleDoor();
 			}
 		}
 	}

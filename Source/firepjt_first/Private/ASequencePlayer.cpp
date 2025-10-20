@@ -1,12 +1,14 @@
 ﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 
-
+#include "LevelSequencePlayer.h"       
+#include "MovieSceneSequencePlayer.h" 
 #include "ASequencePlayer.h"
 #include "LevelSequencePlayer.h"
 #include "Kismet/GameplayStatics.h"
 #include "LevelSequenceActor.h"
 #include "PeopleBase.h"
+#include "PeopleOnePC.h"
 #include "Engine/SceneCapture2D.h"
 #include "Engine/TextureRenderTarget2D.h"
 #include "Components/SceneCaptureComponent2D.h"
@@ -34,6 +36,14 @@ void AASequencePlayer::BeginPlay()
 
 void AASequencePlayer::PlayIntroSequence()
 {
+
+	auto* pc = Cast<APeopleOnePC>(GetWorld()->GetFirstPlayerController());
+	pc->bShowMouseCursor = true;
+	pc->SetIgnoreLookInput(true);
+	pc->SetIgnoreMoveInput(true);
+	
+
+	
 	// cinematic UI를 만들자
 	if (cinematicwidget)
 	{
@@ -87,7 +97,15 @@ void AASequencePlayer::OnSecondSequenceFinished()
 	IsPlayingCinematic = false;
 	cinematicUI->CloseWidget();
 
-	// 두번쨰까지 끝나면 게임 시작
+	
+	auto* pc = Cast<APeopleOnePC>(GetWorld()->GetFirstPlayerController());
+	pc->bShowMouseCursor = false;
+	pc->SetIgnoreLookInput(false);
+	pc->SetIgnoreMoveInput(false);
+	
+
+	
+	// 두 번째까지 끝나면 게임 시작
 	if (HasAuthority())
 	{
 		AHouseGameMode* GM = Cast<AHouseGameMode>(GetWorld()->GetAuthGameMode());
@@ -96,5 +114,26 @@ void AASequencePlayer::OnSecondSequenceFinished()
 			GM->StartGame();
 		}
 	}
+}
+
+void AASequencePlayer::DoSkip()
+{
+
+	auto* pc = Cast<APeopleOnePC>(GetWorld()->GetFirstPlayerController());
+	pc->bShowMouseCursor = false;
+	pc->SetIgnoreLookInput(false);
+	pc->SetIgnoreMoveInput(false);
+
+	
+	if (FirstPlayer)
+	{
+		FirstPlayer->GoToEndAndStop();
+	}
+	if (SecondPlayer)
+	{
+		SecondPlayer->GoToEndAndStop();
+	}
+
+	OnSecondSequenceFinished();
 }
 

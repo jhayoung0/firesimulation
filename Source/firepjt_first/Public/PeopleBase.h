@@ -7,6 +7,7 @@
 #include "PhoneWidget.h"
 #include "PeopleBase.generated.h"
 
+class AASequencePlayer;
 class USceneComponent;
 class UMainUI;
 class AInteractActor;
@@ -167,5 +168,9 @@ public:// 상호작용 액터
 
 	UPROPERTY(EditDefaultsOnly)
 	FVector ActorLocation;
+
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Cinematic")
+	AASequencePlayer* SequenceActor;
 	
 };

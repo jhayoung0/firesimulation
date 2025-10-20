@@ -27,7 +27,13 @@ public class firepjt_first : ModuleRules
 			"LevelSequence"
 		});
 
-		PrivateDependencyModuleNames.AddRange(new string[] { });
+	
+		PrivateDependencyModuleNames.AddRange(new string[] {
+			"LevelSequence",  
+			"MovieScene"    
+		});
+		
+	
 
 		PublicIncludePaths.AddRange(new string[] {
 			"firepjt_first",
