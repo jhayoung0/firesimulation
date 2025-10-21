@@ -20,6 +20,7 @@ protected:
 
 public:
 	virtual void Tick(float DeltaTime) override;
+	virtual void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;
 
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<class USceneComponent> SceneRootComp;
@@ -45,7 +46,10 @@ public:
 	virtual void ReceiveParticleData_Implementation(const TArray<FBasicParticleData>& Data, UNiagaraSystem* NiagaraSystem, const FVector& SimulationPositionOffset) override;
 
 private:
+	UPROPERTY(Replicated)
 	bool bDoesWaterShotNow = false;
+	UPROPERTY(Replicated)
 	bool bDoesSprayShotNow = false;
+	UPROPERTY(Replicated)
 	bool bDoesDirectShotNow = false;
 };

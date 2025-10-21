@@ -35,6 +35,10 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Tool)
 	bool bDoesEquipCrowbar = false;
 
+	// Carry Person
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Carry)
+	bool bDoesCarryingPerson = false;
+
 	// Spine Rotation
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Spine)
 	float Rotation_Spine02;

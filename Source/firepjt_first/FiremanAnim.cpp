@@ -29,10 +29,11 @@ void UFiremanAnim::NativeUpdateAnimation(float DeltaSeconds)
 	// Tool
 	bDoesEquipFireHose = pawnOwner->bDoesEquipFireHose;
 	bDoesEquipCrowbar = pawnOwner->bDoesEquipCrowbar;
+	bDoesCarryingPerson = pawnOwner->bDoesCarryingPerson;
 }
 
 void UFiremanAnim::AddPitchInputToSpine(float pitch)
 {
-	Rotation_Spine02 += pitch;
+	Rotation_Spine02 = FMath::Clamp(Rotation_Spine02 + pitch, -60, 60);
 	// UE_LOG(LogTemp, Warning, TEXT("rot spine : %f"), Rotation_Spine02);
 }

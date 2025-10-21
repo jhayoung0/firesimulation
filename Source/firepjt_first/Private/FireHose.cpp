@@ -7,6 +7,7 @@
 #include "NiagaraComponent.h"
 #include "NiagaraSystem.h"
 #include "Components/SkeletalMeshComponent.h"
+#include "Net/UnrealNetwork.h"
 
 #define FirehoseWater ECC_GameTraceChannel3
 
@@ -53,7 +54,16 @@ void AFireHose::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 }
- 
+
+void AFireHose::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(AFireHose, bDoesWaterShotNow);
+	DOREPLIFETIME(AFireHose, bDoesDirectShotNow);
+	DOREPLIFETIME(AFireHose, bDoesSprayShotNow);
+}
+
 void AFireHose::OnWaterShot()
 {
 	// activate or deactivate water effect

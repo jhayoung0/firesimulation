@@ -14,6 +14,7 @@
 #include "Components/SceneComponent.h"
 #include "EnhancedInput/Public/InputMappingContext.h"
 #include "Kismet/GameplayStatics.h"
+#include "Net/UnrealNetwork.h"
 
 
 class AInteractActor;
@@ -44,10 +45,15 @@ AFireMan::AFireMan()
 	// FiremanCamera->SetRelativeLocationAndRotation(FVector(31.610969,0.863677,0), FRotator(0,20,-90));
 	FiremanCamera->bUsePawnControlRotation = true;
 
+	// Person2 Attach Position
+	Person2Pos = CreateDefaultSubobject<USceneComponent>(TEXT("Person2Pos"));
+	Person2Pos->SetupAttachment(GetMesh());
+	Person2Pos->SetRelativeLocationAndRotation(FVector(0, 50, 60), FRotator(0, 0, 10));
+	
 	// Firehose Attach Position
-	FirehosePos = CreateDefaultSubobject<USceneComponent>(TEXT("FirehosePos"));
-	FirehosePos->SetupAttachment(GetMesh(), TEXT("cc_weaponbone_r"));
-	FirehosePos->SetRelativeLocationAndRotation(FVector(-6.5,-10.5,1), FRotator(0,-75,-90));
+	// FirehosePos = CreateDefaultSubobject<USceneComponent>(TEXT("FirehosePos"));
+	// FirehosePos->SetupAttachment(GetMesh(), TEXT("cc_weaponbone_l"));
+	// FirehosePos->SetRelativeLocationAndRotation(FVector(-6.5,-10.5,1), FRotator(0,-75,-90));
 
 	// Water Niagara System
 	WaterComp = CreateDefaultSubobject<UChildActorComponent>(TEXT("WaterComp"));
@@ -55,7 +61,8 @@ AFireMan::AFireMan()
 	if (WaterRef.Succeeded())
 	{
 		WaterComp->SetChildActorClass(WaterRef.Class);
-		WaterComp->SetupAttachment(FirehosePos);
+		WaterComp->SetupAttachment(GetMesh(), TEXT("cc_weaponbone_l"));
+		WaterComp->SetRelativeLocationAndRotation(FVector(-6.5,-10.5,1), FRotator(0,-75,-90));
 		WaterComp->SetVisibility(false);
 	}
 
@@ -120,6 +127,13 @@ AFireMan::AFireMan()
 		MaskOutAction = maskOutActionRef.Object;
 	}
 
+	// Person2 Class
+	ConstructorHelpers::FClassFinder<AInteractActor> person2ClassRef(TEXT("/Game/CustomContents/People/Blueprints/BP_People_2.BP_People_2_C"));
+	if (person2ClassRef.Succeeded())
+	{
+		Person2Class = person2ClassRef.Class;
+	}
+
 	// Door Class
 	ConstructorHelpers::FClassFinder<AInteractActor> doorClassRef(TEXT("/Game/CustomContents/People/Blueprints/BP_Door.BP_Door_C"));
 	if (doorClassRef.Succeeded())
@@ -151,7 +165,8 @@ void AFireMan::BeginPlay()
 	}
 
 	FiremanAnimInstance = Cast<UFiremanAnim>(GetMesh()->GetAnimInstance());
-	DoorActor = UGameplayStatics::GetActorOfClass(GetWorld(), DoorClass);
+	DoorActor = Cast<AInteractActor>(UGameplayStatics::GetActorOfClass(GetWorld(), DoorClass));
+	Person2Actor = Cast<AInteractActor>(UGameplayStatics::GetActorOfClass(GetWorld(), Person2Class));
 }
 
 // Called every frame
@@ -183,6 +198,15 @@ void AFireMan::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 		playerInput->BindAction(UseToolAction, ETriggerEvent::Started, this, &AFireMan::OnUseTool);
 		playerInput->BindAction(MaskOutAction, ETriggerEvent::Started, this, &AFireMan::OnMaskOut);
 	}
+}
+
+void AFireMan::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(AFireMan, bDoesEquipFireHose);
+	DOREPLIFETIME(AFireMan, bDoesEquipCrowbar);
+	DOREPLIFETIME(AFireMan, bDoesCarryingPerson);
 }
 
 void AFireMan::OnMove(const struct FInputActionValue& value)
@@ -271,19 +295,25 @@ void AFireMan::OnFireHoseShot()
 
 void AFireMan::OnUseTool()
 {
-	if (bDoesCarryingPerson) return;
-
+	if (bDoesEquipFireHose) return;
+	
 	if (bDoesEquipCrowbar)
 	{
 		// force open the door
-		if (AInteractActor* door = Cast<AInteractActor>(DoorActor))
+		if (DoorActor)
 		{
-			float dist = FVector::Distance(GetActorLocation(), door->GetActorLocation());
+			float dist = FVector::Distance(GetActorLocation(), DoorActor->GetActorLocation());
 			if (dist <= InteractDist)
 			{
-				door->ToggleDoor();
+				DoorActor->ToggleWidget(false);
+				DoorActor->ToggleDoor();
 			}
 		}
+	}
+	else
+	{
+		// find person2
+		OnCarryPerson();
 	}
 }
 
@@ -304,24 +334,39 @@ void AFireMan::OnMaskOut()
 
 void AFireMan::OnCarryPerson()
 {
-	// if now equip firehose or crowbar
-	if (bDoesEquipFireHose)
-	{
-		bDoesEquipFireHose = false;
-	}
-	else if (bDoesEquipCrowbar)
-	{
-		bDoesEquipCrowbar = false;
-	}
-
 	// if now carrying person
 	if (bDoesCarryingPerson)
 	{
 		bDoesCarryingPerson = false;
+		if (Person2Actor)
+		{
+			float dist = FVector::Distance(GetActorLocation(), Person2Actor->GetActorLocation());
+			if (dist <= InteractDist)
+			{
+				// detach Person2Actor
+				
+				Person2Actor->ToggleWidget(true);
+				Person2Actor->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
+				Person2Actor->SetActorRotation(ActorRotation);
+			}
+		}
 	}
 	else
 	{
 		bDoesCarryingPerson = true;
+		ActorRotation = Person2Actor->GetActorRotation();
+		if (Person2Actor)
+		{
+			float dist = FVector::Distance(GetActorLocation(), Person2Actor->GetActorLocation());
+			if (dist <= InteractDist)
+			{
+				// attach person
+				Person2Actor->ToggleWidget(false);
+				Person2Actor->AttachToComponent(Person2Pos, FAttachmentTransformRules::SnapToTargetIncludingScale);
+
+				// animation
+			}
+		}
 	}
 }
 
