@@ -2,13 +2,13 @@
 
 
 #include "ASequencePlayer.h"
+#include "firepjt_firstPlayerController.h"
 #include "LevelSequencePlayer.h"       
 #include "MovieSceneSequencePlayer.h" 
 #include "LevelSequencePlayer.h"
 #include "Kismet/GameplayStatics.h"
 #include "LevelSequenceActor.h"
 #include "PeopleBase.h"
-#include "PeopleOnePC.h"
 #include "Engine/SceneCapture2D.h"
 #include "Engine/TextureRenderTarget2D.h"
 #include "Components/SceneCaptureComponent2D.h"
@@ -141,7 +141,7 @@ void AASequencePlayer::DoSkip()
 void AASequencePlayer::SequencePlay()
 {
 	// 마우스 보이기, 컨트롤 안되게 하기
-	auto* pc = Cast<APeopleOnePC>(GetWorld()->GetFirstPlayerController());
+	auto* pc = Cast<Afirepjt_firstPlayerController>(GetWorld()->GetFirstPlayerController());
 	pc->bShowMouseCursor = true;
 	pc->SetIgnoreLookInput(true);
 	pc->SetIgnoreMoveInput(true);
@@ -167,7 +167,7 @@ void AASequencePlayer::SequenceEnd()
 	cinematicUI->CloseWidget();
 
 	// 마우스 숨기기, 컨트롤 되도록 수정하기
-	auto* pc = Cast<APeopleOnePC>(GetWorld()->GetFirstPlayerController());
+	auto* pc = Cast<Afirepjt_firstPlayerController>(GetWorld()->GetFirstPlayerController());
 	pc->bShowMouseCursor = false;
 	pc->SetIgnoreLookInput(false);
 	pc->SetIgnoreMoveInput(false);

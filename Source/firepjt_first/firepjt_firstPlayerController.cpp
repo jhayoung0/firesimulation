@@ -2,7 +2,6 @@
 
 
 #include "firepjt_firstPlayerController.h"
-
 #include "ASequencePlayer.h"
 #include "EnhancedInputSubsystems.h"
 #include "Engine/LocalPlayer.h"
@@ -179,6 +178,7 @@ void Afirepjt_firstPlayerController::OnGamePhaseChanged(EGamePhase NewPhase)
 	}
 }
 
+
 void Afirepjt_firstPlayerController::Client_UpdatePlayerCount_Implementation(int32 CurrentPlayers, int32 MaxPlayers)
 {
 	if (LobbyWidget)
@@ -195,6 +195,38 @@ void Afirepjt_firstPlayerController::Server_RequestPlayerCount_Implementation()
 		LobbyGM->BroadcastPlayerCount();
 	}
 }
+
+
+void Afirepjt_firstPlayerController::OpenPhoneUI()
+{
+	// phone ui를 만들자
+	if (phonewidget)
+	{
+		phoneUI = CreateWidget<UPhoneWidget>(GetWorld(), phonewidget);
+		
+	}
+	
+	phoneUI->AddToViewport();
+	
+	bShowMouseCursor = true;
+	SetIgnoreLookInput(true);
+	SetIgnoreMoveInput(true);
+	
+	AASequencePlayer* Seq = Cast<AASequencePlayer>(
+		UGameplayStatics::GetActorOfClass(GetWorld(), AASequencePlayer::StaticClass())
+	);
+}
+
+void Afirepjt_firstPlayerController::ClosePhoneUI()
+{
+	phoneUI->RemoveFromParent();
+
+	bShowMouseCursor = false;
+
+	SetIgnoreLookInput(false);
+	SetIgnoreMoveInput(false);
+}
+
 
 
 

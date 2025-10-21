@@ -5,12 +5,12 @@
 
 #include "ASequencePlayer.h"
 #include "EnhancedInputComponent.h"
+#include "firepjt_firstPlayerController.h"
 #include "InteractActor.h"
 #include "Blueprint/UserWidget.h"
 #include "Components/CapsuleComponent.h"
 #include "Camera/CameraComponent.h"
 #include "MainUI.h"
-#include "PeopleOnePC.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
@@ -295,7 +295,7 @@ void APeopleBase::AttachActor()
 				MeshComp->PlayAnimation(InteractAnimPhone, true);
 			}
 			// 위젯 띄우기
-			auto* pc = Cast<APeopleOnePC>(GetWorld()->GetFirstPlayerController());
+			auto* pc = Cast<Afirepjt_firstPlayerController>(GetWorld()->GetFirstPlayerController());
 			pc->OpenPhoneUI();
 		}
 		else if (InteractingActor->ActorHasTag(FName("People")))
@@ -365,7 +365,7 @@ void APeopleBase::DetachActor(AInteractActor* tempActor)
 		}
 		else if (tempActor->ActorHasTag(FName("Phone")))
 		{
-			auto* pc = Cast<APeopleOnePC>(GetWorld()->GetFirstPlayerController());
+			auto* pc = Cast<Afirepjt_firstPlayerController>(GetWorld()->GetFirstPlayerController());
 
 			pc->ClosePhoneUI();
 		}

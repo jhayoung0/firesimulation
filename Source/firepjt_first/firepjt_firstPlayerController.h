@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Cubee/HousePlayerState.h"
 #include "GameFramework/PlayerController.h"
+#include "PhoneWidget.h"
 #include "firepjt_firstPlayerController.generated.h"
 
 class UInputMappingContext;
@@ -91,4 +92,18 @@ protected:
 protected:
 	// Cinematic
 	class AActor* SequenceActor;
+
+public: // widget	
+	UFUNCTION(BlueprintCallable)
+	void OpenPhoneUI();
+
+	UFUNCTION(BlueprintCallable)
+	void ClosePhoneUI();
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = UI)
+	TSubclassOf<UPhoneWidget> phonewidget;
+
+	UPROPERTY(Transient)
+	UPhoneWidget* phoneUI = nullptr;
+	
 };
