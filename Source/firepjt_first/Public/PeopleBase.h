@@ -86,15 +86,7 @@ public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Interaction)
 	USceneComponent* compActorPeople = nullptr;
-	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Interaction)
-	class UAnimationAsset* InteractAnimPhone;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Interaction)
-	class UAnimationAsset* InteractAnimTowel;
-	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Interaction)
-	class UAnimationAsset* InteractAnimPeople;
 	
 		
 public: // stat
@@ -113,6 +105,7 @@ public: // stat
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Stats)
 	float Gear = 1.f;
 
+	// 인터랙팅 액터들
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Interaction)
 	bool IsInteracting = false;
 
@@ -121,7 +114,9 @@ public: // stat
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Stats)
 	bool HasMask = false;
-
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Stats)
+	bool HasPhone = false;
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Stats)
 	bool RescuePeople  = false;

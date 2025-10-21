@@ -272,28 +272,13 @@ void APeopleBase::AttachActor()
 			HasMask = false;
 
 			InteractingActor->ChangeTowel(true);
-
-			if (USkeletalMeshComponent* MeshComp = GetMesh())
-			{
-				// AnimBP를 거치지 않고 단일 애니메이션 모드로 전환
-				MeshComp->SetAnimationMode(EAnimationMode::AnimationSingleNode);
-				// 루프 재생
-				MeshComp->PlayAnimation(InteractAnimTowel, true);
-			}
 		}
 		else if (InteractingActor->ActorHasTag(FName("Phone")))
 		{
 			// compActor에 붙이자.
 			InteractingActor->AttachToComponent(compActor, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
-		
+			HasPhone = true;
 
-			if (USkeletalMeshComponent* MeshComp = GetMesh())
-			{
-				// AnimBP를 거치지 않고 단일 애니메이션 모드로 전환
-				MeshComp->SetAnimationMode(EAnimationMode::AnimationSingleNode);
-				// 루프 재생
-				MeshComp->PlayAnimation(InteractAnimPhone, true);
-			}
 			// 위젯 띄우기
 			auto* pc = Cast<Afirepjt_firstPlayerController>(GetWorld()->GetFirstPlayerController());
 			pc->OpenPhoneUI();
@@ -302,15 +287,7 @@ void APeopleBase::AttachActor()
 		{
 			// compActor에 붙이자.
 			InteractingActor->AttachToComponent(compActorPeople, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
-			
-
-			if (USkeletalMeshComponent* MeshComp = GetMesh())
-			{
-				// AnimBP를 거치지 않고 단일 애니메이션 모드로 전환
-				MeshComp->SetAnimationMode(EAnimationMode::AnimationSingleNode);
-				// 루프 재생
-				MeshComp->PlayAnimation(InteractAnimPeople, true);
-			}
+			RescuePeople = true;
 		}
 		else if (InteractingActor->ActorHasTag(FName("Door")))
     		{
@@ -331,12 +308,6 @@ void APeopleBase::DetachActor(AInteractActor* tempActor)
 	IsInteracting = false;
 	tempActor->IsInteracting = false;
 	InteractingActor->ToggleWidget(true);
-
-	if (USkeletalMeshComponent* MeshComp = GetMesh())
-	{
-		// AnimBP를 거치지 않고 단일 애니메이션 모드로 전환
-		MeshComp->SetAnimationMode(EAnimationMode::AnimationBlueprint);
-	}
 	
 	
 	// 분리하자
@@ -353,7 +324,6 @@ void APeopleBase::DetachActor(AInteractActor* tempActor)
 	{
 		if (tempActor->ActorHasTag(FName("Mask")))
 		{
-		
 			HasMask = false;
 			mainui->ShowMaskUI(false);
 		}
@@ -366,20 +336,23 @@ void APeopleBase::DetachActor(AInteractActor* tempActor)
 		else if (tempActor->ActorHasTag(FName("Phone")))
 		{
 			auto* pc = Cast<Afirepjt_firstPlayerController>(GetWorld()->GetFirstPlayerController());
-
 			pc->ClosePhoneUI();
+			HasPhone = false;
+			
 		}
 		else if (tempActor->ActorHasTag(FName("Door")))
 		{
 			InteractingActor->ToggleDoor();
+		}
+		else if (tempActor->ActorHasTag(FName("People")))
+		{
+			RescuePeople = false;
 		}
 		else
 		{
 			UE_LOG(LogTemp, Log, TEXT("태그 없음 또는 알 수 없는 타입"));
 		}
 	}
-	
-
 	
 	InteractingActor = nullptr;
 }
@@ -420,7 +393,6 @@ void APeopleBase::OnCapsuleBeginOverlap(UPrimitiveComponent* OverlappedComp,
 			colhandle, this, &APeopleBase::CollisionActivate,
 			5.0f, false );
 	}
-	
 }
 
 void APeopleBase::CollisionActivate()

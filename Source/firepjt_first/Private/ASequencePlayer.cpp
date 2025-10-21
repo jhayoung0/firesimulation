@@ -96,7 +96,8 @@ void AASequencePlayer::OnSecondSequenceFinished()
 void AASequencePlayer::MissionOneSequencePlay()
 {
 	SequencePlay();
-	
+
+	UE_LOG(LogTemp, Warning, TEXT("missiononesequence play"));
 	// 듀얼 위젯 띄우기
 	cinematicUI->OpenWidgetToggle(true);
 	
@@ -118,6 +119,7 @@ void AASequencePlayer::MissionOneSequencePlay()
 		IsPlayingCinematic = true;
 	}
 }
+
 
 
 void AASequencePlayer::DoSkip()
@@ -174,14 +176,12 @@ void AASequencePlayer::SequenceEnd()
 	
 }
 
-// phone widget 구독
-void AASequencePlayer::BindToPhoneWidget(UPhoneWidget* InWidget)
+
+void AASequencePlayer::BindToWidget(UPhoneWidget* InWidget)
 {
+	// 델리게이트 바인딩
+	if (!InWidget) return;
+	InWidget->OnRequestPlayCinematic.AddDynamic(this, &AASequencePlayer::MissionOneSequencePlay);
 	
 }
 
-
-void AASequencePlayer::HandleDialCall(const FString& Dial)
-{
-	
-}
