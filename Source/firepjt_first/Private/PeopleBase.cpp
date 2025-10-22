@@ -40,7 +40,7 @@ APeopleBase::APeopleBase()
 	compActorPeople = CreateDefaultSubobject<USceneComponent>(TEXT("InteractingPeople"));
 	compActorPeople ->SetupAttachment(GetMesh(), TEXT("hand_l"));
 
-	// 캡슐 hit
+	// 캡슐 hit	
 	UCapsuleComponent* Cap = GetCapsuleComponent();
 	Cap->SetGenerateOverlapEvents(true);
 	
