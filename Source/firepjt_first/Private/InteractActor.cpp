@@ -19,6 +19,7 @@ AInteractActor::AInteractActor()
 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
+
 	
 	boxComp= CreateDefaultSubobject<UBoxComponent>(TEXT("boxComp"));
 	SetRootComponent(boxComp);
@@ -41,6 +42,11 @@ AInteractActor::AInteractActor()
 	// simulate physics
 	boxComp->SetSimulatePhysics(true);
 	InteractWidgetComp->SetCollisionProfileName(FName("UI"));
+
+
+	// replicates 켜주기
+	SetReplicates(true); 
+	SetReplicateMovement(true); 
 }
 
 // Called when the game starts or when spawned
@@ -69,6 +75,17 @@ void AInteractActor::Tick(float DeltaTime)
 }
 
 
+// 네트워크 설정
+void AInteractActor::GetLifetimeReplicatedProps(
+	TArray<class FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	// Replicate 할 변수 등록
+	//DOREPLIFETIME(AInteractActor, IsInteracting);
+}
+
+
 
 void AInteractActor::ToggleWidget(bool check)
 {
@@ -82,10 +99,7 @@ void AInteractActor::ToggleWidget(bool check)
 			meshComp->SetAnimationMode(EAnimationMode::Type::AnimationBlueprint);
 			meshComp->SetRenderCustomDepth(true);
 			boxComp->SetSimulatePhysics(true);
-
-	
 		}
-		
 	}
 	else
 	{
@@ -119,4 +133,5 @@ void AInteractActor::BillboardInteractKey()
 	
 	
 }
+
 

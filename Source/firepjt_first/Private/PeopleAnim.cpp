@@ -27,13 +27,16 @@ void UPeopleAnim::NativeUpdateAnimation(float DeltaSeconds)
 	isinAir = pawnOwner->GetMovementComponent()->IsFalling();
 	// 기고 있는지 여부 설정
 	isCrawl = pawnOwner->IsCrawl;
-
-	HasMask = pawnOwner->HasMask;
+	// 젖은 타월 쓰고 있는지 여부 설정
 	HasWetTowel = pawnOwner->HasWetTowel;
+	// 사람 옮기고 있는지 여부 설정
+	CarryingPeople = pawnOwner->RescuePeople;
+	// 폰 사용 중인지 여부 설정
+	HasPhone = pawnOwner->HasPhone;
 	
 	// 앞 뒤 이동에 따른 값
 	FVector v = velocity;
 	v.Z = 0;
-	dirH = FVector::DotProduct(pawnOwner->GetActorForwardVector(),v);
-	dirV = FVector::DotProduct(pawnOwner->GetActorRightVector(), v);
+	dirH = FVector::DotProduct(pawnOwner->GetActorRightVector(),v);
+	dirV = FVector::DotProduct(pawnOwner->GetActorForwardVector(), v);
 }

@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "Net/UnrealNetwork.h"
 #include "InteractActor.generated.h"
 
 UCLASS()
@@ -39,9 +40,9 @@ public: // 인터랙트 컴포넌트 붙이기 (아웃라인, 가까이 갔을 �
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	class UAnimationAsset* InteractAnim;
-	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	bool IsInteracting;
+
+	//UPROPERTY(EditAnywhere, BlueprintReadWrite, Replicated)
+	//bool IsInteracting;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	class UInteractWidget* InteractUI;
@@ -62,5 +63,7 @@ public: // 인터랙트 컴포넌트 붙이기 (아웃라인, 가까이 갔을 �
 	UFUNCTION()
 	void BillboardInteractKey();
 
+	// 네트워크 설정
+	virtual void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;
 };
 

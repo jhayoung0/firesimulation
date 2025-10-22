@@ -10,8 +10,8 @@
  * 
  */
 
-// 델리게이트 선언 (번호 전달)
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnDialCall, const FString&, DialNumber);
+// 델리게이트 선언
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnRequestPlayCinematic); 
 
 UCLASS()
 class FIREPJT_FIRST_API UPhoneWidget : public UUserWidget
@@ -19,10 +19,10 @@ class FIREPJT_FIRST_API UPhoneWidget : public UUserWidget
 	GENERATED_BODY()
 
 public:
-	UPROPERTY(BlueprintAssignable, Category="Phone")
-	FOnDialCall OnDialCall;
-
+	UPROPERTY(BlueprintAssignable, Category="Cinematic")
+	FOnRequestPlayCinematic OnRequestPlayCinematic;
 	
+
 public:
 	UPROPERTY(meta=(BindWidget))
 	class UTextBlock* callText;

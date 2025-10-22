@@ -2,7 +2,6 @@
 
 
 #include "firepjt_firstPlayerController.h"
-
 #include "ASequencePlayer.h"
 #include "EnhancedInputSubsystems.h"
 #include "Engine/LocalPlayer.h"
@@ -27,6 +26,24 @@ Afirepjt_firstPlayerController::Afirepjt_firstPlayerController()
 void Afirepjt_firstPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
+	
+	// phone ui를 만들자
+	if (phonewidget)
+	{
+		phoneUI = CreateWidget<UPhoneWidget>(GetWorld(), phonewidget);
+	}
+
+	
+	// 시퀀스 액터 찾아두기
+	if (UWorld* W = GetWorld())
+	{
+		AASequencePlayer* seq = Cast<AASequencePlayer>(
+			UGameplayStatics::GetActorOfClass(W, AASequencePlayer::StaticClass()));
+		if (seq)
+		{
+			seq->BindToWidget(phoneUI);
+		}
+	}
 	
 	// only spawn touch controls on local player controllers
 	if (SVirtualJoystick::ShouldDisplayTouchInterface() && IsLocalPlayerController())
@@ -179,6 +196,7 @@ void Afirepjt_firstPlayerController::OnGamePhaseChanged(EGamePhase NewPhase)
 	}
 }
 
+
 void Afirepjt_firstPlayerController::Client_UpdatePlayerCount_Implementation(int32 CurrentPlayers, int32 MaxPlayers)
 {
 	if (LobbyWidget)
@@ -195,6 +213,33 @@ void Afirepjt_firstPlayerController::Server_RequestPlayerCount_Implementation()
 		LobbyGM->BroadcastPlayerCount();
 	}
 }
+
+
+void Afirepjt_firstPlayerController::OpenPhoneUI()
+{
+
+	
+	phoneUI->AddToViewport();
+	
+	bShowMouseCursor = true;
+	SetIgnoreLookInput(true);
+	SetIgnoreMoveInput(true);
+	
+	AASequencePlayer* Seq = Cast<AASequencePlayer>(
+		UGameplayStatics::GetActorOfClass(GetWorld(), AASequencePlayer::StaticClass())
+	);
+}
+
+void Afirepjt_firstPlayerController::ClosePhoneUI()
+{
+	phoneUI->RemoveFromParent();
+
+	bShowMouseCursor = false;
+
+	SetIgnoreLookInput(false);
+	SetIgnoreMoveInput(false);
+}
+
 
 
 
