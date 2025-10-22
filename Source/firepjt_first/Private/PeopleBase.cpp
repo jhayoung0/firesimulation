@@ -31,16 +31,18 @@ APeopleBase::APeopleBase()
 	//상호작용 액터 붙일 컴포넌트
 	compActorMask = CreateDefaultSubobject<USceneComponent>(TEXT("InteractingMask"));
 	compActorMask ->SetupAttachment(GetMesh(), TEXT("headsocket"));
-	//compActorMask->SetRelativeLocation(FVector(0,7,5.5f));
 	
 	
 	compActorTowel = CreateDefaultSubobject<USceneComponent>(TEXT("InteractingTowel"));
 	compActorTowel ->SetupAttachment(GetMesh(), TEXT("headsocket2"));
 
 	compActorPeople = CreateDefaultSubobject<USceneComponent>(TEXT("InteractingPeople"));
-	compActorPeople ->SetupAttachment(GetMesh(), TEXT("hand_l"));
+	compActorPeople_first = CreateDefaultSubobject<USceneComponent>(TEXT("InteractingPeople_first"));
+		
+	compActorPeople ->SetupAttachment(GetMesh(), TEXT("SpineSocket"));
+	compActorPeople_first ->SetupAttachment(GetFirstPersonMesh(), TEXT("SpineSocket_first"));
 
-	// 캡슐 hit
+	// 캡슐 hit	
 	UCapsuleComponent* Cap = GetCapsuleComponent();
 	Cap->SetGenerateOverlapEvents(true);
 	
@@ -75,10 +77,6 @@ void APeopleBase::BeginPlay()
 			mainui->SetOxygenPercent(InitPercent);
 		}
 	}
-
-
-	
-
 }
 
 
@@ -153,6 +151,9 @@ void APeopleBase::Tick(float DeltaSeconds)
 	}
 }
 
+
+
+
 void APeopleBase::ApplyCrawlState(bool bEnable)
 {
 
@@ -162,6 +163,17 @@ void APeopleBase::ApplyCrawlState(bool bEnable)
 
 	// crawl 상태일 때는 더 느리게
 	GetCharacterMovement()->MaxWalkSpeed = bEnable ? 200.f : 600.f;
+}
+
+void APeopleBase::GetLifetimeReplicatedProps(
+	TArray<class FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	
+	// replicate할 변수 등록
+	DOREPLIFETIME(APeopleBase, InteractingActor);
+
+	
 }
 
 
@@ -198,11 +210,20 @@ void APeopleBase::crawlAction()
 // e 키
 void APeopleBase::Interaction()
 {
+	// 서버한테 인터랙션 요청
+	ServerRPC_Interaction();
+}
 
+
+// 서버에게 인터랙션 attach or detach 해달라고 요청
+void APeopleBase::ServerRPC_Interaction_Implementation()
+{
 	if (IsInteracting)
 	{
 		AInteractActor* tempActor = InteractingActor;
-		DetachActor(tempActor);
+		
+		// 멀티 캐스트로 변경
+		MultiCastRPC_DetachActor(tempActor);
 		return;
 	}
 
@@ -228,27 +249,31 @@ void APeopleBase::Interaction()
 	}
 	
 	if (ClosestIndex != -1) {
+		// 여기서 인터랙팅 액터가 변경되어서 클라에서 attachactor가 호출됨.
 		InteractingActor = Cast<AInteractActor>(allInteractActor[ClosestIndex]);
 		// 검색된 액터의 상호작용 함수를 호출
 		if (InteractingActor) {
 			AttachActor();
 		}
 	}
-	
 }
 
 
+// 모든 클라한테 detach 요청
+void APeopleBase::MultiCastRPC_DetachActor_Implementation(
+	AInteractActor* tempActor)
+{
+	DetachActor(tempActor);
+}
 
 void APeopleBase::AttachActor()
 {
 
 	IsInteracting = true;
-	InteractingActor->IsInteracting = true;
+	//InteractingActor->IsInteracting = true;
 	InteractingActor->ToggleWidget(false);
 	ActorRotation = InteractingActor->GetActorRotation();
 	ActorLocation = InteractingActor->GetActorLocation();
-
-
 
 	
 	// tag에 따라서 구분하자.
@@ -261,7 +286,12 @@ void APeopleBase::AttachActor()
 		
 			HasMask = true;
 			HasWetTowel = false;
-			mainui->ShowMaskUI(true);
+			
+			if (IsLocallyControlled())
+			{
+				mainui->ShowMaskUI(true);
+			}
+
 		}
 		else if (InteractingActor->ActorHasTag(FName("WetTowel")))
 		{
@@ -272,45 +302,42 @@ void APeopleBase::AttachActor()
 			HasMask = false;
 
 			InteractingActor->ChangeTowel(true);
-
-			if (USkeletalMeshComponent* MeshComp = GetMesh())
-			{
-				// AnimBP를 거치지 않고 단일 애니메이션 모드로 전환
-				MeshComp->SetAnimationMode(EAnimationMode::AnimationSingleNode);
-				// 루프 재생
-				MeshComp->PlayAnimation(InteractAnimTowel, true);
-			}
 		}
 		else if (InteractingActor->ActorHasTag(FName("Phone")))
 		{
 			// compActor에 붙이자.
 			InteractingActor->AttachToComponent(compActor, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
-		
+			HasPhone = true;
 
-			if (USkeletalMeshComponent* MeshComp = GetMesh())
+
+						
+			if (IsLocallyControlled())
 			{
-				// AnimBP를 거치지 않고 단일 애니메이션 모드로 전환
-				MeshComp->SetAnimationMode(EAnimationMode::AnimationSingleNode);
-				// 루프 재생
-				MeshComp->PlayAnimation(InteractAnimPhone, true);
+				// 위젯 띄우기
+				auto* pc = Cast<Afirepjt_firstPlayerController>(GetWorld()->GetFirstPlayerController());
+				pc->OpenPhoneUI();
 			}
-			// 위젯 띄우기
-			auto* pc = Cast<Afirepjt_firstPlayerController>(GetWorld()->GetFirstPlayerController());
-			pc->OpenPhoneUI();
+			
+			
+
 		}
 		else if (InteractingActor->ActorHasTag(FName("People")))
 		{
-			// compActor에 붙이자.
-			InteractingActor->AttachToComponent(compActorPeople, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
-			
-
-			if (USkeletalMeshComponent* MeshComp = GetMesh())
+			if (!HasAuthority())
 			{
-				// AnimBP를 거치지 않고 단일 애니메이션 모드로 전환
-				MeshComp->SetAnimationMode(EAnimationMode::AnimationSingleNode);
-				// 루프 재생
-				MeshComp->PlayAnimation(InteractAnimPeople, true);
+				// 남이 보는 시선
+				// compActor에 붙이자.
+				InteractingActor->AttachToComponent(compActorPeople, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+				RescuePeople = true;
 			}
+			else
+			{
+				// 자기가 보는 시선
+				// compActor에 붙이자.
+				InteractingActor->AttachToComponent(compActorPeople_first, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+				RescuePeople = true;
+			}
+	
 		}
 		else if (InteractingActor->ActorHasTag(FName("Door")))
     		{
@@ -329,14 +356,8 @@ void APeopleBase::AttachActor()
 void APeopleBase::DetachActor(AInteractActor* tempActor)
 {
 	IsInteracting = false;
-	tempActor->IsInteracting = false;
+	//tempActor->IsInteracting = false;
 	InteractingActor->ToggleWidget(true);
-
-	if (USkeletalMeshComponent* MeshComp = GetMesh())
-	{
-		// AnimBP를 거치지 않고 단일 애니메이션 모드로 전환
-		MeshComp->SetAnimationMode(EAnimationMode::AnimationBlueprint);
-	}
 	
 	
 	// 분리하자
@@ -353,9 +374,12 @@ void APeopleBase::DetachActor(AInteractActor* tempActor)
 	{
 		if (tempActor->ActorHasTag(FName("Mask")))
 		{
-		
 			HasMask = false;
-			mainui->ShowMaskUI(false);
+			if (IsLocallyControlled())
+			{
+				mainui->ShowMaskUI(false);
+			}
+			
 		}
 		else if (tempActor->ActorHasTag(FName("WetTowel")))
 		{
@@ -365,21 +389,29 @@ void APeopleBase::DetachActor(AInteractActor* tempActor)
 		}
 		else if (tempActor->ActorHasTag(FName("Phone")))
 		{
-			auto* pc = Cast<Afirepjt_firstPlayerController>(GetWorld()->GetFirstPlayerController());
+			if (IsLocallyControlled())
+			{
+				auto* pc = Cast<Afirepjt_firstPlayerController>(GetWorld()->GetFirstPlayerController());
+				pc->ClosePhoneUI();
+			}
+			
 
-			pc->ClosePhoneUI();
+			HasPhone = false;
+			
 		}
 		else if (tempActor->ActorHasTag(FName("Door")))
 		{
 			InteractingActor->ToggleDoor();
+		}
+		else if (tempActor->ActorHasTag(FName("People")))
+		{
+			RescuePeople = false;
 		}
 		else
 		{
 			UE_LOG(LogTemp, Log, TEXT("태그 없음 또는 알 수 없는 타입"));
 		}
 	}
-	
-
 	
 	InteractingActor = nullptr;
 }
@@ -420,7 +452,6 @@ void APeopleBase::OnCapsuleBeginOverlap(UPrimitiveComponent* OverlappedComp,
 			colhandle, this, &APeopleBase::CollisionActivate,
 			5.0f, false );
 	}
-	
 }
 
 void APeopleBase::CollisionActivate()
@@ -430,4 +461,5 @@ void APeopleBase::CollisionActivate()
 		Cap->SetGenerateOverlapEvents(true);
 	}
 }
+
 

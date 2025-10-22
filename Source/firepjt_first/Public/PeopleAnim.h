@@ -45,12 +45,14 @@ public:
 
 	// 상호작용 물건
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	bool HasMask;
+	bool CarryingPeople;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	bool HasWetTowel;
 	
-
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	bool HasPhone;
+	
 	virtual void NativeInitializeAnimation() override;
 	virtual void NativeUpdateAnimation(float DeltaSeconds) override;
 

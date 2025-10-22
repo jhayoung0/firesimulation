@@ -28,6 +28,24 @@ void Afirepjt_firstPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
 	
+	// phone ui를 만들자
+	if (phonewidget)
+	{
+		phoneUI = CreateWidget<UPhoneWidget>(GetWorld(), phonewidget);
+	}
+
+	
+	// 시퀀스 액터 찾아두기
+	if (UWorld* W = GetWorld())
+	{
+		AASequencePlayer* seq = Cast<AASequencePlayer>(
+			UGameplayStatics::GetActorOfClass(W, AASequencePlayer::StaticClass()));
+		if (seq)
+		{
+			seq->BindToWidget(phoneUI);
+		}
+	}
+	
 	// only spawn touch controls on local player controllers
 	if (SVirtualJoystick::ShouldDisplayTouchInterface() && IsLocalPlayerController())
 	{
@@ -216,12 +234,7 @@ void Afirepjt_firstPlayerController::Server_SetPlayerRole_Implementation(EPlayer
 
 void Afirepjt_firstPlayerController::OpenPhoneUI()
 {
-	// phone ui를 만들자
-	if (phonewidget)
-	{
-		phoneUI = CreateWidget<UPhoneWidget>(GetWorld(), phonewidget);
-		
-	}
+
 	
 	phoneUI->AddToViewport();
 	

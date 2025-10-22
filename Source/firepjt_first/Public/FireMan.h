@@ -24,6 +24,8 @@ public:
 
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+	virtual void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;
+
 	// Components
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TObjectPtr<class UBoxComponent> BoxCollision;
@@ -31,6 +33,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TObjectPtr<class UCameraComponent> FiremanCamera;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TObjectPtr<class USceneComponent> Person2Pos;
+	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TObjectPtr<class USceneComponent> FirehosePos;
 
@@ -40,6 +45,7 @@ public:
 	// FireHose
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	TObjectPtr<class AFireHose> FireHoseActor;
+	UPROPERTY(Replicated)
 	bool bDoesEquipFireHose = false;
 	
 	// Crowbar
@@ -48,10 +54,17 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	TSubclassOf<class AInteractActor> DoorClass;
 	UPROPERTY()
-	TObjectPtr<AActor> DoorActor;
+	TObjectPtr<AInteractActor> DoorActor;
+	UPROPERTY(Replicated)
 	bool bDoesEquipCrowbar = false;
 
 	// Carry Person
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	TSubclassOf<class AInteractActor> Person2Class;
+	UPROPERTY()
+	TObjectPtr<AInteractActor> Person2Actor;
+	FRotator ActorRotation;
+	UPROPERTY(Replicated)
 	bool bDoesCarryingPerson = false;
 
 	// Mask
@@ -64,6 +77,9 @@ public:
 	// Interact
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float InteractDist = 1000.f;
+
+	// Get
+	float GetRotationSpine02();
 	
 private:
 	// Animation Blueprint
@@ -91,9 +107,27 @@ private:
 
 	void OnMove(const struct FInputActionValue& value);
 	void OnLook(const struct FInputActionValue& value);
+	void AddPitchInputToSpine(float pitch);
+
+	// FireHose
 	void OnEquipFireHose();
+	UFUNCTION(Server, Reliable)
+	void ServerRPC_OnEquipFireHose();
+	UFUNCTION(NetMulticast, Reliable)
+	void Multicast_OnEquipFireHose();
+
+	// Crowbar
 	void OnEquipCrowbar();
+	UFUNCTION(Server, Reliable)
+	void ServerRPC_OnEquipCrowbar();
+	UFUNCTION(NetMulticast, Reliable)
+	void Multicast_OnEquipCrowbar();
+
+	// FireHose Shot
 	void OnFireHoseShot();
+	UFUNCTION(Server, Reliable)
+	void ServerRPC_OnFireHoseShot();
+	
 	void OnUseTool();
 	void OnMaskOut();
 	void OnCarryPerson();
@@ -101,6 +135,10 @@ private:
 	// Movement Variables
 	FVector direction;
 	float WalkSpeed;
+
+	// Rotation Variable
+	UPROPERTY(Replicated)
+	float Rotation_Spine02;
 
 	// FireHose Off
 	void OffFireHose();

@@ -11,10 +11,8 @@
 
 void UPhoneWidget::AppendDigit(const FString& Digit)
 {
-
 	// 버튼 sfx
 	UGameplayStatics::PlaySound2D(this, callbuttonSound);
-		
 	// 숫자만 허용 
 	if (Digit.Len() == 1 && FChar::IsDigit(Digit[0]))
 	{
@@ -23,11 +21,8 @@ void UPhoneWidget::AppendDigit(const FString& Digit)
 			RawNumber += Digit;
 			if (callText)
 				callText->SetText(FText::FromString(RawNumber));
-			
-			
 		}
 	}
-	
 }
 
 
@@ -65,18 +60,22 @@ void UPhoneWidget::NativeConstruct()
 
 void UPhoneWidget::TryCall()
 {
-	OnDialCall.Broadcast(RawNumber);
 	
 	if (RawNumber== TEXT("119"))
 	{
 		auto* world = GetWorld();
 		auto* peoplebase = Cast<APeopleBase>(UGameplayStatics::GetPlayerPawn(world,0));
 		peoplebase->Interaction();
-
 		// 전화 sfx
 		UGameplayStatics::PlaySound2D(this, callSound);
+
+		// 델리게이트 브로드캐스트 (시네마틱 재생)
+		OnRequestPlayCinematic.Broadcast();
+
 		// 다음 미션으로 넘기기
 		peoplebase->GoNextMission();
+
+		
 	}
 	else
 	{

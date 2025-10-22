@@ -48,14 +48,23 @@ void UCinematicUI::NativeConstruct()
 
 void UCinematicUI::OnSkipClicked()
 {
-	// 스킵 버튼 클릭
-	UE_LOG(LogTemp, Warning, TEXT("skip btn"));
+	ServerRPC_OnSkipClicked();
+}
 
+void UCinematicUI::MultiCastRPC_OnSkipClicked_Implementation()
+{
+	// 스킵 버튼 클릭
 	auto* seq = Cast<AASequencePlayer>(UGameplayStatics::GetActorOfClass(GetWorld(), AASequencePlayer::StaticClass()));
 	if (seq)
 	{
 		seq->DoSkip();
 	}
+	
+}
 
+void UCinematicUI::ServerRPC_OnSkipClicked_Implementation()
+{
+
+	MultiCastRPC_OnSkipClicked();
 	
 }

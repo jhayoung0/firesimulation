@@ -7,6 +7,7 @@
 #include "LevelSequence.h"
 #include "LevelSequenceActor.h"
 #include "MainUI.h"
+#include "PhoneWidget.h"
 #include "GameFramework/Actor.h"
 #include "ASequencePlayer.generated.h"
 
@@ -31,27 +32,28 @@ protected:
 public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+	
+	// 모든 시퀀스 시작 및 종료 시 호출
+	UFUNCTION()
+	void SequencePlay();
+	UFUNCTION()
+	void SequenceEnd();
 
-
+	
 	// 시네마틱 플레이 여부
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool IsPlayingCinematic;
 
 	// intro cinematic
 	void PlayIntroSequence();
-
 	UPROPERTY(EditAnywhere, Category = "Sequence")
 	TObjectPtr<ULevelSequence> FirstSequence;
-
 	UPROPERTY(EditAnywhere, Category = "Sequence")
 	TObjectPtr<ULevelSequence> SecondSequence;
-
 	UPROPERTY()
 	TObjectPtr<ULevelSequencePlayer> FirstPlayer;
-
 	UPROPERTY()
 	TObjectPtr<ULevelSequencePlayer> SecondPlayer;
-
 	UFUNCTION()
 	void OnFirstSequenceFinished();
 	UFUNCTION()
@@ -71,25 +73,13 @@ public:
 	UPROPERTY()
 	TObjectPtr<ULevelSequencePlayer> Mission1_Fireman_Player;
 
+	UFUNCTION()
 	void MissionOneSequencePlay();
 
-
-	// 모든 시퀀스 시작 및 종료 시 호출
-	UFUNCTION()
-	void SequencePlay();
-	UFUNCTION()
-	void SequenceEnd();
-
-
 	// 델리게이트
-	UFUNCTION(BlueprintCallable) 
-	void BindToPhoneWidget(UPhoneWidget* InWidget);
+	UFUNCTION(BlueprintCallable, Category="Cinematic")
+	void BindToWidget(UPhoneWidget* InWidget);
 
-	UFUNCTION() 
-	void HandleDialCall(const FString& Dial);
-	
-	UPROPERTY(EditInstanceOnly, Category="Sequence")
-	TWeakObjectPtr<ALevelSequenceActor> LevelSequenceActor;
 
 	
 

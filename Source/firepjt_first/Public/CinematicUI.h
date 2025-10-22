@@ -39,6 +39,7 @@ public:
 	// 스킵 버튼 
 	UPROPERTY(meta=(BindWidget))
 	class UButton* Skipbtn;
+	
 	//토글
 	UFUNCTION()
 	void OpenWidgetToggle(bool isdual);
@@ -53,4 +54,10 @@ public:
 
 	UFUNCTION()
 	void OnSkipClicked();
+
+	UFUNCTION(Server, Reliable)
+	void ServerRPC_OnSkipClicked();
+
+	UFUNCTION(NetMulticast, Reliable)
+	void MultiCastRPC_OnSkipClicked();
 };
