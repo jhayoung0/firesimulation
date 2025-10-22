@@ -75,10 +75,6 @@ void APeopleBase::BeginPlay()
 			mainui->SetOxygenPercent(InitPercent);
 		}
 	}
-
-
-	
-
 }
 
 
@@ -153,6 +149,9 @@ void APeopleBase::Tick(float DeltaSeconds)
 	}
 }
 
+
+
+
 void APeopleBase::ApplyCrawlState(bool bEnable)
 {
 
@@ -162,6 +161,17 @@ void APeopleBase::ApplyCrawlState(bool bEnable)
 
 	// crawl 상태일 때는 더 느리게
 	GetCharacterMovement()->MaxWalkSpeed = bEnable ? 200.f : 600.f;
+}
+
+void APeopleBase::GetLifetimeReplicatedProps(
+	TArray<class FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	
+	// replicate할 변수 등록
+	DOREPLIFETIME(APeopleBase, InteractingActor);
+
+	
 }
 
 
@@ -198,11 +208,20 @@ void APeopleBase::crawlAction()
 // e 키
 void APeopleBase::Interaction()
 {
+	// 서버한테 인터랙션 요청
+	ServerRPC_Interaction();
+}
 
+
+// 서버에게 인터랙션 attach or detach 해달라고 요청
+void APeopleBase::ServerRPC_Interaction_Implementation()
+{
 	if (IsInteracting)
 	{
 		AInteractActor* tempActor = InteractingActor;
-		DetachActor(tempActor);
+		
+		// 멀티 캐스트로 변경
+		MultiCastRPC_DetachActor(tempActor);
 		return;
 	}
 
@@ -228,27 +247,31 @@ void APeopleBase::Interaction()
 	}
 	
 	if (ClosestIndex != -1) {
+		// 여기서 인터랙팅 액터가 변경되어서 클라에서 attachactor가 호출됨.
 		InteractingActor = Cast<AInteractActor>(allInteractActor[ClosestIndex]);
 		// 검색된 액터의 상호작용 함수를 호출
 		if (InteractingActor) {
 			AttachActor();
 		}
 	}
-	
 }
 
 
+// 모든 클라한테 detach 요청
+void APeopleBase::MultiCastRPC_DetachActor_Implementation(
+	AInteractActor* tempActor)
+{
+	DetachActor(tempActor);
+}
 
 void APeopleBase::AttachActor()
 {
 
 	IsInteracting = true;
-	InteractingActor->IsInteracting = true;
+	//InteractingActor->IsInteracting = true;
 	InteractingActor->ToggleWidget(false);
 	ActorRotation = InteractingActor->GetActorRotation();
 	ActorLocation = InteractingActor->GetActorLocation();
-
-
 
 	
 	// tag에 따라서 구분하자.
@@ -261,7 +284,12 @@ void APeopleBase::AttachActor()
 		
 			HasMask = true;
 			HasWetTowel = false;
-			mainui->ShowMaskUI(true);
+			
+			if (IsLocallyControlled())
+			{
+				mainui->ShowMaskUI(true);
+			}
+
 		}
 		else if (InteractingActor->ActorHasTag(FName("WetTowel")))
 		{
@@ -279,9 +307,17 @@ void APeopleBase::AttachActor()
 			InteractingActor->AttachToComponent(compActor, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
 			HasPhone = true;
 
-			// 위젯 띄우기
-			auto* pc = Cast<Afirepjt_firstPlayerController>(GetWorld()->GetFirstPlayerController());
-			pc->OpenPhoneUI();
+
+						
+			if (IsLocallyControlled())
+			{
+				// 위젯 띄우기
+				auto* pc = Cast<Afirepjt_firstPlayerController>(GetWorld()->GetFirstPlayerController());
+				pc->OpenPhoneUI();
+			}
+			
+			
+
 		}
 		else if (InteractingActor->ActorHasTag(FName("People")))
 		{
@@ -306,7 +342,7 @@ void APeopleBase::AttachActor()
 void APeopleBase::DetachActor(AInteractActor* tempActor)
 {
 	IsInteracting = false;
-	tempActor->IsInteracting = false;
+	//tempActor->IsInteracting = false;
 	InteractingActor->ToggleWidget(true);
 	
 	
@@ -325,7 +361,11 @@ void APeopleBase::DetachActor(AInteractActor* tempActor)
 		if (tempActor->ActorHasTag(FName("Mask")))
 		{
 			HasMask = false;
-			mainui->ShowMaskUI(false);
+			if (IsLocallyControlled())
+			{
+				mainui->ShowMaskUI(false);
+			}
+			
 		}
 		else if (tempActor->ActorHasTag(FName("WetTowel")))
 		{
@@ -335,8 +375,13 @@ void APeopleBase::DetachActor(AInteractActor* tempActor)
 		}
 		else if (tempActor->ActorHasTag(FName("Phone")))
 		{
-			auto* pc = Cast<Afirepjt_firstPlayerController>(GetWorld()->GetFirstPlayerController());
-			pc->ClosePhoneUI();
+			if (IsLocallyControlled())
+			{
+				auto* pc = Cast<Afirepjt_firstPlayerController>(GetWorld()->GetFirstPlayerController());
+				pc->ClosePhoneUI();
+			}
+			
+
 			HasPhone = false;
 			
 		}
@@ -402,4 +447,5 @@ void APeopleBase::CollisionActivate()
 		Cap->SetGenerateOverlapEvents(true);
 	}
 }
+
 
