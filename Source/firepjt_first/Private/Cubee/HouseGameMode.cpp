@@ -2,7 +2,10 @@
 
 
 #include "Cubee/HouseGameMode.h"
+#include "Cubee/FireGameInstance.h"
 #include "Cubee/HouseGameState.h"
+#include "FireMan.h"
+#include "PeopleBase.h"
 #include "TimerManager.h"
 #include "Kismet/GameplayStatics.h"
 
@@ -12,8 +15,72 @@ AHouseGameMode::AHouseGameMode()
 	GameStateClass = AHouseGameState::StaticClass();
 	PlayerStateClass = AHousePlayerState::StaticClass();
 
+	// Default Pawn Classes 설정
+	FirefighterPawnClass = AFireMan::StaticClass();
+	CitizenPawnClass = APeopleBase::StaticClass();
+
 	// Tick 비활성화 (Timer 기반으로 동작)
 	PrimaryActorTick.bCanEverTick = false;
+}
+
+UClass* AHouseGameMode::GetDefaultPawnClassForController_Implementation(AController* InController)
+{
+	// GameInstance에서 PlayerController의 Role 조회
+	APlayerController* PC = Cast<APlayerController>(InController);
+	if (!PC)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("[HouseGameMode] Controller is not a PlayerController, using default"));
+		return Super::GetDefaultPawnClassForController(InController);
+	}
+
+	UFireGameInstance* GameInstance = GetGameInstance<UFireGameInstance>();
+	if (!GameInstance)
+	{
+		UE_LOG(LogTemp, Error, TEXT("[HouseGameMode] FireGameInstance not found! Using default pawn."));
+		return Super::GetDefaultPawnClassForController(InController);
+	}
+
+	// Role 조회
+	EPlayerRole CurrentRole = GameInstance->GetPlayerRole(PC);
+
+	// Role에 따라 Pawn Class 결정
+	UClass* SelectedPawnClass = nullptr;
+
+	switch (CurrentRole)
+	{
+	case EPlayerRole::Firefighter:
+		SelectedPawnClass = FirefighterPawnClass;
+		UE_LOG(LogTemp, Warning, TEXT("[HouseGameMode] Spawning Firefighter pawn for %s"), *PC->GetName());
+		break;
+
+	case EPlayerRole::Citizen:
+		SelectedPawnClass = CitizenPawnClass;
+		UE_LOG(LogTemp, Warning, TEXT("[HouseGameMode] Spawning Citizen pawn for %s"), *PC->GetName());
+		break;
+
+	default:
+		UE_LOG(LogTemp, Warning, TEXT("[HouseGameMode] No role assigned for %s, using Citizen as default"), *PC->GetName());
+		SelectedPawnClass = CitizenPawnClass;
+		break;
+	}
+
+	// Pawn Class가 설정되지 않았으면 기본값 사용
+	if (!SelectedPawnClass)
+	{
+		UE_LOG(LogTemp, Error, TEXT("[HouseGameMode] Selected pawn class is null! Using default."));
+		return Super::GetDefaultPawnClassForController(InController);
+	}
+
+	// PlayerState에도 Role 저장 (동기화)
+	AHousePlayerState* HousePS = PC->GetPlayerState<AHousePlayerState>();
+	if (HousePS && CurrentRole != EPlayerRole::None)
+	{
+		HousePS->PlayerRole = CurrentRole;
+		UE_LOG(LogTemp, Warning, TEXT("[HouseGameMode] Set PlayerState role to %s"),
+			*UEnum::GetValueAsString(CurrentRole));
+	}
+
+	return SelectedPawnClass;
 }
 
 void AHouseGameMode::BeginPlay()
@@ -35,7 +102,7 @@ void AHouseGameMode::BeginPlay()
 		GetWorldTimerManager().SetTimer(TimerHandle, FTimerDelegate::CreateLambda([&]
 		{
 			ChangeGamePhase(EGamePhase::Intro);
-			
+
 		}), 1.f, false);
 	}
 }

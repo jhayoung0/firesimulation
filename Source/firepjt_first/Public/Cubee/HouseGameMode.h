@@ -20,11 +20,22 @@ public:
 
 	virtual void BeginPlay() override;
 
+	// Role에 따라 올바른 Pawn Class 반환
+	virtual UClass* GetDefaultPawnClassForController_Implementation(AController* InController) override;
+
 public:
 	// Game (타이머 시작) 
 	UFUNCTION(BlueprintCallable, Category = "Game")
 	void StartGame();
 	
+protected:
+	// Pawn Classes for each role
+	UPROPERTY(EditDefaultsOnly, Category = "Pawn")
+	TSubclassOf<APawn> FirefighterPawnClass;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Pawn")
+	TSubclassOf<APawn> CitizenPawnClass;
+
 protected:
 	// Mission
 	UPROPERTY(EditDefaultsOnly, Category = "Mission")

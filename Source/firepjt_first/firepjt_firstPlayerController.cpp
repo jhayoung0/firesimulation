@@ -9,6 +9,7 @@
 #include "firepjt_firstCameraManager.h"
 #include "Blueprint/UserWidget.h"
 #include "firepjt_first.h"
+#include "Cubee/FireGameInstance.h"
 #include "Cubee/HouseGameState.h"
 #include "Cubee/InGameWidget.h"
 #include "Cubee/LobbyGameMode.h"
@@ -193,6 +194,22 @@ void Afirepjt_firstPlayerController::Server_RequestPlayerCount_Implementation()
 	if (LobbyGM)
 	{
 		LobbyGM->BroadcastPlayerCount();
+	}
+}
+
+void Afirepjt_firstPlayerController::Server_SetPlayerRole_Implementation(EPlayerRole NewRole)
+{
+	// Server에서만 실행됨
+	UFireGameInstance* GameInstance = GetGameInstance<UFireGameInstance>();
+	if (GameInstance)
+	{
+		GameInstance->SetPlayerRole(this, NewRole);
+		UE_LOG(LogTemp, Warning, TEXT("[PlayerController] Server received role selection: %s for %s"),
+			*UEnum::GetValueAsString(NewRole), *GetName());
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("[PlayerController] FireGameInstance not found!"));
 	}
 }
 

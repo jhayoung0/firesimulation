@@ -6,6 +6,7 @@
 #include "Components/Button.h"
 #include "Components/TextBlock.h"
 #include "Cubee/LobbyGameMode.h"
+#include "firepjt_firstPlayerController.h"
 
 void ULobbyWidget::NativeConstruct()
 {
@@ -40,16 +41,30 @@ void ULobbyWidget::OnStartClicked()
 
 void ULobbyWidget::OnFirefighterClicked()
 {
-	ALobbyGameMode* GM = Cast<ALobbyGameMode>(GetWorld()->GetAuthGameMode());
-	if (GM)
+	// PlayerController를 통해 Server RPC 호출
+	if (APlayerController* PC = GetOwningPlayer())
 	{
-		
+		Afirepjt_firstPlayerController* CustomPC = Cast<Afirepjt_firstPlayerController>(PC);
+		if (CustomPC)
+		{
+			CustomPC->Server_SetPlayerRole(EPlayerRole::Firefighter);
+			UE_LOG(LogTemp, Warning, TEXT("[LobbyWidget] Firefighter role selected by %s"), *PC->GetName());
+		}
 	}
 }
 
 void ULobbyWidget::OnCitizenClicked()
 {
-	
+	// PlayerController를 통해 Server RPC 호출
+	if (APlayerController* PC = GetOwningPlayer())
+	{
+		Afirepjt_firstPlayerController* CustomPC = Cast<Afirepjt_firstPlayerController>(PC);
+		if (CustomPC)
+		{
+			CustomPC->Server_SetPlayerRole(EPlayerRole::Citizen);
+			UE_LOG(LogTemp, Warning, TEXT("[LobbyWidget] Citizen role selected by %s"), *PC->GetName());
+		}
+	}
 }
 
 void ULobbyWidget::UpdatePlayerCount(int32 Current, int32 Max)

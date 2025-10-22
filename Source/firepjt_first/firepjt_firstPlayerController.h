@@ -82,6 +82,10 @@ public:
 	UFUNCTION(Server, Reliable)
 	void Server_RequestPlayerCount();
 
+	// Server RPC to set player role (called from Lobby)
+	UFUNCTION(Server, Reliable)
+	void Server_SetPlayerRole(EPlayerRole NewRole);
+
 protected:
 	// Game state delegate binding
 	void BindToGameStateEvents();
