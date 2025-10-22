@@ -72,7 +72,8 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Interaction)
 	USceneComponent* compActorPeople = nullptr;
 
-	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Interaction)
+	USceneComponent* compActorPeople_first = nullptr;
 		
 public: // stat
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Stats)

@@ -31,14 +31,16 @@ APeopleBase::APeopleBase()
 	//상호작용 액터 붙일 컴포넌트
 	compActorMask = CreateDefaultSubobject<USceneComponent>(TEXT("InteractingMask"));
 	compActorMask ->SetupAttachment(GetMesh(), TEXT("headsocket"));
-	//compActorMask->SetRelativeLocation(FVector(0,7,5.5f));
 	
 	
 	compActorTowel = CreateDefaultSubobject<USceneComponent>(TEXT("InteractingTowel"));
 	compActorTowel ->SetupAttachment(GetMesh(), TEXT("headsocket2"));
 
 	compActorPeople = CreateDefaultSubobject<USceneComponent>(TEXT("InteractingPeople"));
-	compActorPeople ->SetupAttachment(GetMesh(), TEXT("hand_l"));
+	compActorPeople_first = CreateDefaultSubobject<USceneComponent>(TEXT("InteractingPeople_first"));
+		
+	compActorPeople ->SetupAttachment(GetMesh(), TEXT("SpineSocket"));
+	compActorPeople_first ->SetupAttachment(GetFirstPersonMesh(), TEXT("SpineSocket_first"));
 
 	// 캡슐 hit	
 	UCapsuleComponent* Cap = GetCapsuleComponent();
@@ -321,9 +323,21 @@ void APeopleBase::AttachActor()
 		}
 		else if (InteractingActor->ActorHasTag(FName("People")))
 		{
-			// compActor에 붙이자.
-			InteractingActor->AttachToComponent(compActorPeople, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
-			RescuePeople = true;
+			if (!HasAuthority())
+			{
+				// 남이 보는 시선
+				// compActor에 붙이자.
+				InteractingActor->AttachToComponent(compActorPeople, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+				RescuePeople = true;
+			}
+			else
+			{
+				// 자기가 보는 시선
+				// compActor에 붙이자.
+				InteractingActor->AttachToComponent(compActorPeople_first, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+				RescuePeople = true;
+			}
+	
 		}
 		else if (InteractingActor->ActorHasTag(FName("Door")))
     		{
