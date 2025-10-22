@@ -36,7 +36,7 @@ AFireMan::AFireMan()
 	// Camera Collision
 	BoxCollision = CreateDefaultSubobject<UBoxComponent>(TEXT("BoxCollision"));
 	BoxCollision->SetupAttachment(GetMesh(), TEXT("head"));
-	BoxCollision->SetRelativeLocationAndRotation(FVector(-9.396923,-3.420199,0),FRotator(0,20,-90));
+	BoxCollision->SetRelativeLocationAndRotation(FVector(-9.396923,-3.420199,0), FRotator(0,20,-90));
 
 	// Fireman Camera
 	FiremanCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("FiremanCamera"));
@@ -48,7 +48,7 @@ AFireMan::AFireMan()
 	// Person2 Attach Position
 	Person2Pos = CreateDefaultSubobject<USceneComponent>(TEXT("Person2Pos"));
 	Person2Pos->SetupAttachment(GetMesh());
-	Person2Pos->SetRelativeLocationAndRotation(FVector(0, 50, 60), FRotator(0, 0, 10));
+	Person2Pos->SetRelativeLocationAndRotation(FVector(-6,57,54.5), FRotator(0, 0, 10));
 	
 	// Firehose Attach Position
 	// FirehosePos = CreateDefaultSubobject<USceneComponent>(TEXT("FirehosePos"));
@@ -62,7 +62,7 @@ AFireMan::AFireMan()
 	{
 		WaterComp->SetChildActorClass(WaterRef.Class);
 		WaterComp->SetupAttachment(GetMesh(), TEXT("cc_weaponbone_l"));
-		WaterComp->SetRelativeLocationAndRotation(FVector(-6.5,-10.5,1), FRotator(0,-75,-90));
+		WaterComp->SetRelativeLocationAndRotation(FVector(7,-7.5,1.5), FRotator(32,-94.5,99));
 		WaterComp->SetVisibility(false);
 	}
 
@@ -207,6 +207,12 @@ void AFireMan::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLi
 	DOREPLIFETIME(AFireMan, bDoesEquipFireHose);
 	DOREPLIFETIME(AFireMan, bDoesEquipCrowbar);
 	DOREPLIFETIME(AFireMan, bDoesCarryingPerson);
+	DOREPLIFETIME(AFireMan, Rotation_Spine02);
+}
+
+float AFireMan::GetRotationSpine02()
+{
+	return Rotation_Spine02;
 }
 
 void AFireMan::OnMove(const struct FInputActionValue& value)
@@ -221,21 +227,35 @@ void AFireMan::OnLook(const struct FInputActionValue& value)
 	float yaw = value.Get<FVector2D>().X;
 	float pitch = value.Get<FVector2D>().Y;
 	AddControllerYawInput(yaw);
-	AddControllerPitchInput(pitch);
-	FiremanAnimInstance->AddPitchInputToSpine(pitch);
+	AddPitchInputToSpine(pitch);
+}
+
+// NetMulticast, Unreliable 사용해서 Rotation_Spine02 갱신하기
+void AFireMan::AddPitchInputToSpine(float pitch)
+{
+	Rotation_Spine02 = FMath::Clamp(Rotation_Spine02 + pitch, -20, 60);
 }
 
 void AFireMan::OnEquipFireHose()
+{	
+	ServerRPC_OnEquipFireHose();
+}
+
+void AFireMan::ServerRPC_OnEquipFireHose_Implementation()
 {
 	if (bDoesCarryingPerson) return;
+	
+	Multicast_OnEquipFireHose();
+}
 
+void AFireMan::Multicast_OnEquipFireHose_Implementation()
+{
 	if (bDoesEquipFireHose)
 	{
 		// off
 		OffFireHose();
 		bDoesEquipFireHose = false;
 		WaterComp->SetVisibility(false);
-		FiremanCamera->bUsePawnControlRotation = true;
 	}
 	else
 	{
@@ -248,20 +268,28 @@ void AFireMan::OnEquipFireHose()
 		// firehose on
 		bDoesEquipFireHose = true;
 		WaterComp->SetVisibility(true);
-		FiremanCamera->bUsePawnControlRotation = false;
 	}
 }
 
 void AFireMan::OnEquipCrowbar()
 {
+	ServerRPC_OnEquipCrowbar();
+}
+
+void AFireMan::ServerRPC_OnEquipCrowbar_Implementation()
+{
 	if (bDoesCarryingPerson) return;
 	
+	Multicast_OnEquipCrowbar();
+}
+
+void AFireMan::Multicast_OnEquipCrowbar_Implementation()
+{
 	if (bDoesEquipCrowbar)
 	{
 		// off
 		bDoesEquipCrowbar = false;
 		CrowbarMeshComp->SetVisibility(false);
-		FiremanCamera->bUsePawnControlRotation = true;
 	}
 	else
 	{
@@ -275,11 +303,15 @@ void AFireMan::OnEquipCrowbar()
 		// crowbar on
 		bDoesEquipCrowbar = true;
 		CrowbarMeshComp->SetVisibility(true);
-		FiremanCamera->bUsePawnControlRotation = false;
 	}
 }
 
 void AFireMan::OnFireHoseShot()
+{
+	ServerRPC_OnFireHoseShot();
+}
+
+void AFireMan::ServerRPC_OnFireHoseShot_Implementation()
 {
 	if (bDoesCarryingPerson) return;
 	

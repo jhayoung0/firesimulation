@@ -64,7 +64,7 @@ void AFireHose::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutL
 	DOREPLIFETIME(AFireHose, bDoesSprayShotNow);
 }
 
-void AFireHose::OnWaterShot()
+void AFireHose::OnWaterShot_Implementation()
 {
 	// activate or deactivate water effect
 	if (bDoesWaterShotNow)

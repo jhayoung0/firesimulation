@@ -42,7 +42,4 @@ protected:
 	// Spine Rotation
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Spine)
 	float Rotation_Spine02;
-
-public:
-	void AddPitchInputToSpine(float pitch);
 };

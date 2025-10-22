@@ -77,6 +77,9 @@ public:
 	// Interact
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float InteractDist = 1000.f;
+
+	// Get
+	float GetRotationSpine02();
 	
 private:
 	// Animation Blueprint
@@ -104,9 +107,27 @@ private:
 
 	void OnMove(const struct FInputActionValue& value);
 	void OnLook(const struct FInputActionValue& value);
+	void AddPitchInputToSpine(float pitch);
+
+	// FireHose
 	void OnEquipFireHose();
+	UFUNCTION(Server, Reliable)
+	void ServerRPC_OnEquipFireHose();
+	UFUNCTION(NetMulticast, Reliable)
+	void Multicast_OnEquipFireHose();
+
+	// Crowbar
 	void OnEquipCrowbar();
+	UFUNCTION(Server, Reliable)
+	void ServerRPC_OnEquipCrowbar();
+	UFUNCTION(NetMulticast, Reliable)
+	void Multicast_OnEquipCrowbar();
+
+	// FireHose Shot
 	void OnFireHoseShot();
+	UFUNCTION(Server, Reliable)
+	void ServerRPC_OnFireHoseShot();
+	
 	void OnUseTool();
 	void OnMaskOut();
 	void OnCarryPerson();
@@ -114,6 +135,10 @@ private:
 	// Movement Variables
 	FVector direction;
 	float WalkSpeed;
+
+	// Rotation Variable
+	UPROPERTY(Replicated)
+	float Rotation_Spine02;
 
 	// FireHose Off
 	void OffFireHose();

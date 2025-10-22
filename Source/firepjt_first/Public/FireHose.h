@@ -32,7 +32,7 @@ public:
 	TObjectPtr<class UNiagaraComponent> NiagaraParticleSystemComp;
 
 	// Water Shot
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(NetMulticast, Reliable, BlueprintCallable)
 	void OnWaterShot();
 	
 	UFUNCTION(BlueprintCallable)
