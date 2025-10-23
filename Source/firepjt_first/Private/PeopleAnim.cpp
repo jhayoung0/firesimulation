@@ -26,7 +26,7 @@ void UPeopleAnim::NativeUpdateAnimation(float DeltaSeconds)
 	// 공중 여부 설정
 	isinAir = pawnOwner->GetMovementComponent()->IsFalling();
 	// 기고 있는지 여부 설정
-	isCrawl = pawnOwner->IsCrawl;
+	isCrawl = pawnOwner->IsCrouched();
 	// 젖은 타월 쓰고 있는지 여부 설정
 	HasWetTowel = pawnOwner->HasWetTowel;
 	// 사람 옮기고 있는지 여부 설정

@@ -225,7 +225,7 @@ void AASequencePlayer::BindToWidget(UPhoneWidget* InWidget)
 {
 	// 델리게이트 바인딩
 	if (!InWidget) return;
-	InWidget->OnRequestPlayCinematic.AddDynamic(this, &AASequencePlayer::MissionTwoSequencePlay);
+	InWidget->OnRequestPlayCinematic.AddDynamic(this, &AASequencePlayer::MissionOneSequencePlay);
 	
 }
 

@@ -59,6 +59,7 @@ public:
 	UPROPERTY(meta = (BindWidgetAnim), Transient)
 	UWidgetAnimation* FadeIn;
 
+
 public:
 	// 각 캐릭터별 data asset 연결
 	UFUNCTION(BlueprintCallable, Category = Info)

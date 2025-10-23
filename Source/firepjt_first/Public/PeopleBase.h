@@ -36,9 +36,11 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category= Input)
 	class UInputAction* crawlInput;
 	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)    
 	bool IsCrawl = false;
-
+	
+	
+	
 	// 물건 상호작용
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category= Input)
 	class UInputAction* InteractionInput;
@@ -176,10 +178,15 @@ public:
 
 	UFUNCTION()
 	void crawlAction();
-	
-	// 기고 있을 때 속도 느리게 설정
-	void ApplyCrawlState(bool bEnable);
 
 	// 변수 동기화
 	virtual void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;
+
+	// 인터랙트 대상 찾기
+	void FindInteractActor();
+
+	// mask bool 값 하나 두기
+	UPROPERTY(EditAnywhere)
+	bool HasMaskFirst = false;
+	
 };

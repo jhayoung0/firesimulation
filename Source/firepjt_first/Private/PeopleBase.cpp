@@ -16,6 +16,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Kismet/KismetSystemLibrary.h"
+#include "Trace/Analysis.h"
 
 APeopleBase::APeopleBase()
 {
@@ -62,7 +63,7 @@ void APeopleBase::BeginPlay()
 	SequenceActor = Cast<AASequencePlayer>(UGameplayStatics::GetActorOfClass(GetWorld(), AASequencePlayer::StaticClass()));
 	
 	// 레벨에 있는 모든 상호작용 액터를 찾자.
-	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AInteractActor::StaticClass(), allInteractActor);
+	FindInteractActor();
 
 
 	// Main ui를 만들자
@@ -151,20 +152,6 @@ void APeopleBase::Tick(float DeltaSeconds)
 	}
 }
 
-
-
-
-void APeopleBase::ApplyCrawlState(bool bEnable)
-{
-
-	constexpr float StandHalf = 88.f;
-	constexpr float CrawlHalf = 48.f;
-	GetCapsuleComponent()->SetCapsuleHalfHeight(bEnable ? CrawlHalf : StandHalf);
-
-	// crawl 상태일 때는 더 느리게
-	GetCharacterMovement()->MaxWalkSpeed = bEnable ? 200.f : 600.f;
-}
-
 void APeopleBase::GetLifetimeReplicatedProps(
 	TArray<class FLifetimeProperty>& OutLifetimeProps) const
 {
@@ -172,38 +159,23 @@ void APeopleBase::GetLifetimeReplicatedProps(
 	
 	// replicate할 변수 등록
 	DOREPLIFETIME(APeopleBase, InteractingActor);
-
 	
+}
+
+// 상호작용 액터 찾기
+void APeopleBase::FindInteractActor()
+{
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AInteractActor::StaticClass(), allInteractActor);
 }
 
 
 // c 키 
 void APeopleBase::crawlAction()
 {
-	if (IsCrawl)
-	{
-		// 기고 있는 상태 → 일어나기
-		IsCrawl = false;
-
-		
-		ApplyCrawlState(IsCrawl);
-		GetFirstPersonCameraComponent()->SetRelativeLocation(CameraLocation);
-		GetFirstPersonCameraComponent()->SetRelativeRotation(CamerRotation);
-		// mesh 높이 조정
-		GetMesh()->SetRelativeLocation(FVector(0.000000,0.000000,-95.000000));
-	}
+	if (!IsCrouched())
+		Crouch();
 	else
-	{
-		// 서 있는 상태 → 기기 시작
-		IsCrawl = true;
-		
-		ApplyCrawlState(IsCrawl);
-		GetFirstPersonCameraComponent()->SetRelativeLocation(CameramLocationCrawl);
-		GetFirstPersonCameraComponent()->SetRelativeRotation(CamerRotationCrawl);
-
-		// mesh 높이 조정
-		GetMesh()->SetRelativeLocation(FVector(0.000000,0.000000,-35.000000));
-	}
+		UnCrouch();
 }
 
 
@@ -269,6 +241,8 @@ void APeopleBase::MultiCastRPC_DetachActor_Implementation(
 void APeopleBase::AttachActor()
 {
 
+	FindInteractActor();
+	
 	IsInteracting = true;
 	//InteractingActor->IsInteracting = true;
 	InteractingActor->ToggleWidget(false);
@@ -286,6 +260,12 @@ void APeopleBase::AttachActor()
 		
 			HasMask = true;
 			HasWetTowel = false;
+
+			// 최초 1회만 호출됨.
+			if (!HasMaskFirst) {GoNextMission();}
+			// 최초 1회를 위한 변수 (1번 바뀌면 값 변경 안됨)
+			HasMaskFirst = true;
+			
 			
 			if (IsLocallyControlled())
 			{
@@ -302,23 +282,26 @@ void APeopleBase::AttachActor()
 			HasMask = false;
 
 			InteractingActor->ChangeTowel(true);
+
+			// 물수건 정보성 UI
+			mainui->AddInfoUI(1);
 		}
 		else if (InteractingActor->ActorHasTag(FName("Phone")))
 		{
 			// compActor에 붙이자.
 			InteractingActor->AttachToComponent(compActor, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
 			HasPhone = true;
-
-
-						
+		
 			if (IsLocallyControlled())
 			{
 				// 위젯 띄우기
 				auto* pc = Cast<Afirepjt_firstPlayerController>(GetWorld()->GetFirstPlayerController());
 				pc->OpenPhoneUI();
 			}
+			// 핸드폰 정보성 UI
+			mainui->AddInfoUI(0);
 			
-			
+	
 
 		}
 		else if (InteractingActor->ActorHasTag(FName("People")))

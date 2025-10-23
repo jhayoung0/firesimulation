@@ -21,6 +21,7 @@ void UInfoWidget::SetInfoDataAsset(UInfoDataAsset* NewDataAsset)
 
 void UInfoWidget::ViewInfoWidget(int32 Idx)
 {
+	UE_LOG(LogTemp, Warning, TEXT("viewinfowidget "));
 	InitializeTextBlocks();
 	SetVisibility(ESlateVisibility::Visible);
 
@@ -30,6 +31,10 @@ void UInfoWidget::ViewInfoWidget(int32 Idx)
 	{
 		PlayAnimation(FadeIn);
 	}
+
+	// 3초 뒤에 사라지게 하기
+	FTimerHandle removeHandle;
+	GetWorld()->GetTimerManager().SetTimer(removeHandle, this, &UInfoWidget::RemoveInfoWidget, 3.0f, false);
 }
 
 void UInfoWidget::RemoveInfoWidget()

@@ -6,6 +6,7 @@
 #include "Blueprint/UserWidget.h"
 #include "MainUI.generated.h"
 
+class UInfoDataAsset;
 class UTextureRenderTarget2D;
 
 /**
@@ -17,6 +18,21 @@ class FIREPJT_FIRST_API UMainUI : public UUserWidget
 	GENERATED_BODY()
 
 public:
+	// 정보선 ui
+	UPROPERTY(meta=(BindWidget))
+	class USizeBox* SizeBox_Info;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UInfoDataAsset* peopleda;
+	
+	
+	// SizeBox_Info 블루프린트 담을 변수
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<class UInfoWidget> InfoWidget;
+	// INFO UI 추가 함수
+	void AddInfoUI(int32 idx);
+
+	
 	// 산소 바
 	UPROPERTY(meta=(BindWidget))
 	class UProgressBar* OxygenBar;

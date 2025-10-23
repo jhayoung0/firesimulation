@@ -2,9 +2,23 @@
 
 
 #include "MainUI.h"
-
+#include "Cubee/InfoWidget.h"
 #include "Components/Image.h"
 #include "Components/ProgressBar.h"
+#include "Components/SizeBox.h"
+
+
+void UMainUI::AddInfoUI(int32 idx)
+{
+	// info widget 만들자 
+	UInfoWidget* info = CreateWidget<UInfoWidget>(GetWorld(), InfoWidget);
+	info->SetInfoDataAsset(peopleda);
+	// size box에 추가
+	//SizeBox_Info->AddChild(info);
+	SizeBox_Info->SetContent(info);
+	// view info widget
+	info->ViewInfoWidget(idx); 
+}
 
 
 
