@@ -117,8 +117,8 @@ public: // widget
 
 
 public: // 스킵
-	UFUNCTION()
-	void DoSkip();
-
+	void Skip();
 	
+	UFUNCTION(NetMulticast, Reliable)
+	void MultiCast_Skip();
 };

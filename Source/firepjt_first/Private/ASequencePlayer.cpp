@@ -19,6 +19,8 @@ AASequencePlayer::AASequencePlayer()
 {
 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
+
+	bReplicates = true;
 }
 // Called every frame
 void AASequencePlayer::Tick(float DeltaTime)
@@ -36,7 +38,6 @@ void AASequencePlayer::BeginPlay()
 
 void AASequencePlayer::PlayIntroSequence()
 {
-
 	SequencePlay();
 	
 	cinematicUI->OpenWidgetToggle(false);
@@ -150,8 +151,6 @@ void AASequencePlayer::MissionTwoSequencePlay()
 	}
 }
 
-
-
 // 미션 3 완료 후 나오는 시네마틱
 void AASequencePlayer::MissionThreeSequencePlay()
 {
@@ -176,44 +175,32 @@ void AASequencePlayer::MissionThreeSequencePlay()
 	}
 }
 
-
-// 스킵 버튼
-void AASequencePlayer::DoSkip()
-{
-	
-	if (FirstPlayer)
-	{
-		FirstPlayer->GoToEndAndStop();
-	}
-	if (SecondPlayer)
-	{
-		SecondPlayer->GoToEndAndStop();
-	}
-
-	OnSecondSequenceFinished();
-}
-
-
-
 // 시퀀스 시작시 호출
 void AASequencePlayer::SequencePlay()
 {
-	// 마우스 보이기, 컨트롤 안되게 하기
-	auto* pc = Cast<Afirepjt_firstPlayerController>(GetWorld()->GetFirstPlayerController());
-	pc->bShowMouseCursor = true;
-	pc->SetIgnoreLookInput(true);
-	pc->SetIgnoreMoveInput(true);
-
-	// cinematic UI를 만들자
-	if (cinematicwidget)
+	for (FConstPlayerControllerIterator It = GetWorld()->GetPlayerControllerIterator(); It; It++)
 	{
-		cinematicUI = CreateWidget<UCinematicUI>(GetWorld(), cinematicwidget);
-		if (cinematicUI)
+		APlayerController* PC = It->Get();
+		if (PC && PC->IsLocalController())
 		{
-			cinematicUI->AddToViewport();
+			auto* FirePC = Cast<Afirepjt_firstPlayerController>(PC);
+			if (FirePC)
+			{
+				FirePC->bShowMouseCursor = true;
+				FirePC->SetIgnoreLookInput(true);
+				FirePC->SetIgnoreMoveInput(true);
+
+				if (cinematicwidget)
+				{
+					cinematicUI = CreateWidget<UCinematicUI>(FirePC, cinematicwidget);
+					if (cinematicUI)
+					{
+						cinematicUI->AddToViewport();
+					}
+				}
+			}
 		}
 	}
-	
 }
 
 // 시퀀스 끝나면 호출
@@ -241,3 +228,26 @@ void AASequencePlayer::BindToWidget(UPhoneWidget* InWidget)
 	InWidget->OnRequestPlayCinematic.AddDynamic(this, &AASequencePlayer::MissionTwoSequencePlay);
 	
 }
+
+void AASequencePlayer::Skip()
+{
+	if (FirstPlayer)
+	{
+		FirstPlayer->GoToEndAndStop();
+	}
+	if (SecondPlayer)
+	{
+		SecondPlayer->GoToEndAndStop();
+	}
+
+	OnSecondSequenceFinished();
+}
+
+void AASequencePlayer::MultiCast_Skip_Implementation()
+{
+	Skip();
+}
+
+
+
+

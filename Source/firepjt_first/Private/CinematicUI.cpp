@@ -4,6 +4,7 @@
 #include "CinematicUI.h"
 
 #include "ASequencePlayer.h"
+#include "firepjt_firstPlayerController.h"
 #include "Components/Button.h"
 #include "Components/SizeBox.h"
 #include "Components/TextBlock.h"
@@ -54,23 +55,11 @@ void UCinematicUI::NativeConstruct()
 
 void UCinematicUI::OnSkipClicked()
 {
-	ServerRPC_OnSkipClicked();
-}
-
-void UCinematicUI::MultiCastRPC_OnSkipClicked_Implementation()
-{
-	// 스킵 버튼 클릭
-	auto* seq = Cast<AASequencePlayer>(UGameplayStatics::GetActorOfClass(GetWorld(), AASequencePlayer::StaticClass()));
-	if (seq)
+	Afirepjt_firstPlayerController* PC = Cast<Afirepjt_firstPlayerController>(GetWorld()->GetFirstPlayerController());
+	if (PC)
 	{
-		seq->DoSkip();
+		PC->Server_CinematicSkip();
 	}
-	
+
 }
 
-void UCinematicUI::ServerRPC_OnSkipClicked_Implementation()
-{
-
-	MultiCastRPC_OnSkipClicked();
-	
-}

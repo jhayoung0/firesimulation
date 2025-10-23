@@ -61,10 +61,4 @@ public:
 
 	UFUNCTION()
 	void OnSkipClicked();
-
-	UFUNCTION(Server, Reliable)
-	void ServerRPC_OnSkipClicked();
-
-	UFUNCTION(NetMulticast, Reliable)
-	void MultiCastRPC_OnSkipClicked();
 };
