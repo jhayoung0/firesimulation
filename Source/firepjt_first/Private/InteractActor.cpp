@@ -45,8 +45,7 @@ AInteractActor::AInteractActor()
 
 
 	// replicates 켜주기
-	SetReplicates(true); 
-	SetReplicateMovement(true); 
+	bReplicates = true;
 }
 
 // Called when the game starts or when spawned
@@ -54,6 +53,7 @@ void AInteractActor::BeginPlay()
 {
 	Super::BeginPlay();
 
+	SetReplicateMovement(true);
 	if (UUserWidget* W = InteractWidgetComp->GetWidget())
 	{
 		InteractUI = Cast<UInteractWidget>(W);

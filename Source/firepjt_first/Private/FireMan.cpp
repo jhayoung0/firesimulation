@@ -8,6 +8,7 @@
 #include "FireHose.h"
 #include "FiremanAnim.h"
 #include "InteractActor.h"
+#include "InteractWidget.h"
 #include "PeopleBase.h"
 #include "Camera/CameraComponent.h"
 #include "Components/BoxComponent.h"
@@ -332,28 +333,50 @@ void AFireMan::OnUseTool()
 	if (bDoesEquipCrowbar)
 	{
 		// force open the door
-		Multicast_OpenDoor();
+		ServerRPC_OpenDoor();
 	}
 	else
 	{
 		// find person2
-		Multicast_CarryPerson();
+		ServerRPC_CarryPerson();
 	}
 }
 
-void AFireMan::OnMaskOut_Implementation()
+void AFireMan::OnMaskOut()
+{
+	ServerRPC_OnMaskOut();
+}
+
+void AFireMan::ServerRPC_OnMaskOut_Implementation()
+{
+	Multicast_OnMaskOut();
+}
+
+void AFireMan::Multicast_OnMaskOut_Implementation()
 {
 	// give mask to person2
+	if (HasAuthority())
+	{
+		UE_LOG(LogTemp, Warning, TEXT("server mask !!!!!!!!!!!!!!!!!!!!!"));
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("client mask !!!!!!!!!!!!!!!!!!!!!"));
+	}
 	APeopleBase* person = Cast<APeopleBase>(UGameplayStatics::GetActorOfClass(GetWorld(), APeopleBase::StaticClass()));
 	if (person)
 	{
 		float dist = FVector::Distance(GetActorLocation(), person->GetActorLocation());
 		if (dist <= InteractDist)
 		{
-			AInteractActor* mask = GetWorld()->SpawnActor<AInteractActor>(MaskActor, FTransform(GetActorLocation() + GetActorForwardVector() * MaskSpawnDist));
-			mask->ToggleWidget(true);
+			GetWorld()->SpawnActor<AInteractActor>(MaskActor, FTransform(GetActorLocation() + GetActorForwardVector() * MaskSpawnDist));
 		}
 	}
+}
+
+void AFireMan::ServerRPC_OpenDoor_Implementation()
+{
+	Multicast_OpenDoor();
 }
 
 void AFireMan::Multicast_OpenDoor_Implementation()
@@ -366,6 +389,11 @@ void AFireMan::Multicast_OpenDoor_Implementation()
 		DoorActor->ToggleWidget(false);
 		DoorActor->ToggleDoor();
 	}
+}
+
+void AFireMan::ServerRPC_CarryPerson_Implementation()
+{
+	Multicast_CarryPerson();
 }
 
 void AFireMan::Multicast_CarryPerson_Implementation()
@@ -399,8 +427,6 @@ void AFireMan::Multicast_CarryPerson_Implementation()
 				// attach person
 				Person2Actor->ToggleWidget(false);
 				Person2Actor->AttachToComponent(Person2Pos, FAttachmentTransformRules::SnapToTargetIncludingScale);
-
-				// animation
 			}
 		}
 	}

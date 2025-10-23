@@ -130,10 +130,17 @@ private:
 	void ServerRPC_OnFireHoseShot();
 	
 	void OnUseTool();
-	UFUNCTION(Server, Reliable)
 	void OnMaskOut();
+	UFUNCTION(Server, Reliable)
+	void ServerRPC_OnMaskOut();
+	UFUNCTION(NetMulticast, Reliable)
+	void Multicast_OnMaskOut();
+	UFUNCTION(Server, Reliable)
+	void ServerRPC_OpenDoor();
 	UFUNCTION(NetMulticast, Reliable)
 	void Multicast_OpenDoor();
+	UFUNCTION(Server, Reliable)
+	void ServerRPC_CarryPerson();
 	UFUNCTION(NetMulticast, Reliable)
 	void Multicast_CarryPerson();
 
