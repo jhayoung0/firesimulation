@@ -8,10 +8,12 @@
 #include "FireHose.h"
 #include "FiremanAnim.h"
 #include "InteractActor.h"
+#include "InteractWidget.h"
 #include "PeopleBase.h"
 #include "Camera/CameraComponent.h"
 #include "Components/BoxComponent.h"
 #include "Components/SceneComponent.h"
+#include "Cubee/HousePlayerState.h"
 #include "EnhancedInput/Public/InputMappingContext.h"
 #include "Kismet/GameplayStatics.h"
 #include "Net/UnrealNetwork.h"
@@ -227,11 +229,10 @@ void AFireMan::OnLook(const struct FInputActionValue& value)
 	float yaw = value.Get<FVector2D>().X;
 	float pitch = value.Get<FVector2D>().Y;
 	AddControllerYawInput(yaw);
-	AddPitchInputToSpine(pitch);
+	Multicast_AddPitchInputToSpine(pitch);
 }
 
-// NetMulticast, Unreliable 사용해서 Rotation_Spine02 갱신하기
-void AFireMan::AddPitchInputToSpine(float pitch)
+void AFireMan::Multicast_AddPitchInputToSpine_Implementation(float pitch)
 {
 	Rotation_Spine02 = FMath::Clamp(Rotation_Spine02 + pitch, -20, 60);
 }
@@ -332,27 +333,36 @@ void AFireMan::OnUseTool()
 	if (bDoesEquipCrowbar)
 	{
 		// force open the door
-		if (DoorActor)
-		{
-			float dist = FVector::Distance(GetActorLocation(), DoorActor->GetActorLocation());
-			if (dist <= InteractDist)
-			{
-				DoorActor->ToggleWidget(false);
-				DoorActor->ToggleDoor();
-			}
-		}
+		ServerRPC_OpenDoor();
 	}
 	else
 	{
 		// find person2
-		OnCarryPerson();
+		ServerRPC_CarryPerson();
 	}
 }
 
 void AFireMan::OnMaskOut()
 {
-	// 서버 상으로 상대 편의 액터를 가져올 수 있으면 그렇게 해도 됨
-	// if can get actor from other pc(server), you can get other actor that way
+	ServerRPC_OnMaskOut();
+}
+
+void AFireMan::ServerRPC_OnMaskOut_Implementation()
+{
+	Multicast_OnMaskOut();
+}
+
+void AFireMan::Multicast_OnMaskOut_Implementation()
+{
+	// give mask to person2
+	if (HasAuthority())
+	{
+		UE_LOG(LogTemp, Warning, TEXT("server mask !!!!!!!!!!!!!!!!!!!!!"));
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("client mask !!!!!!!!!!!!!!!!!!!!!"));
+	}
 	APeopleBase* person = Cast<APeopleBase>(UGameplayStatics::GetActorOfClass(GetWorld(), APeopleBase::StaticClass()));
 	if (person)
 	{
@@ -364,7 +374,29 @@ void AFireMan::OnMaskOut()
 	}
 }
 
-void AFireMan::OnCarryPerson()
+void AFireMan::ServerRPC_OpenDoor_Implementation()
+{
+	Multicast_OpenDoor();
+}
+
+void AFireMan::Multicast_OpenDoor_Implementation()
+{
+	if (!DoorActor) return;
+	
+	float dist = FVector::Distance(GetActorLocation(), DoorActor->GetActorLocation());
+	if (dist <= InteractDist)
+	{
+		DoorActor->ToggleWidget(false);
+		DoorActor->ToggleDoor();
+	}
+}
+
+void AFireMan::ServerRPC_CarryPerson_Implementation()
+{
+	Multicast_CarryPerson();
+}
+
+void AFireMan::Multicast_CarryPerson_Implementation()
 {
 	// if now carrying person
 	if (bDoesCarryingPerson)
@@ -395,12 +427,48 @@ void AFireMan::OnCarryPerson()
 				// attach person
 				Person2Actor->ToggleWidget(false);
 				Person2Actor->AttachToComponent(Person2Pos, FAttachmentTransformRules::SnapToTargetIncludingScale);
-
-				// animation
 			}
 		}
 	}
 }
+
+// void AFireMan::OnCarryPerson()
+// {
+// 	// if now carrying person
+// 	if (bDoesCarryingPerson)
+// 	{
+// 		bDoesCarryingPerson = false;
+// 		if (Person2Actor)
+// 		{
+// 			float dist = FVector::Distance(GetActorLocation(), Person2Actor->GetActorLocation());
+// 			if (dist <= InteractDist)
+// 			{
+// 				// detach Person2Actor
+// 				
+// 				Person2Actor->ToggleWidget(true);
+// 				Person2Actor->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
+// 				Person2Actor->SetActorRotation(ActorRotation);
+// 			}
+// 		}
+// 	}
+// 	else
+// 	{
+// 		bDoesCarryingPerson = true;
+// 		ActorRotation = Person2Actor->GetActorRotation();
+// 		if (Person2Actor)
+// 		{
+// 			float dist = FVector::Distance(GetActorLocation(), Person2Actor->GetActorLocation());
+// 			if (dist <= InteractDist)
+// 			{
+// 				// attach person
+// 				Person2Actor->ToggleWidget(false);
+// 				Person2Actor->AttachToComponent(Person2Pos, FAttachmentTransformRules::SnapToTargetIncludingScale);
+//
+// 				// animation
+// 			}
+// 		}
+// 	}
+// }
 
 void AFireMan::OffFireHose()
 {
