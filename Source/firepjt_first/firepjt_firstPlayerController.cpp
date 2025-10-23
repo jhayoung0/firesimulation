@@ -257,6 +257,16 @@ void Afirepjt_firstPlayerController::ClosePhoneUI()
 	SetIgnoreMoveInput(false);
 }
 
+void Afirepjt_firstPlayerController::Server_CinematicSkip_Implementation()
+{
+	auto* seq = Cast<AASequencePlayer>(UGameplayStatics::GetActorOfClass(GetWorld(),
+		AASequencePlayer::StaticClass()));
+	if (seq)
+	{
+		seq->MultiCast_Skip();
+	}
+}
+
 
 
 

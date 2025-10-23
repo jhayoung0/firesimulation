@@ -96,6 +96,10 @@ protected:
 protected:
 	// Cinematic
 	class AActor* SequenceActor;
+	
+public:
+	UFUNCTION(Server, Reliable)
+	void Server_CinematicSkip();
 
 public: // widget	
 	UFUNCTION(BlueprintCallable)
@@ -109,5 +113,4 @@ public: // widget
 
 	UPROPERTY(Transient)
 	UPhoneWidget* phoneUI = nullptr;
-	
 };
