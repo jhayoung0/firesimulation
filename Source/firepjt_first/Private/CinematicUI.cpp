@@ -6,7 +6,13 @@
 #include "ASequencePlayer.h"
 #include "Components/Button.h"
 #include "Components/SizeBox.h"
+#include "Components/TextBlock.h"
 #include "Kismet/GameplayStatics.h"
+
+void UCinematicUI::ChangeCompleteText(FString text)
+{
+	completetext->SetText(FText::FromString(text));
+}
 
 void UCinematicUI::OpenWidgetToggle(bool isdual)
 {

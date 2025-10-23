@@ -40,7 +40,9 @@ void AASequencePlayer::PlayIntroSequence()
 	SequencePlay();
 	
 	cinematicUI->OpenWidgetToggle(false);
-
+	// 텍스트 없음.
+	cinematicUI->ChangeCompleteText(FString(TEXT("")));
+	
 	// 시퀀스 재생
 	if (FirstSequence)
 	{
@@ -97,7 +99,10 @@ void AASequencePlayer::MissionOneSequencePlay()
 {
 	SequencePlay();
 
-	UE_LOG(LogTemp, Warning, TEXT("missiononesequence play"));
+	
+	cinematicUI->ChangeCompleteText(FString(TEXT("미션1 성공!")));
+	
+
 	// 듀얼 위젯 띄우기
 	cinematicUI->OpenWidgetToggle(true);
 	
@@ -122,6 +127,57 @@ void AASequencePlayer::MissionOneSequencePlay()
 
 
 
+// 미션 2 완료 후 나오는 시네마틱
+void AASequencePlayer::MissionTwoSequencePlay()
+{
+	SequencePlay();
+	cinematicUI->ChangeCompleteText(FString(TEXT("미션2 성공!")));
+	// 듀얼 위젯 띄우기
+	cinematicUI->OpenWidgetToggle(false);
+	
+	if (Mission2_Fireman_Sequence)
+	{
+		FMovieSceneSequencePlaybackSettings Settings;
+		ALevelSequenceActor* SeqActor = nullptr;
+		Mission2_Fireman_Player =
+			ULevelSequencePlayer::CreateLevelSequencePlayer(GetWorld(), Mission2_Fireman_Sequence, Settings, SeqActor);
+		// 이건 시퀀스 끝나면 호출 (1번만 호출될 수 있도록 임의로 우측 시네마틱에 연결)
+		Mission2_Fireman_Player->OnFinished.AddDynamic(this, &AASequencePlayer::SequenceEnd);
+		// 시퀀스 재생
+		Mission2_Fireman_Player->Play();
+		// 산소 차감 막기 위한 bool 값
+		IsPlayingCinematic = true;
+	}
+}
+
+
+
+// 미션 3 완료 후 나오는 시네마틱
+void AASequencePlayer::MissionThreeSequencePlay()
+{
+	SequencePlay();
+	cinematicUI->ChangeCompleteText(FString(TEXT("미션3 성공!")));
+	
+	// 단일 위젯 띄우기
+	cinematicUI->OpenWidgetToggle(false);
+	
+	if (Mission3_Sequence)
+	{
+		FMovieSceneSequencePlaybackSettings Settings;
+		ALevelSequenceActor* SeqActor = nullptr;
+		Mission3_Player =
+			ULevelSequencePlayer::CreateLevelSequencePlayer(GetWorld(), Mission3_Sequence, Settings, SeqActor);
+		// 이건 시퀀스 끝나면 호출 (1번만 호출될 수 있도록 임의로 우측 시네마틱에 연결)
+		Mission3_Player->OnFinished.AddDynamic(this, &AASequencePlayer::SequenceEnd);
+		// 시퀀스 재생
+		Mission3_Player->Play();
+		// 산소 차감 막기 위한 bool 값
+		IsPlayingCinematic = true;
+	}
+}
+
+
+// 스킵 버튼
 void AASequencePlayer::DoSkip()
 {
 	
@@ -177,11 +233,11 @@ void AASequencePlayer::SequenceEnd()
 }
 
 
+// 미션 1을 위한 델리게이트 바인딩
 void AASequencePlayer::BindToWidget(UPhoneWidget* InWidget)
 {
 	// 델리게이트 바인딩
 	if (!InWidget) return;
-	InWidget->OnRequestPlayCinematic.AddDynamic(this, &AASequencePlayer::MissionOneSequencePlay);
+	InWidget->OnRequestPlayCinematic.AddDynamic(this, &AASequencePlayer::MissionTwoSequencePlay);
 	
 }
-

@@ -81,6 +81,31 @@ public:
 	void BindToWidget(UPhoneWidget* InWidget);
 
 
+	// 미션 2 시네마틱
+	UPROPERTY(EditAnywhere, Category = "Sequence")
+	TObjectPtr<ULevelSequence> Mission2_People_Sequence;
+
+	UPROPERTY(EditAnywhere, Category = "Sequence")
+	TObjectPtr<ULevelSequence> Mission2_Fireman_Sequence;
+
+	UPROPERTY()
+	TObjectPtr<ULevelSequencePlayer> Mission2_People_Player;
+
+	UPROPERTY()
+	TObjectPtr<ULevelSequencePlayer> Mission2_Fireman_Player;
+
+	UFUNCTION()
+	void MissionTwoSequencePlay();
+
+	// 미션 3 시네마틱
+	UPROPERTY(EditAnywhere, Category = "Sequence")
+	TObjectPtr<ULevelSequence> Mission3_Sequence;
+;
+	UPROPERTY()
+	TObjectPtr<ULevelSequencePlayer> Mission3_Player;
+	
+	UFUNCTION()
+	void MissionThreeSequencePlay();
 	
 
 public: // widget

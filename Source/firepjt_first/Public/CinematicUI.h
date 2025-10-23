@@ -35,7 +35,14 @@ public:
 
 	UPROPERTY(meta=(BindWidget))
 	class USizeBox* sizebox_one_Fireman;
+
+
+	UPROPERTY(meta=(BindWidget))
+	class UTextBlock* completetext;
+
 	
+	UFUNCTION()
+	void ChangeCompleteText(FString text);
 	// 스킵 버튼 
 	UPROPERTY(meta=(BindWidget))
 	class UButton* Skipbtn;
