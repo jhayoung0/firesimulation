@@ -32,7 +32,8 @@ protected:
 	UPROPERTY()
 	TArray<APlayerController*> ConnectedPlayers;
 
-	const int32 MaxPlayers = 2;
+	// 테스트용으로 2명 제한 풀어놓음
+	const int32 MaxPlayers = 1;
 
 	
 };
