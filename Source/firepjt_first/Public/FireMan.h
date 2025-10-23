@@ -107,7 +107,8 @@ private:
 
 	void OnMove(const struct FInputActionValue& value);
 	void OnLook(const struct FInputActionValue& value);
-	void AddPitchInputToSpine(float pitch);
+	UFUNCTION(NetMulticast, Unreliable)
+	void Multicast_AddPitchInputToSpine(float pitch);
 
 	// FireHose
 	void OnEquipFireHose();
@@ -129,8 +130,12 @@ private:
 	void ServerRPC_OnFireHoseShot();
 	
 	void OnUseTool();
+	UFUNCTION(Server, Reliable)
 	void OnMaskOut();
-	void OnCarryPerson();
+	UFUNCTION(NetMulticast, Reliable)
+	void Multicast_OpenDoor();
+	UFUNCTION(NetMulticast, Reliable)
+	void Multicast_CarryPerson();
 
 	// Movement Variables
 	FVector direction;
