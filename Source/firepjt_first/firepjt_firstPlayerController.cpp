@@ -4,6 +4,7 @@
 #include "firepjt_firstPlayerController.h"
 #include "ASequencePlayer.h"
 #include "EnhancedInputSubsystems.h"
+#include "FireMan.h"
 #include "Engine/LocalPlayer.h"
 #include "InputMappingContext.h"
 #include "firepjt_firstCameraManager.h"
@@ -170,9 +171,11 @@ void Afirepjt_firstPlayerController::OnGamePhaseChanged(EGamePhase NewPhase)
 			InGameWidget = CreateWidget<UInGameWidget>(this, InGameWidgetClass);
 			if (InGameWidget)
 			{
-				// DataTable 할당(추후 위치 변경 가능)
 				InGameWidget->AddToViewport();
-				InGameWidget->SetMissionDataTable(MissionDataTable);
+				
+				// Set DataTable
+				InGameWidget->SetMissionDataTable(Cast<AFireMan>(
+					GetPawn())? FiremanMissionTable : PeopleMissionTable);
 			}
 		}
 	}

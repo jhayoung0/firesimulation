@@ -76,7 +76,7 @@ public:
 
 	// Interact
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float InteractDist = 1000.f;
+	float InteractDist = 200.f;
 
 	// Get
 	float GetRotationSpine02();
@@ -111,6 +111,16 @@ private:
 	void Multicast_AddPitchInputToSpine(float pitch);
 
 	// FireHose
+	UPROPERTY(VisibleAnywhere)
+	TSubclassOf<class AFireTruckFireHose> FireTruckFireHoseClass;
+	UPROPERTY()
+	TObjectPtr<class AFireTruckFireHose> FireTruckFireHoseActor;
+	UPROPERTY(Replicated)
+	bool bCanUseFireHose = false;
+	void OnGetFireHose();
+	UFUNCTION(Server, Reliable)
+	void ServerRPC_OnGetFireHose();
+	
 	void OnEquipFireHose();
 	UFUNCTION(Server, Reliable)
 	void ServerRPC_OnEquipFireHose();
@@ -118,6 +128,16 @@ private:
 	void Multicast_OnEquipFireHose();
 
 	// Crowbar
+	UPROPERTY(VisibleAnywhere)
+	TSubclassOf<class AFireTruckCrowbar> FireTruckCrowbarClass;
+	UPROPERTY()
+	TObjectPtr<class AFireTruckCrowbar> FireTruckCrowbarActor;
+	UPROPERTY(Replicated)
+	bool bCanUseCrowbar = false;
+	void OnGetCrowbar();
+	UFUNCTION(Server, Reliable)
+	void ServerRPC_OnGetCrowbar();
+	
 	void OnEquipCrowbar();
 	UFUNCTION(Server, Reliable)
 	void ServerRPC_OnEquipCrowbar();

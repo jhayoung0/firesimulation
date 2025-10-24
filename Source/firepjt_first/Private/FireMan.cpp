@@ -7,13 +7,13 @@
 #include "EnhancedInputSubsystems.h"
 #include "FireHose.h"
 #include "FiremanAnim.h"
+#include "FireTruckCrowbar.h"
+#include "FireTruckFireHose.h"
 #include "InteractActor.h"
-#include "InteractWidget.h"
 #include "PeopleBase.h"
 #include "Camera/CameraComponent.h"
 #include "Components/BoxComponent.h"
 #include "Components/SceneComponent.h"
-#include "Cubee/HousePlayerState.h"
 #include "EnhancedInput/Public/InputMappingContext.h"
 #include "Kismet/GameplayStatics.h"
 #include "Net/UnrealNetwork.h"
@@ -44,18 +44,12 @@ AFireMan::AFireMan()
 	FiremanCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("FiremanCamera"));
 	FiremanCamera->SetupAttachment(BoxCollision);
 	FiremanCamera->SetRelativeLocation(FVector(47,1,0));
-	// FiremanCamera->SetRelativeLocationAndRotation(FVector(31.610969,0.863677,0), FRotator(0,20,-90));
 	FiremanCamera->bUsePawnControlRotation = true;
 
 	// Person2 Attach Position
 	Person2Pos = CreateDefaultSubobject<USceneComponent>(TEXT("Person2Pos"));
 	Person2Pos->SetupAttachment(GetMesh());
 	Person2Pos->SetRelativeLocationAndRotation(FVector(-6,57,54.5), FRotator(0, 0, 10));
-	
-	// Firehose Attach Position
-	// FirehosePos = CreateDefaultSubobject<USceneComponent>(TEXT("FirehosePos"));
-	// FirehosePos->SetupAttachment(GetMesh(), TEXT("cc_weaponbone_l"));
-	// FirehosePos->SetRelativeLocationAndRotation(FVector(-6.5,-10.5,1), FRotator(0,-75,-90));
 
 	// Water Niagara System
 	WaterComp = CreateDefaultSubobject<UChildActorComponent>(TEXT("WaterComp"));
@@ -64,8 +58,8 @@ AFireMan::AFireMan()
 	{
 		WaterComp->SetChildActorClass(WaterRef.Class);
 		WaterComp->SetupAttachment(GetMesh(), TEXT("cc_weaponbone_l"));
-		WaterComp->SetRelativeLocationAndRotation(FVector(7,-7.5,1.5), FRotator(32,-94.5,99));
 		WaterComp->SetVisibility(false);
+		WaterComp->SetRelativeLocationAndRotation(FVector(7,-7.5,1.5), FRotator(32,-94.5,99));
 	}
 
 	// Crowbar Mesh
@@ -149,6 +143,19 @@ AFireMan::AFireMan()
 	{
 		MaskActor = maskRef.Class;
 	}
+
+	// FireTruck FireHose
+	ConstructorHelpers::FClassFinder<AFireTruckFireHose> fireTruckFireHoseRef(TEXT("/Game/CustomContents/Fireman/FireTruck/BP_FirehoseInTruck.BP_FirehoseInTruck_C"));
+	if (fireTruckFireHoseRef.Succeeded())
+	{
+		FireTruckFireHoseClass = fireTruckFireHoseRef.Class;
+	}
+	// FireTruck Crowbar
+	ConstructorHelpers::FClassFinder<AFireTruckCrowbar> fireTruckCrowbarRef(TEXT("/Game/CustomContents/Fireman/FireTruck/BP_CrowbarInTruck.BP_CrowbarInTruck_C"));
+	if (fireTruckCrowbarRef.Succeeded())
+	{
+		FireTruckCrowbarClass = fireTruckCrowbarRef.Class;
+	}
 }
 
 // Called when the game starts or when spawned
@@ -169,6 +176,8 @@ void AFireMan::BeginPlay()
 	FiremanAnimInstance = Cast<UFiremanAnim>(GetMesh()->GetAnimInstance());
 	DoorActor = Cast<AInteractActor>(UGameplayStatics::GetActorOfClass(GetWorld(), DoorClass));
 	Person2Actor = Cast<AInteractActor>(UGameplayStatics::GetActorOfClass(GetWorld(), Person2Class));
+	FireTruckFireHoseActor = Cast<AFireTruckFireHose>(UGameplayStatics::GetActorOfClass(GetWorld(), FireTruckFireHoseClass));
+	FireTruckCrowbarActor = Cast<AFireTruckCrowbar>(UGameplayStatics::GetActorOfClass(GetWorld(), FireTruckCrowbarClass));
 }
 
 // Called every frame
@@ -206,7 +215,9 @@ void AFireMan::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLi
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
+	DOREPLIFETIME(AFireMan, bCanUseFireHose);
 	DOREPLIFETIME(AFireMan, bDoesEquipFireHose);
+	DOREPLIFETIME(AFireMan, bCanUseCrowbar);
 	DOREPLIFETIME(AFireMan, bDoesEquipCrowbar);
 	DOREPLIFETIME(AFireMan, bDoesCarryingPerson);
 	DOREPLIFETIME(AFireMan, Rotation_Spine02);
@@ -234,7 +245,27 @@ void AFireMan::OnLook(const struct FInputActionValue& value)
 
 void AFireMan::Multicast_AddPitchInputToSpine_Implementation(float pitch)
 {
-	Rotation_Spine02 = FMath::Clamp(Rotation_Spine02 + pitch, -20, 60);
+	Rotation_Spine02 = FMath::Clamp(Rotation_Spine02 + pitch, -30, 90);
+}
+
+void AFireMan::OnGetFireHose()
+{
+	ServerRPC_OnGetFireHose();
+}
+
+void AFireMan::ServerRPC_OnGetFireHose_Implementation()
+{
+	if (bCanUseFireHose) return;
+	
+	if (FireTruckFireHoseActor)
+	{
+		float dist = FVector::Distance(GetActorLocation(), FireTruckFireHoseActor->GetActorLocation());
+		if (dist <= InteractDist)
+		{
+			bCanUseFireHose = true;
+			Multicast_OnEquipFireHose();
+		}
+	}
 }
 
 void AFireMan::OnEquipFireHose()
@@ -244,7 +275,7 @@ void AFireMan::OnEquipFireHose()
 
 void AFireMan::ServerRPC_OnEquipFireHose_Implementation()
 {
-	if (bDoesCarryingPerson) return;
+	if (!bCanUseFireHose || bDoesCarryingPerson) return;
 	
 	Multicast_OnEquipFireHose();
 }
@@ -272,6 +303,27 @@ void AFireMan::Multicast_OnEquipFireHose_Implementation()
 	}
 }
 
+void AFireMan::OnGetCrowbar()
+{
+	ServerRPC_OnGetCrowbar();
+}
+
+void AFireMan::ServerRPC_OnGetCrowbar_Implementation()
+{
+	if (bCanUseCrowbar) return;
+
+	if (FireTruckCrowbarActor)
+	{
+		float dist = FVector::Distance(GetActorLocation(), FireTruckCrowbarActor->GetActorLocation());
+		if (dist <= InteractDist)
+		{
+			bCanUseCrowbar = true;
+			FireTruckCrowbarActor->Destroy();
+			Multicast_OnEquipCrowbar();
+		}
+	}
+}
+
 void AFireMan::OnEquipCrowbar()
 {
 	ServerRPC_OnEquipCrowbar();
@@ -279,7 +331,7 @@ void AFireMan::OnEquipCrowbar()
 
 void AFireMan::ServerRPC_OnEquipCrowbar_Implementation()
 {
-	if (bDoesCarryingPerson) return;
+	if (!bCanUseCrowbar || bDoesCarryingPerson) return;
 	
 	Multicast_OnEquipCrowbar();
 }
@@ -328,6 +380,12 @@ void AFireMan::ServerRPC_OnFireHoseShot_Implementation()
 
 void AFireMan::OnUseTool()
 {
+	if (!bCanUseCrowbar || !bCanUseFireHose)
+	{
+		OnGetCrowbar();
+		OnGetFireHose();
+	}
+	
 	if (bDoesEquipFireHose) return;
 	
 	if (bDoesEquipCrowbar)
@@ -355,14 +413,6 @@ void AFireMan::ServerRPC_OnMaskOut_Implementation()
 void AFireMan::Multicast_OnMaskOut_Implementation()
 {
 	// give mask to person2
-	if (HasAuthority())
-	{
-		UE_LOG(LogTemp, Warning, TEXT("server mask !!!!!!!!!!!!!!!!!!!!!"));
-	}
-	else
-	{
-		UE_LOG(LogTemp, Warning, TEXT("client mask !!!!!!!!!!!!!!!!!!!!!"));
-	}
 	APeopleBase* person = Cast<APeopleBase>(UGameplayStatics::GetActorOfClass(GetWorld(), APeopleBase::StaticClass()));
 	if (person)
 	{
@@ -431,44 +481,6 @@ void AFireMan::Multicast_CarryPerson_Implementation()
 		}
 	}
 }
-
-// void AFireMan::OnCarryPerson()
-// {
-// 	// if now carrying person
-// 	if (bDoesCarryingPerson)
-// 	{
-// 		bDoesCarryingPerson = false;
-// 		if (Person2Actor)
-// 		{
-// 			float dist = FVector::Distance(GetActorLocation(), Person2Actor->GetActorLocation());
-// 			if (dist <= InteractDist)
-// 			{
-// 				// detach Person2Actor
-// 				
-// 				Person2Actor->ToggleWidget(true);
-// 				Person2Actor->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
-// 				Person2Actor->SetActorRotation(ActorRotation);
-// 			}
-// 		}
-// 	}
-// 	else
-// 	{
-// 		bDoesCarryingPerson = true;
-// 		ActorRotation = Person2Actor->GetActorRotation();
-// 		if (Person2Actor)
-// 		{
-// 			float dist = FVector::Distance(GetActorLocation(), Person2Actor->GetActorLocation());
-// 			if (dist <= InteractDist)
-// 			{
-// 				// attach person
-// 				Person2Actor->ToggleWidget(false);
-// 				Person2Actor->AttachToComponent(Person2Pos, FAttachmentTransformRules::SnapToTargetIncludingScale);
-//
-// 				// animation
-// 			}
-// 		}
-// 	}
-// }
 
 void AFireMan::OffFireHose()
 {
