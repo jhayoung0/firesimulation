@@ -318,6 +318,7 @@ void AFireMan::ServerRPC_OnGetCrowbar_Implementation()
 		if (dist <= InteractDist)
 		{
 			bCanUseCrowbar = true;
+			FireTruckCrowbarActor->Destroy();
 			Multicast_OnEquipCrowbar();
 		}
 	}
@@ -379,6 +380,12 @@ void AFireMan::ServerRPC_OnFireHoseShot_Implementation()
 
 void AFireMan::OnUseTool()
 {
+	if (!bCanUseCrowbar || !bCanUseFireHose)
+	{
+		OnGetCrowbar();
+		OnGetFireHose();
+	}
+	
 	if (bDoesEquipFireHose) return;
 	
 	if (bDoesEquipCrowbar)

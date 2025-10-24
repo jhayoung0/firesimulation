@@ -76,7 +76,7 @@ public:
 
 	// Interact
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float InteractDist = 500.f;
+	float InteractDist = 200.f;
 
 	// Get
 	float GetRotationSpine02();

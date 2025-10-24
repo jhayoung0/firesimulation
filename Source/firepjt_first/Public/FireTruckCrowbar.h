@@ -21,4 +21,5 @@ protected:
 
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<UStaticMeshComponent> CrowbarComp;
+
 };

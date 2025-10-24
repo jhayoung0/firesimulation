@@ -3,6 +3,10 @@
 
 #include "FireTruckCrowbar.h"
 
+#include "InteractWidgetComp.h"
+#include "Kismet/GameplayStatics.h"
+#include "Kismet/KismetMathLibrary.h"
+
 
 // Sets default values
 AFireTruckCrowbar::AFireTruckCrowbar()
