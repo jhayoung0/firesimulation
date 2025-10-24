@@ -65,4 +65,8 @@ protected:
 protected:
 	// 상태 서버&클라이언트 일괄 변경
 	void ChangeGamePhase(EGamePhase NewState);
+
+public:
+	// 플레이어 스타트
+	void SetAllPlayersStart();
 };

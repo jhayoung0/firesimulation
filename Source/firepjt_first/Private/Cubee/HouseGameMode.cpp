@@ -7,6 +7,7 @@
 #include "FireMan.h"
 #include "PeopleBase.h"
 #include "TimerManager.h"
+#include "GameFramework/PlayerStart.h"
 #include "Kismet/GameplayStatics.h"
 
 AHouseGameMode::AHouseGameMode()
@@ -97,6 +98,9 @@ void AHouseGameMode::BeginPlay()
 
 		UE_LOG(LogTemp, Warning, TEXT("[HouseGameMode] Waiting to start"));
 
+		// 임시로 여기
+		SetAllPlayersStart();
+		
 		// 시작 시네마틱
 		FTimerHandle TimerHandle;
 		GetWorldTimerManager().SetTimer(TimerHandle, FTimerDelegate::CreateLambda([&]
@@ -253,6 +257,53 @@ void AHouseGameMode::ChangeGamePhase(EGamePhase NewState)
 	{
 		HouseGS->OnPhaseChanged.Broadcast(NewState);
 		HouseGS->PreviousPhase = NewState;
+	}
+}
+
+void AHouseGameMode::SetAllPlayersStart()
+{
+	for (FConstPlayerControllerIterator It = GetWorld()->GetPlayerControllerIterator(); It; ++It)
+	{
+		APlayerController* PC = It->Get();
+		if (!PC || !PC->GetPawn()) continue;
+
+		AHousePlayerState* HousePS = PC->GetPlayerState<AHousePlayerState>();
+		if (!HousePS) continue;
+
+		EPlayerRole CurrentRole = HousePS->PlayerRole;
+		FName PlayerStartTag;
+
+		// Role에 따라 찾을 Tag 결정
+		switch (CurrentRole)
+		{
+		case EPlayerRole::Firefighter:
+			PlayerStartTag = FName("Firefighter");
+			break;
+		case EPlayerRole::Citizen:
+			PlayerStartTag = FName("Citizen");
+			break;
+		default:
+			UE_LOG(LogTemp, Warning, TEXT("[HouseGameMode] No role assigned, skipping spawn"));
+			continue;
+		}
+
+		// Tag로 PlayerStart 찾기
+		TArray<AActor*> FoundStarts;
+		UGameplayStatics::GetAllActorsOfClassWithTag(this, APlayerStart::StaticClass(), PlayerStartTag, FoundStarts);
+
+		if (FoundStarts.Num() > 0)
+		{
+			APlayerStart* PlayerStart = Cast<APlayerStart>(FoundStarts[0]);
+			if (PlayerStart)
+			{
+				PC->GetPawn()->SetActorTransform(PlayerStart->GetActorTransform());
+				PC->GetPawn()->SetActorHiddenInGame(false);
+			}
+		}
+		else
+		{
+			UE_LOG(LogTemp, Error, TEXT("[HouseGameMode] PlayerStart with tag '%s' not found!"), *PlayerStartTag.ToString());
+		}
 	}
 }
 
