@@ -71,7 +71,10 @@ protected:
 
 	// Mission DataTable(테스트용. 추후 위치 변경 가능)
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Mission")
-	class UDataTable* MissionDataTable;
+	class UDataTable* PeopleMissionTable;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Mission")
+	class UDataTable* FiremanMissionTable;
 
 public:
 	// Client RPC to update player count in lobby
@@ -96,6 +99,10 @@ protected:
 protected:
 	// Cinematic
 	class AActor* SequenceActor;
+	
+public:
+	UFUNCTION(Server, Reliable)
+	void Server_CinematicSkip();
 
 public: // widget	
 	UFUNCTION(BlueprintCallable)
@@ -109,5 +116,4 @@ public: // widget
 
 	UPROPERTY(Transient)
 	UPhoneWidget* phoneUI = nullptr;
-	
 };
