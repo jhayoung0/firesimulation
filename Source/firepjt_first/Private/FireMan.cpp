@@ -239,17 +239,24 @@ void AFireMan::OnLook(const struct FInputActionValue& value)
 	float yaw = value.Get<FVector2D>().X;
 	float pitch = value.Get<FVector2D>().Y;
 	AddControllerYawInput(yaw);
-	Multicast_AddPitchInputToSpine(pitch);
+	ServerRPC_AddPitchInputToSpine(pitch);
 }
 
-void AFireMan::Multicast_AddPitchInputToSpine_Implementation(float pitch)
+void AFireMan::ServerRPC_AddPitchInputToSpine_Implementation(float pitch)
 {
 	Rotation_Spine02 = FMath::Clamp(Rotation_Spine02 + pitch, -30, 90);
 }
 
-void AFireMan::ChangeBoolFireHose(bool bCanUse)
+void AFireMan::OnChangeCanUseTool()
 {
-	bCanUseFireHose = bCanUse;
+	if (HasAuthority())
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Server get somewhat : bCanUseFireHose - %d"), bCanUseFireHose);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Local get somewhat : bCanUseFireHose - %d"), bCanUseFireHose);
+	}
 	if (bCanUseCrowbar && bCanUseFireHose)
 		OnMissionComplete();
 }
@@ -268,26 +275,45 @@ void AFireMan::ServerRPC_OnGetFireHose_Implementation()
 		float dist = FVector::Distance(GetActorLocation(), FireTruckFireHoseActor->GetActorLocation());
 		if (dist <= InteractDist)
 		{
-			ChangeBoolFireHose(true);
+			bCanUseFireHose = true;
 			Multicast_OnEquipFireHose();
 		}
 	}
 }
 
 void AFireMan::OnEquipFireHose()
-{	
+{
+	if (!HasAuthority())
+		UE_LOG(LogTemp, Warning, TEXT("onequipfirehose in localplayer : %d, %d"), bCanUseFireHose, bDoesEquipFireHose);
 	ServerRPC_OnEquipFireHose();
 }
 
 void AFireMan::ServerRPC_OnEquipFireHose_Implementation()
 {
+	if (HasAuthority())
+	{
+		UE_LOG(LogTemp, Warning, TEXT("serveronequipfirehose in serverplayer : %d, %d, %d"), bCanUseFireHose, bDoesEquipFireHose, bDoesCarryingPerson);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("serveronequipfirehose in localplayer : %d, %d, %d"), bCanUseFireHose, bDoesEquipFireHose, bDoesCarryingPerson);
+	}
 	if (!bCanUseFireHose || bDoesCarryingPerson) return;
-	
+
 	Multicast_OnEquipFireHose();
 }
 
 void AFireMan::Multicast_OnEquipFireHose_Implementation()
 {
+	if (!HasAuthority())
+	{
+		UE_LOG(LogTemp, Warning, TEXT("multicastonequipfirehose in localplayer : %d, %d"), bCanUseFireHose, bDoesEquipFireHose);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("multicastonequipfirehose in serverplayer : %d, %d"), bCanUseFireHose, bDoesEquipFireHose);
+	}
+	
 	if (bDoesEquipFireHose)
 	{
 		// off
@@ -309,13 +335,6 @@ void AFireMan::Multicast_OnEquipFireHose_Implementation()
 	}
 }
 
-void AFireMan::ChangeBoolCrowbar(bool bCanUse)
-{
-	bCanUseCrowbar = bCanUse;
-	if (bCanUseCrowbar && bCanUseFireHose)
-		OnMissionComplete();
-}
-
 void AFireMan::OnGetCrowbar()
 {
 	ServerRPC_OnGetCrowbar();
@@ -330,7 +349,7 @@ void AFireMan::ServerRPC_OnGetCrowbar_Implementation()
 		float dist = FVector::Distance(GetActorLocation(), FireTruckCrowbarActor->GetActorLocation());
 		if (dist <= InteractDist)
 		{
-			ChangeBoolCrowbar(true);
+			bCanUseCrowbar = true;
 			FireTruckCrowbarActor->Destroy();
 			Multicast_OnEquipCrowbar();
 		}
@@ -397,8 +416,9 @@ void AFireMan::OnUseTool()
 	{
 		OnGetCrowbar();
 		OnGetFireHose();
+		return;
 	}
-	
+
 	if (bDoesEquipFireHose) return;
 	
 	if (bDoesEquipCrowbar)
@@ -516,6 +536,7 @@ void AFireMan::OnMissionComplete()
 
 	if (AHousePlayerState* hps = Cast<AHousePlayerState>(GetPlayerState()))
 	{
+		UE_LOG(LogTemp, Warning, TEXT("ㅁ러ㅣㅏㄴㅇㄷ텀리ㅏㄴㄷ러ㅣㅈㄷ나러믿나ㅓㄹ"));
 		CurrentMissionIndex++;
 		hps->SetMissionComplete();
 	}

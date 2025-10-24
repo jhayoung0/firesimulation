@@ -40,16 +40,6 @@ void AFireActor::BeginPlay()
 	
 }
 
-void AFireActor::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const
-{
-	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
-
-	DOREPLIFETIME(AFireActor, FlameScale);
-	DOREPLIFETIME(AFireActor, SmokeScale);
-	DOREPLIFETIME(AFireActor, DistortionScale);
-	DOREPLIFETIME(AFireActor, DebrisRate);
-}
-
 void AFireActor::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
@@ -105,11 +95,6 @@ void AFireActor::PostEditChangeProperty(struct FPropertyChangedEvent& PropertyCh
 
 void AFireActor::PutOutFire()
 {
-	ServerRPC_PutOutFire();
-}
-
-void AFireActor::ServerRPC_PutOutFire_Implementation()
-{
 	// Use Alpha Value for synchronizing variable Scale Rates 
 	FlameScale = FMath::FInterpConstantTo(FlameScale, 0.f, GetWorld()->DeltaTimeSeconds, vanishAlpha);
 	SmokeScale = FMath::FInterpConstantTo(SmokeScale, 0.f, GetWorld()->DeltaTimeSeconds, vanishAlpha);;
@@ -126,9 +111,6 @@ void AFireActor::ServerRPC_PutOutFire_Implementation()
 		Destroy();
 	}
 }
-
-
-
 
 
 

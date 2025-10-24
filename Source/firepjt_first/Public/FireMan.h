@@ -107,17 +107,20 @@ private:
 
 	void OnMove(const struct FInputActionValue& value);
 	void OnLook(const struct FInputActionValue& value);
-	UFUNCTION(NetMulticast, Unreliable)
-	void Multicast_AddPitchInputToSpine(float pitch);
+	UFUNCTION(Server, Unreliable)
+	void ServerRPC_AddPitchInputToSpine(float pitch);
 
+	// Change bCanUse~ when Replicated
+	UFUNCTION()
+	void OnChangeCanUseTool();
+	
 	// FireHose
 	UPROPERTY(VisibleAnywhere)
 	TSubclassOf<class AFireTruckFireHose> FireTruckFireHoseClass;
 	UPROPERTY()
 	TObjectPtr<class AFireTruckFireHose> FireTruckFireHoseActor;
-	UPROPERTY(Replicated)
+	UPROPERTY(ReplicatedUsing=OnChangeCanUseTool)
 	bool bCanUseFireHose = false;
-	void ChangeBoolFireHose(bool bCanUse);
 	void OnGetFireHose();
 	UFUNCTION(Server, Reliable)
 	void ServerRPC_OnGetFireHose();
@@ -127,15 +130,14 @@ private:
 	void ServerRPC_OnEquipFireHose();
 	UFUNCTION(NetMulticast, Reliable)
 	void Multicast_OnEquipFireHose();
-
+	
 	// Crowbar
 	UPROPERTY(VisibleAnywhere)
 	TSubclassOf<class AFireTruckCrowbar> FireTruckCrowbarClass;
 	UPROPERTY()
 	TObjectPtr<class AFireTruckCrowbar> FireTruckCrowbarActor;
-	UPROPERTY(Replicated)
+	UPROPERTY(ReplicatedUsing=OnChangeCanUseTool)
 	bool bCanUseCrowbar = false;
-	void ChangeBoolCrowbar(bool bCanUse);
 	void OnGetCrowbar();
 	UFUNCTION(Server, Reliable)
 	void ServerRPC_OnGetCrowbar();

@@ -40,7 +40,6 @@ AFireHose::AFireHose()
 		NiagaraParticleSystemComp->SetRelativeLocation(FVector(20, 0, 0));
 		NiagaraParticleSystemComp->SetRelativeRotation(FRotator(-90, 0, 0));
 		NiagaraParticleSystemComp->SetAutoActivate(false);
-		// NiagaraParticleSystemComp->SetEmitterEnable(FName(TEXT("WaterCollision")), true);
 	}
 }
 
