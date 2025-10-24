@@ -46,7 +46,9 @@ public:
 	UPROPERTY(meta = (BindWidget)) UButton* Btn_7;
 	UPROPERTY(meta = (BindWidget)) UButton* Btn_8;
 	UPROPERTY(meta = (BindWidget)) UButton* Btn_9;
-	
+
+	UFUNCTION()
+	void ResetTEXT();
 	
 	UFUNCTION()
 	void AppendDigit(const FString& Digit);

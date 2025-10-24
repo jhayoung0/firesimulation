@@ -62,6 +62,10 @@ void APeopleBase::BeginPlay()
 	// sequence actor 찾기
 	SequenceActor = Cast<AASequencePlayer>(UGameplayStatics::GetActorOfClass(GetWorld(), AASequencePlayer::StaticClass()));
 	
+	// house ps 지정
+	housePs = Cast<AHousePlayerState>(this->GetPlayerState());
+	
+	
 	// 레벨에 있는 모든 상호작용 액터를 찾자.
 	FindInteractActor();
 
@@ -106,7 +110,6 @@ void APeopleBase::Tick(float DeltaSeconds)
 	{
 		if (!housePs)
 		{
-			UE_LOG(LogTemp, Warning, TEXT("houseps null"));
 			return;
 		}
 		UE_LOG(LogTemp, Warning, TEXT("%d"), housePs->bIsOutOfOxygen);
@@ -158,7 +161,10 @@ void APeopleBase::Tick(float DeltaSeconds)
 	// 산소 부족 UI
 	if (currOxygen < 30.f)
 	{
-		mainui->ShowDamageUI(0.5f);
+		if (IsLocallyControlled())
+		{
+			mainui->ShowDamageUI(0.5f);
+		}
 		
 	}
 }
@@ -273,7 +279,8 @@ void APeopleBase::AttachActor()
 			HasWetTowel = false;
 
 			// 최초 1회만 호출됨.
-			if (!HasMaskFirst) {GoNextMission();}
+			if (!HasMaskFirst) {GoNextMission();};
+			
 			// 최초 1회를 위한 변수 (1번 바뀌면 값 변경 안됨)
 			HasMaskFirst = true;
 			
@@ -314,15 +321,16 @@ void APeopleBase::AttachActor()
 
 				// 핸드폰 정보성 UI
 				mainui->AddInfoUI(0);
-				
 			}
-		
-			
-	
-
 		}
 		else if (InteractingActor->ActorHasTag(FName("People")))
 		{
+			if (IsLocallyControlled())
+			{
+				// 사람 정보성 UI
+				mainui->AddInfoUI(2);
+			}
+			
 			if (!HasAuthority())
 			{
 				// 남이 보는 시선
@@ -394,8 +402,6 @@ void APeopleBase::DetachActor(AInteractActor* tempActor)
 				auto* pc = Cast<Afirepjt_firstPlayerController>(GetWorld()->GetFirstPlayerController());
 				pc->ClosePhoneUI();
 			}
-			
-
 			HasPhone = false;
 			
 		}
@@ -412,7 +418,6 @@ void APeopleBase::DetachActor(AInteractActor* tempActor)
 			UE_LOG(LogTemp, Log, TEXT("태그 없음 또는 알 수 없는 타입"));
 		}
 	}
-	
 	InteractingActor = nullptr;
 }
 

@@ -9,6 +9,16 @@
 #include "Components/TextBlock.h"
 #include "Kismet/GameplayStatics.h"
 
+void UPhoneWidget::ResetTEXT()
+{
+	UE_LOG(LogTemp, Warning, TEXT("Reset Text call")); 
+	RawNumber.Empty();
+	if (callText)
+	{
+		callText->SetText(FText::GetEmpty());
+	}
+}
+
 void UPhoneWidget::AppendDigit(const FString& Digit)
 {
 	// 버튼 sfx
@@ -44,16 +54,56 @@ void UPhoneWidget::NativeConstruct()
 	Super::NativeConstruct();
 
 	// 버튼 바인딩
-	if (Btn_1) Btn_1->OnClicked.AddDynamic(this, &UPhoneWidget::OnNumberClicked_1);
-	if (Btn_2) Btn_2->OnClicked.AddDynamic(this, &UPhoneWidget::OnNumberClicked_2);
-	if (Btn_3) Btn_3->OnClicked.AddDynamic(this, &UPhoneWidget::OnNumberClicked_3);
-	if (Btn_4) Btn_4->OnClicked.AddDynamic(this, &UPhoneWidget::OnNumberClicked_4);
-	if (Btn_5) Btn_5->OnClicked.AddDynamic(this, &UPhoneWidget::OnNumberClicked_5);
-	if (Btn_6) Btn_6->OnClicked.AddDynamic(this, &UPhoneWidget::OnNumberClicked_6);
-	if (Btn_7) Btn_7->OnClicked.AddDynamic(this, &UPhoneWidget::OnNumberClicked_7);
-	if (Btn_8) Btn_8->OnClicked.AddDynamic(this, &UPhoneWidget::OnNumberClicked_8);
-	if (Btn_9) Btn_9->OnClicked.AddDynamic(this, &UPhoneWidget::OnNumberClicked_9);
-	if (callButton) callButton->OnClicked.AddDynamic(this, &UPhoneWidget::TryCall);
+	if (Btn_1)
+	{
+		Btn_1->OnClicked.RemoveDynamic(this, &UPhoneWidget::OnNumberClicked_1);
+		Btn_1->OnClicked.AddDynamic(this, &UPhoneWidget::OnNumberClicked_1);
+	}
+	if (Btn_2)
+	{
+		Btn_2->OnClicked.RemoveDynamic(this, &UPhoneWidget::OnNumberClicked_2);
+		Btn_2->OnClicked.AddDynamic(this, &UPhoneWidget::OnNumberClicked_2);
+	}
+	if (Btn_3)
+	{
+		Btn_3->OnClicked.RemoveDynamic(this, &UPhoneWidget::OnNumberClicked_3);
+		Btn_3->OnClicked.AddDynamic(this, &UPhoneWidget::OnNumberClicked_3);
+	}
+	if (Btn_4)
+	{
+		Btn_4->OnClicked.RemoveDynamic(this, &UPhoneWidget::OnNumberClicked_4);
+		Btn_4->OnClicked.AddDynamic(this, &UPhoneWidget::OnNumberClicked_4);
+	}
+	if (Btn_5)
+	{
+		Btn_5->OnClicked.RemoveDynamic(this, &UPhoneWidget::OnNumberClicked_5);
+		Btn_5->OnClicked.AddDynamic(this, &UPhoneWidget::OnNumberClicked_5);
+	}
+	if (Btn_6)
+	{
+		Btn_6->OnClicked.RemoveDynamic(this, &UPhoneWidget::OnNumberClicked_6);
+		Btn_6->OnClicked.AddDynamic(this, &UPhoneWidget::OnNumberClicked_6);
+	}
+	if (Btn_7)
+	{
+		Btn_7->OnClicked.RemoveDynamic(this, &UPhoneWidget::OnNumberClicked_7);
+		Btn_7->OnClicked.AddDynamic(this, &UPhoneWidget::OnNumberClicked_7);
+	}
+	if (Btn_8)
+	{
+		Btn_8->OnClicked.RemoveDynamic(this, &UPhoneWidget::OnNumberClicked_8);
+		Btn_8->OnClicked.AddDynamic(this, &UPhoneWidget::OnNumberClicked_8);
+	}
+	if (Btn_9)
+	{
+		Btn_9->OnClicked.RemoveDynamic(this, &UPhoneWidget::OnNumberClicked_9);
+		Btn_9->OnClicked.AddDynamic(this, &UPhoneWidget::OnNumberClicked_9);
+	}
+	if (callButton)
+	{
+		callButton->OnClicked.RemoveDynamic(this, &UPhoneWidget::TryCall);
+		callButton->OnClicked.AddDynamic(this, &UPhoneWidget::TryCall);
+	}
 }
 
 
@@ -74,8 +124,6 @@ void UPhoneWidget::TryCall()
 
 		// 다음 미션으로 넘기기
 		peoplebase->GoNextMission();
-
-		
 	}
 	else
 	{
