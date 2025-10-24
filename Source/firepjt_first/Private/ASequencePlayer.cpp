@@ -40,7 +40,7 @@ void AASequencePlayer::PlayIntroSequence()
 {
 	SequencePlay();
 	
-	cinematicUI->OpenWidgetToggle(false);
+	cinematicUI->OpenWidgetToggle(2);
 	// 텍스트 없음.
 	cinematicUI->ChangeCompleteText(FString(TEXT("")));
 	
@@ -62,7 +62,7 @@ void AASequencePlayer::PlayIntroSequence()
 
 void AASequencePlayer::OnFirstSequenceFinished()
 {
-	cinematicUI->NextWidgetStart();
+	cinematicUI->OpenWidgetToggle(3);
 	
 	// 2번째 시퀀스 재생
 	if (SecondSequence)
@@ -74,7 +74,7 @@ void AASequencePlayer::OnFirstSequenceFinished()
 		if (!SecondPlayer) return;
 
 		// 이건 시퀀스 끝나면 호출
-		SecondPlayer->OnFinished.AddDynamic(this, &AASequencePlayer::SequenceEnd);
+		SecondPlayer->OnFinished.AddDynamic(this, &AASequencePlayer::OnSecondSequenceFinished);
 		SecondPlayer->Play();
 	}
 }
@@ -101,16 +101,13 @@ void AASequencePlayer::MissionOneSequencePlay()
 {
 
 	SequencePlay();
-
 	// 스킵버튼 숨기기
 	cinematicUI->HideSkipbtn();
-
 	// 미션 성공 UI 띄우기
 	cinematicUI->ChangeCompleteText(FString(TEXT("미션1 성공!")));
 	
-
 	// 듀얼 위젯 띄우기
-	cinematicUI->OpenWidgetToggle(true);
+	cinematicUI->OpenWidgetToggle(1);
 	
 	if (Mission1_Fireman_Sequence && Mission1_People_Sequence)
 	{
@@ -150,10 +147,8 @@ void AASequencePlayer::MissionTwoSequencePlay()
 
 	// 스킵버튼 숨기기
 	cinematicUI->HideSkipbtn();
-	
 	cinematicUI->ChangeCompleteText(FString(TEXT("미션2 성공!")));
-	// 듀얼 위젯 띄우기
-	cinematicUI->OpenWidgetToggle(false);
+	cinematicUI->OpenWidgetToggle(2);
 	
 	if (Mission2_Fireman_Sequence)
 	{
@@ -181,8 +176,6 @@ void AASequencePlayer::MultiCastRPC_MissionTwoSequencePlay_Implementation()
 }
 
 
-
-
 // 미션 3 완료 후 나오는 시네마틱
 void AASequencePlayer::MissionThreeSequencePlay()
 {
@@ -193,8 +186,7 @@ void AASequencePlayer::MissionThreeSequencePlay()
 	cinematicUI->HideSkipbtn();
 	
 	// 단일 위젯 띄우기
-	UE_LOG(LogTemp, Warning, TEXT("missionthreesequenceplay"));
-	cinematicUI->OpenWidgetToggle(false);
+	cinematicUI->OpenWidgetToggle(3);
 	
 	if (Mission3_Sequence)
 	{
@@ -273,6 +265,7 @@ void AASequencePlayer::BindToWidget(UPhoneWidget* InWidget)
 	// 델리게이트 바인딩
 	if (!InWidget) return;
 	InWidget->OnRequestPlayCinematic.AddDynamic(this, &AASequencePlayer::ServerRPC_MissionOneSequencePlay);
+
 }
 
 

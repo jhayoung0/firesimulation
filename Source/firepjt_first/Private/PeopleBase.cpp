@@ -71,7 +71,7 @@ void APeopleBase::BeginPlay()
 
 
 	// Main ui를 만들자
-	if (mainwidget)
+	if (mainwidget && IsLocallyControlled()) // 소방관에겐 안보이게 하기.
 	{
 		mainui = CreateWidget<UMainUI>(GetWorld(), mainwidget);
 		if (mainui)
@@ -112,9 +112,8 @@ void APeopleBase::Tick(float DeltaSeconds)
 		{
 			return;
 		}
-		UE_LOG(LogTemp, Warning, TEXT("%d"), housePs->bIsOutOfOxygen);
+
 		housePs->bIsOutOfOxygen = true;
-		UE_LOG(LogTemp, Warning, TEXT("%d"), housePs->bIsOutOfOxygen);
 		return; 
 	}
 	
@@ -216,7 +215,10 @@ void APeopleBase::ServerRPC_Interaction_Implementation()
 		return;
 	}
 
+	// 스폰된 마스크 다시 검색
+	FindInteractActor();
 	
+	// 거리가 가까운 상호작용 가능 물체를 변수에 담고
 	// 거리가 가까운 상호작용 가능 물체를 변수에 담고
 	// 가장 거리가 가까운 상호작용 가능 물체의 상호작용 함수를 호출해준다.
 	if (allInteractActor.Num() == 0)
@@ -257,8 +259,7 @@ void APeopleBase::MultiCastRPC_DetachActor_Implementation(
 
 void APeopleBase::AttachActor()
 {
-
-	FindInteractActor();
+	
 	
 	IsInteracting = true;
 	//InteractingActor->IsInteracting = true;
