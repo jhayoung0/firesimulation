@@ -74,7 +74,7 @@ void AASequencePlayer::OnFirstSequenceFinished()
 		if (!SecondPlayer) return;
 
 		// 이건 시퀀스 끝나면 호출
-		SecondPlayer->OnFinished.AddDynamic(this, &AASequencePlayer::SequenceEnd);
+		SecondPlayer->OnFinished.AddDynamic(this, &AASequencePlayer::OnSecondSequenceFinished);
 		SecondPlayer->Play();
 	}
 }
@@ -193,7 +193,6 @@ void AASequencePlayer::MissionThreeSequencePlay()
 	cinematicUI->HideSkipbtn();
 	
 	// 단일 위젯 띄우기
-	UE_LOG(LogTemp, Warning, TEXT("missionthreesequenceplay"));
 	cinematicUI->OpenWidgetToggle(false);
 	
 	if (Mission3_Sequence)
@@ -273,6 +272,7 @@ void AASequencePlayer::BindToWidget(UPhoneWidget* InWidget)
 	// 델리게이트 바인딩
 	if (!InWidget) return;
 	InWidget->OnRequestPlayCinematic.AddDynamic(this, &AASequencePlayer::ServerRPC_MissionOneSequencePlay);
+
 }
 
 
