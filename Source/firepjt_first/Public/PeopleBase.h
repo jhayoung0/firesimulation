@@ -6,6 +6,7 @@
 #include "Net/UnrealNetwork.h"
 #include "firepjt_firstCharacter.h"
 #include "PhoneWidget.h"
+#include "Cubee/HousePlayerState.h"
 #include "PeopleBase.generated.h"
 
 class AASequencePlayer;
@@ -27,10 +28,13 @@ public:
 	// 생성자
 	APeopleBase();
 	virtual void BeginPlay() override;
-
+	
 	// 인풋
 	virtual void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) override;
 	virtual void Tick(float DeltaSeconds) override;
+
+	// house ps
+	AHousePlayerState* housePs = Cast<AHousePlayerState>(this->GetPlayerState());
 	
 	// crawl
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category= Input)
@@ -109,6 +113,7 @@ public: // stat
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Stats)
 	bool RescuePeople  = false;
+
 	
 protected:
 	float PreviousGear = -1.f;
@@ -188,5 +193,7 @@ public:
 	// mask bool 값 하나 두기
 	UPROPERTY(EditAnywhere)
 	bool HasMaskFirst = false;
+
+	
 	
 };

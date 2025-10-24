@@ -46,6 +46,10 @@ public:
 	// 스킵 버튼 
 	UPROPERTY(meta=(BindWidget))
 	class UButton* Skipbtn;
+
+	// 스킵버튼 없애기
+	UFUNCTION()
+	void HideSkipbtn();
 	
 	//토글
 	UFUNCTION()

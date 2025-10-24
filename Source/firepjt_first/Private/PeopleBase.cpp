@@ -97,12 +97,23 @@ void APeopleBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 void APeopleBase::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
-
-
+	
 	// 시네마틱 재생 중에 산소 떨어지는거 막기
-	auto* seqplayer = Cast<AASequencePlayer>
-	(UGameplayStatics::GetActorOfClass(GetWorld(), AASequencePlayer::StaticClass()));
-	if (seqplayer && seqplayer->IsPlayingCinematic) {return;}
+	if (SequenceActor && SequenceActor->IsPlayingCinematic) {return;}
+	
+	// 플레이어 죽음 처리
+	if (currOxygen <= 0.0f)
+	{
+		if (!housePs)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("houseps null"));
+			return;
+		}
+		UE_LOG(LogTemp, Warning, TEXT("%d"), housePs->bIsOutOfOxygen);
+		housePs->bIsOutOfOxygen = true;
+		UE_LOG(LogTemp, Warning, TEXT("%d"), housePs->bIsOutOfOxygen);
+		return; 
+	}
 	
 	// 상태별 계수 먼저 갱신
 	Posture = IsCrawl ? 0.8f : 1.0f;
@@ -403,7 +414,6 @@ void APeopleBase::DetachActor(AInteractActor* tempActor)
 void APeopleBase::GoNextMission()
 {
 	// 다음 미션으로 넘기기
-	auto* housePs = Cast<AHousePlayerState>(this->GetPlayerState());
 	if (!housePs){return;}
 	housePs->SetMissionComplete();
 }

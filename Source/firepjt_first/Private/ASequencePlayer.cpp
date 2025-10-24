@@ -82,6 +82,7 @@ void AASequencePlayer::OnFirstSequenceFinished()
 void AASequencePlayer::OnSecondSequenceFinished()
 {
 	SequenceEnd();
+
 	
 	// 두 번째까지 끝나면 게임 시작
 	if (HasAuthority())
@@ -100,7 +101,10 @@ void AASequencePlayer::MissionOneSequencePlay()
 {
 	SequencePlay();
 
-	
+	// 스킵버튼 숨기기
+	cinematicUI->HideSkipbtn();
+
+	// 미션 성공 UI 띄우기
 	cinematicUI->ChangeCompleteText(FString(TEXT("미션1 성공!")));
 	
 
@@ -132,6 +136,10 @@ void AASequencePlayer::MissionOneSequencePlay()
 void AASequencePlayer::MissionTwoSequencePlay()
 {
 	SequencePlay();
+
+	// 스킵버튼 숨기기
+	cinematicUI->HideSkipbtn();
+	
 	cinematicUI->ChangeCompleteText(FString(TEXT("미션2 성공!")));
 	// 듀얼 위젯 띄우기
 	cinematicUI->OpenWidgetToggle(false);
@@ -142,7 +150,7 @@ void AASequencePlayer::MissionTwoSequencePlay()
 		ALevelSequenceActor* SeqActor = nullptr;
 		Mission2_Fireman_Player =
 			ULevelSequencePlayer::CreateLevelSequencePlayer(GetWorld(), Mission2_Fireman_Sequence, Settings, SeqActor);
-		// 이건 시퀀스 끝나면 호출 (1번만 호출될 수 있도록 임의로 우측 시네마틱에 연결)
+		// 이건 시퀀스 끝나면 호출
 		Mission2_Fireman_Player->OnFinished.AddDynamic(this, &AASequencePlayer::SequenceEnd);
 		// 시퀀스 재생
 		Mission2_Fireman_Player->Play();
@@ -156,6 +164,9 @@ void AASequencePlayer::MissionThreeSequencePlay()
 {
 	SequencePlay();
 	cinematicUI->ChangeCompleteText(FString(TEXT("미션3 성공!")));
+
+	// 스킵버튼 숨기기
+	cinematicUI->HideSkipbtn();
 	
 	// 단일 위젯 띄우기
 	cinematicUI->OpenWidgetToggle(false);
@@ -206,6 +217,8 @@ void AASequencePlayer::SequencePlay()
 // 시퀀스 끝나면 호출
 void AASequencePlayer::SequenceEnd()
 {
+
+
 	// 산소 차감 진행
 	IsPlayingCinematic = false;
 	// UI 끄기
@@ -225,7 +238,7 @@ void AASequencePlayer::BindToWidget(UPhoneWidget* InWidget)
 {
 	// 델리게이트 바인딩
 	if (!InWidget) return;
-	InWidget->OnRequestPlayCinematic.AddDynamic(this, &AASequencePlayer::MissionOneSequencePlay);
+	InWidget->OnRequestPlayCinematic.AddDynamic(this, &AASequencePlayer::MissionThreeSequencePlay);
 	
 }
 

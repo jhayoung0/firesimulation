@@ -15,6 +15,16 @@ void UCinematicUI::ChangeCompleteText(FString text)
 	completetext->SetText(FText::FromString(text));
 }
 
+void UCinematicUI::HideSkipbtn()
+{
+	if (Skipbtn)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("hideskipbyn"));
+		// Skipbtn->RemoveFromParent(); // 부모 패널에서 제거
+		Skipbtn->SetVisibility(ESlateVisibility::Hidden);
+	}
+}
+
 void UCinematicUI::OpenWidgetToggle(bool isdual)
 {
 	// dual 화면이면
