@@ -53,10 +53,8 @@ public:
 	
 	//토글
 	UFUNCTION()
-	void OpenWidgetToggle(bool isdual);
-
-	UFUNCTION()
-	void NextWidgetStart();
+	void OpenWidgetToggle(int32 idx);  // 1이면 dual, 2면 people 3이면 fireman
+	
 	
 	UFUNCTION()
 	void CloseWidget();
