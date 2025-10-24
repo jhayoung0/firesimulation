@@ -18,6 +18,7 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+	virtual void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;
 
 public:
 	// Called every frame
@@ -33,22 +34,23 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TObjectPtr<class USphereComponent> SphereCollision;
 	
-	UFUNCTION()
 	void PutOutFire();
+	UFUNCTION(Server, Reliable)
+	void ServerRPC_PutOutFire();
 
 	// Fire Vanish Rate Variable
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=PutOutFire)
 	float vanishAlpha = 0.2f;
 
 	// PutOutFire
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="NiagaraVariable|PutOutFire")
+	UPROPERTY(Replicated, VisibleAnywhere, BlueprintReadWrite, Category="NiagaraVariable|PutOutFire")
 	float FlameScale = 1.f;
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="NiagaraVariable|PutOutFire")
+	UPROPERTY(Replicated, VisibleAnywhere, BlueprintReadWrite, Category="NiagaraVariable|PutOutFire")
 	float SmokeScale = 1.f;
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="NiagaraVariable|PutOutFire")
+	UPROPERTY(Replicated, VisibleAnywhere, BlueprintReadWrite, Category="NiagaraVariable|PutOutFire")
 	float DistortionScale = 1.f;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="NiagaraVariable|PutOutFire")
-	float DebrisRate = 50.f;
+	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category="NiagaraVariable|PutOutFire")
+	float DebrisRate = 80.f;
 	// Flame
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="NiagaraVariable|Flame")
 	float FlameSpawnRate = 50.f;

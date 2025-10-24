@@ -76,7 +76,7 @@ public:
 
 	// Interact
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float InteractDist = 200.f;
+	float InteractDist = 250.f;
 
 	// Get
 	float GetRotationSpine02();
@@ -117,6 +117,7 @@ private:
 	TObjectPtr<class AFireTruckFireHose> FireTruckFireHoseActor;
 	UPROPERTY(Replicated)
 	bool bCanUseFireHose = false;
+	void ChangeBoolFireHose(bool bCanUse);
 	void OnGetFireHose();
 	UFUNCTION(Server, Reliable)
 	void ServerRPC_OnGetFireHose();
@@ -134,6 +135,7 @@ private:
 	TObjectPtr<class AFireTruckCrowbar> FireTruckCrowbarActor;
 	UPROPERTY(Replicated)
 	bool bCanUseCrowbar = false;
+	void ChangeBoolCrowbar(bool bCanUse);
 	void OnGetCrowbar();
 	UFUNCTION(Server, Reliable)
 	void ServerRPC_OnGetCrowbar();
@@ -174,4 +176,10 @@ private:
 
 	// FireHose Off
 	void OffFireHose();
+
+	// Mission Complete
+	UPROPERTY(EditAnywhere)
+	int32 MaxMissionIndex = 3;
+	int32 CurrentMissionIndex = 1;
+	void OnMissionComplete();
 };

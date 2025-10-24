@@ -27,8 +27,8 @@ AFireHose::AFireHose()
 	if (FirehoseMeshRef.Succeeded())
 	{
 		FirehoseComp->SetSkeletalMesh(FirehoseMeshRef.Object);
+		FirehoseComp->SetupAttachment(RootComponent);
 	}
-	FirehoseComp->SetupAttachment(RootComponent);
 
 	// Niagara Component
 	NiagaraParticleSystemComp = CreateDefaultSubobject<UNiagaraComponent>("ParticleSystemComponent");
@@ -36,11 +36,12 @@ AFireHose::AFireHose()
 	if (niagaraCompRef.Succeeded())
 	{
 		NiagaraParticleSystemComp->SetAsset(niagaraCompRef.Object);
+		NiagaraParticleSystemComp->SetupAttachment(FirehoseComp);
+		NiagaraParticleSystemComp->SetRelativeLocation(FVector(20, 0, 0));
+		NiagaraParticleSystemComp->SetRelativeRotation(FRotator(-90, 0, 0));
+		NiagaraParticleSystemComp->SetAutoActivate(false);
+		// NiagaraParticleSystemComp->SetEmitterEnable(FName(TEXT("WaterCollision")), true);
 	}
-	NiagaraParticleSystemComp->SetupAttachment(FirehoseComp);
-	NiagaraParticleSystemComp->SetRelativeLocation(FVector(20, 0, 0));
-	NiagaraParticleSystemComp->SetRelativeRotation(FRotator(-90, 0, 0));
-	NiagaraParticleSystemComp->SetAutoActivate(false);
 }
 
 void AFireHose::BeginPlay()

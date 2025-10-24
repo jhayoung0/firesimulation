@@ -19,7 +19,6 @@
 #include "Net/UnrealNetwork.h"
 
 
-class AInteractActor;
 // Sets default values
 AFireMan::AFireMan()
 {
@@ -248,6 +247,13 @@ void AFireMan::Multicast_AddPitchInputToSpine_Implementation(float pitch)
 	Rotation_Spine02 = FMath::Clamp(Rotation_Spine02 + pitch, -30, 90);
 }
 
+void AFireMan::ChangeBoolFireHose(bool bCanUse)
+{
+	bCanUseFireHose = bCanUse;
+	if (bCanUseCrowbar && bCanUseFireHose)
+		OnMissionComplete();
+}
+
 void AFireMan::OnGetFireHose()
 {
 	ServerRPC_OnGetFireHose();
@@ -262,7 +268,7 @@ void AFireMan::ServerRPC_OnGetFireHose_Implementation()
 		float dist = FVector::Distance(GetActorLocation(), FireTruckFireHoseActor->GetActorLocation());
 		if (dist <= InteractDist)
 		{
-			bCanUseFireHose = true;
+			ChangeBoolFireHose(true);
 			Multicast_OnEquipFireHose();
 		}
 	}
@@ -303,6 +309,13 @@ void AFireMan::Multicast_OnEquipFireHose_Implementation()
 	}
 }
 
+void AFireMan::ChangeBoolCrowbar(bool bCanUse)
+{
+	bCanUseCrowbar = bCanUse;
+	if (bCanUseCrowbar && bCanUseFireHose)
+		OnMissionComplete();
+}
+
 void AFireMan::OnGetCrowbar()
 {
 	ServerRPC_OnGetCrowbar();
@@ -317,7 +330,7 @@ void AFireMan::ServerRPC_OnGetCrowbar_Implementation()
 		float dist = FVector::Distance(GetActorLocation(), FireTruckCrowbarActor->GetActorLocation());
 		if (dist <= InteractDist)
 		{
-			bCanUseCrowbar = true;
+			ChangeBoolCrowbar(true);
 			FireTruckCrowbarActor->Destroy();
 			Multicast_OnEquipCrowbar();
 		}
@@ -420,6 +433,8 @@ void AFireMan::Multicast_OnMaskOut_Implementation()
 		if (dist <= InteractDist)
 		{
 			GetWorld()->SpawnActor<AInteractActor>(MaskActor, FTransform(GetActorLocation() + GetActorForwardVector() * MaskSpawnDist));
+			if (CurrentMissionIndex == 2)
+				OnMissionComplete();
 		}
 	}
 }
@@ -490,8 +505,18 @@ void AFireMan::OffFireHose()
 	{
 		if (fireHose->GetDoesWaterShotNow())
 		{
-			UE_LOG(LogTemp, Warning, TEXT("Off WaterShot"));
 			fireHose->OnWaterShot();
 		}
+	}
+}
+
+void AFireMan::OnMissionComplete()
+{
+	if (CurrentMissionIndex > MaxMissionIndex) return;
+
+	if (AHousePlayerState* hps = Cast<AHousePlayerState>(GetPlayerState()))
+	{
+		CurrentMissionIndex++;
+		hps->SetMissionComplete();
 	}
 }

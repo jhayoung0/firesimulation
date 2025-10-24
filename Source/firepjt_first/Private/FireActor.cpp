@@ -6,6 +6,7 @@
 #include "NiagaraComponent.h"
 #include "NiagaraSystem.h"
 #include "Components/SphereComponent.h"
+#include "Net/UnrealNetwork.h"
 
 
 // Sets default values
@@ -37,6 +38,16 @@ void AFireActor::BeginPlay()
 {
 	Super::BeginPlay();
 	
+}
+
+void AFireActor::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(AFireActor, FlameScale);
+	DOREPLIFETIME(AFireActor, SmokeScale);
+	DOREPLIFETIME(AFireActor, DistortionScale);
+	DOREPLIFETIME(AFireActor, DebrisRate);
 }
 
 void AFireActor::Tick(float DeltaTime)
@@ -94,6 +105,11 @@ void AFireActor::PostEditChangeProperty(struct FPropertyChangedEvent& PropertyCh
 
 void AFireActor::PutOutFire()
 {
+	ServerRPC_PutOutFire();
+}
+
+void AFireActor::ServerRPC_PutOutFire_Implementation()
+{
 	// Use Alpha Value for synchronizing variable Scale Rates 
 	FlameScale = FMath::FInterpConstantTo(FlameScale, 0.f, GetWorld()->DeltaTimeSeconds, vanishAlpha);
 	SmokeScale = FMath::FInterpConstantTo(SmokeScale, 0.f, GetWorld()->DeltaTimeSeconds, vanishAlpha);;
@@ -105,7 +121,6 @@ void AFireActor::PutOutFire()
 	FireComp->SetVariableFloat(FName("DistortionScale"), DistortionScale);
 	FireComp->SetVariableFloat(FName("DebrisRate"), DebrisRate);
 
-	UE_LOG(LogTemp, Warning, TEXT("FlameScale : %f"), FlameScale);
 	if (FlameScale <= 0.001f)
 	{
 		Destroy();
