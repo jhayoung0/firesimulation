@@ -46,6 +46,10 @@ public:
 
 	// intro cinematic
 	void PlayIntroSequence();
+
+	UFUNCTION(NetMulticast, Reliable)
+	void Multicast_PlayIntroSequence();
+	
 	UPROPERTY(EditAnywhere, Category = "Sequence")
 	TObjectPtr<ULevelSequence> FirstSequence;
 	UPROPERTY(EditAnywhere, Category = "Sequence")
@@ -110,7 +114,8 @@ public:
 	UFUNCTION(NetMulticast, Reliable)
 	void MultiCastRPC_MissionTwoSequencePlay();
 	
-	
+	UFUNCTION()
+	void OnMissionTwoSequenceFinished();
 
 	// 미션 3 시네마틱
 	UPROPERTY(EditAnywhere, Category = "Sequence")
@@ -128,6 +133,9 @@ public:
 	
 	UFUNCTION(NetMulticast, Reliable)
 	void MultiCastRPC_MissionThreeSequencePlay();
+
+	UFUNCTION()
+	void OnMissionThreeSequenceFinished();
 	
 public: // widget
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = UI)
