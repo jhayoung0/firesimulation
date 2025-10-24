@@ -75,11 +75,18 @@ public:
 
 	UFUNCTION()
 	void MissionOneSequencePlay();
-
+	
+	UFUNCTION(Server, Reliable)
+	void ServerRPC_MissionOneSequencePlay();
+	
+	UFUNCTION(NetMulticast, Reliable)
+	void MultiCastRPC_MissionOneSequencePlay();
+	
 	// 델리게이트
 	UFUNCTION(BlueprintCallable, Category="Cinematic")
 	void BindToWidget(UPhoneWidget* InWidget);
 
+	
 
 	// 미션 2 시네마틱
 	UPROPERTY(EditAnywhere, Category = "Sequence")
@@ -96,6 +103,14 @@ public:
 
 	UFUNCTION()
 	void MissionTwoSequencePlay();
+	
+	UFUNCTION(Server, Reliable)
+	void ServerRPC_MissionTwoSequencePlay();
+	
+	UFUNCTION(NetMulticast, Reliable)
+	void MultiCastRPC_MissionTwoSequencePlay();
+	
+	
 
 	// 미션 3 시네마틱
 	UPROPERTY(EditAnywhere, Category = "Sequence")
@@ -107,7 +122,13 @@ public:
 	UFUNCTION()
 	void MissionThreeSequencePlay();
 	
-
+		
+	UFUNCTION(Server, Reliable)
+	void ServerRPC_MissionThreeSequencePlay();
+	
+	UFUNCTION(NetMulticast, Reliable)
+	void MultiCastRPC_MissionThreeSequencePlay();
+	
 public: // widget
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = UI)
 	TSubclassOf<UCinematicUI> cinematicwidget;

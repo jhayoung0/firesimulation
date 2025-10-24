@@ -237,10 +237,8 @@ void Afirepjt_firstPlayerController::Server_SetPlayerRole_Implementation(EPlayer
 
 void Afirepjt_firstPlayerController::OpenPhoneUI()
 {
-
-	
 	phoneUI->AddToViewport();
-	
+	phoneUI->ResetTEXT();
 	bShowMouseCursor = true;
 	SetIgnoreLookInput(true);
 	SetIgnoreMoveInput(true);

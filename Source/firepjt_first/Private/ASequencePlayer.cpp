@@ -74,7 +74,7 @@ void AASequencePlayer::OnFirstSequenceFinished()
 		if (!SecondPlayer) return;
 
 		// 이건 시퀀스 끝나면 호출
-		SecondPlayer->OnFinished.AddDynamic(this, &AASequencePlayer::OnSecondSequenceFinished);
+		SecondPlayer->OnFinished.AddDynamic(this, &AASequencePlayer::SequenceEnd);
 		SecondPlayer->Play();
 	}
 }
@@ -99,6 +99,7 @@ void AASequencePlayer::OnSecondSequenceFinished()
 // 미션 첫번째 완료되면 나올 시네마틱
 void AASequencePlayer::MissionOneSequencePlay()
 {
+
 	SequencePlay();
 
 	// 스킵버튼 숨기기
@@ -130,6 +131,16 @@ void AASequencePlayer::MissionOneSequencePlay()
 	}
 }
 
+// 미션1
+void AASequencePlayer::ServerRPC_MissionOneSequencePlay_Implementation()
+{
+	MultiCastRPC_MissionOneSequencePlay();
+}
+
+void AASequencePlayer::MultiCastRPC_MissionOneSequencePlay_Implementation()
+{
+	MissionOneSequencePlay();
+}
 
 
 // 미션 2 완료 후 나오는 시네마틱
@@ -159,6 +170,19 @@ void AASequencePlayer::MissionTwoSequencePlay()
 	}
 }
 
+void AASequencePlayer::ServerRPC_MissionTwoSequencePlay_Implementation()
+{
+	MultiCastRPC_MissionTwoSequencePlay();
+}
+
+void AASequencePlayer::MultiCastRPC_MissionTwoSequencePlay_Implementation()
+{
+	MissionTwoSequencePlay();
+}
+
+
+
+
 // 미션 3 완료 후 나오는 시네마틱
 void AASequencePlayer::MissionThreeSequencePlay()
 {
@@ -169,10 +193,12 @@ void AASequencePlayer::MissionThreeSequencePlay()
 	cinematicUI->HideSkipbtn();
 	
 	// 단일 위젯 띄우기
+	UE_LOG(LogTemp, Warning, TEXT("missionthreesequenceplay"));
 	cinematicUI->OpenWidgetToggle(false);
 	
 	if (Mission3_Sequence)
 	{
+		UE_LOG(LogTemp, Warning, TEXT("Mission3_Sequence 존재"));
 		FMovieSceneSequencePlaybackSettings Settings;
 		ALevelSequenceActor* SeqActor = nullptr;
 		Mission3_Player =
@@ -184,6 +210,16 @@ void AASequencePlayer::MissionThreeSequencePlay()
 		// 산소 차감 막기 위한 bool 값
 		IsPlayingCinematic = true;
 	}
+}
+
+void AASequencePlayer::ServerRPC_MissionThreeSequencePlay_Implementation()
+{
+	MultiCastRPC_MissionThreeSequencePlay();
+}
+
+void AASequencePlayer::MultiCastRPC_MissionThreeSequencePlay_Implementation()
+{
+	MissionThreeSequencePlay();
 }
 
 // 시퀀스 시작시 호출
@@ -217,8 +253,6 @@ void AASequencePlayer::SequencePlay()
 // 시퀀스 끝나면 호출
 void AASequencePlayer::SequenceEnd()
 {
-
-
 	// 산소 차감 진행
 	IsPlayingCinematic = false;
 	// UI 끄기
@@ -238,9 +272,9 @@ void AASequencePlayer::BindToWidget(UPhoneWidget* InWidget)
 {
 	// 델리게이트 바인딩
 	if (!InWidget) return;
-	InWidget->OnRequestPlayCinematic.AddDynamic(this, &AASequencePlayer::MissionThreeSequencePlay);
-	
+	InWidget->OnRequestPlayCinematic.AddDynamic(this, &AASequencePlayer::ServerRPC_MissionOneSequencePlay);
 }
+
 
 void AASequencePlayer::Skip()
 {

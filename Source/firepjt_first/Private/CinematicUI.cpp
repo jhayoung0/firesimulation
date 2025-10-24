@@ -19,8 +19,6 @@ void UCinematicUI::HideSkipbtn()
 {
 	if (Skipbtn)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("hideskipbyn"));
-		// Skipbtn->RemoveFromParent(); // 부모 패널에서 제거
 		Skipbtn->SetVisibility(ESlateVisibility::Hidden);
 	}
 }
