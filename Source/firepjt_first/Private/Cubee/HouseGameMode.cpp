@@ -2,6 +2,8 @@
 
 
 #include "Cubee/HouseGameMode.h"
+
+#include "ASequencePlayer.h"
 #include "Cubee/FireGameInstance.h"
 #include "Cubee/HouseGameState.h"
 #include "FireMan.h"
@@ -106,6 +108,14 @@ void AHouseGameMode::BeginPlay()
 		GetWorldTimerManager().SetTimer(TimerHandle, FTimerDelegate::CreateLambda([&]
 		{
 			ChangeGamePhase(EGamePhase::Intro);
+
+			// SequencePlayer 찾아서 Multicast 호출                                                                                                                                                                                       
+			AASequencePlayer* SequencePlayer = Cast<AASequencePlayer>(
+			UGameplayStatics::GetActorOfClass(GetWorld(), AASequencePlayer::StaticClass()));
+			if (SequencePlayer)
+			{
+				SequencePlayer->Multicast_PlayIntroSequence();
+			}
 
 		}), 1.f, false);
 	}
@@ -212,26 +222,44 @@ void AHouseGameMode::AdvanceToNextMission()
 	AHouseGameState* HouseGS = GetGameState<AHouseGameState>();
 	if (!HouseGS) return;
 
+	int32 CurrentMissionIndex = HouseGS->CurrentMissionIndex;
 	int32 NextMissionIndex = HouseGS->CurrentMissionIndex + 1;
 
 	if (NextMissionIndex >= TotalMissions)
 	{
 		// 승리!
-		ChangeGamePhase(EGamePhase::Victory);
-
 		GetWorldTimerManager().ClearTimer(MissionTimerHandle);
+
+		AASequencePlayer* SequencePlayer = Cast<AASequencePlayer>(
+			UGameplayStatics::GetActorOfClass(GetWorld(), AASequencePlayer::StaticClass()));
+		if (SequencePlayer)
+		{
+			SequencePlayer->MultiCastRPC_MissionThreeSequencePlay();
+		}
+		
 		return;
 	}
 	
-	// 다음 미션 시작
 	ChangeGamePhase(EGamePhase::MissionComplete);
 
-	FTimerHandle TimerHandle;
-	GetWorldTimerManager().SetTimer(TimerHandle, FTimerDelegate::CreateLambda([this, NextMissionIndex]
+	if (CurrentMissionIndex == 1)
 	{
-		StartMission(NextMissionIndex);
+		AASequencePlayer* SequencePlayer = Cast<AASequencePlayer>(
+			UGameplayStatics::GetActorOfClass(GetWorld(), AASequencePlayer::StaticClass()));
+		if (SequencePlayer)
+		{
+			SequencePlayer->MultiCastRPC_MissionTwoSequencePlay();
+		}
+	}
+	else
+	{
+		FTimerHandle TimerHandle;
+		GetWorldTimerManager().SetTimer(TimerHandle, FTimerDelegate::CreateLambda([this, NextMissionIndex]
+		{
+			StartMission(NextMissionIndex);
 		
-	}),1.f, false);
+		}),1.f, false);
+	}
 }
 
 void AHouseGameMode::FailMission()
@@ -242,6 +270,11 @@ void AHouseGameMode::FailMission()
 	HouseGS->CurrentPhase = EGamePhase::GameOver;
 	
 	GetWorldTimerManager().ClearTimer(MissionTimerHandle);
+}
+
+void AHouseGameMode::Victory()
+{
+	ChangeGamePhase(EGamePhase::Victory);
 }
 
 void AHouseGameMode::ChangeGamePhase(EGamePhase NewState)
