@@ -294,8 +294,11 @@ void APeopleBase::AttachActor()
 
 			InteractingActor->ChangeTowel(true);
 
-			// 물수건 정보성 UI
-			mainui->AddInfoUI(1);
+			if (IsLocallyControlled())
+			{
+				// 물수건 정보성 UI
+				mainui->AddInfoUI(1);
+			}
 		}
 		else if (InteractingActor->ActorHasTag(FName("Phone")))
 		{
@@ -308,9 +311,12 @@ void APeopleBase::AttachActor()
 				// 위젯 띄우기
 				auto* pc = Cast<Afirepjt_firstPlayerController>(GetWorld()->GetFirstPlayerController());
 				pc->OpenPhoneUI();
+
+				// 핸드폰 정보성 UI
+				mainui->AddInfoUI(0);
+				
 			}
-			// 핸드폰 정보성 UI
-			mainui->AddInfoUI(0);
+		
 			
 	
 
