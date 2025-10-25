@@ -188,6 +188,18 @@ void Afirepjt_firstPlayerController::OnGamePhaseChanged(EGamePhase NewPhase)
 			InGameWidget->SetMissionTextFromIndex(HouseGS->CurrentMissionIndex);
 		}
 	}
+	else if (NewPhase == EGamePhase::MissionComplete)
+	{
+		AHouseGameState* HouseGS = GetWorld()->GetGameState<AHouseGameState>();
+		if (HouseGS)
+		{
+			if (HasAuthority() && HouseGS->CurrentMissionIndex == 1)
+			{
+				Server_PlayMissionTwoCinematic();
+			}
+				
+		}
+	}
 	else if (NewPhase == EGamePhase::Victory)
 	{
 		InGameWidget->RemoveFromParent();
@@ -234,6 +246,18 @@ void Afirepjt_firstPlayerController::Server_SetPlayerRole_Implementation(EPlayer
 	}
 }
 
+
+void Afirepjt_firstPlayerController::Server_PlayMissionTwoCinematic_Implementation()
+{
+	UE_LOG(LogTemp, Warning, TEXT("mission two cine"));
+	
+	auto* seq = Cast<AASequencePlayer>(UGameplayStatics::GetActorOfClass(GetWorld(),
+		AASequencePlayer::StaticClass()));
+	if (seq)
+	{
+		seq->MultiCastRPC_MissionTwoSequencePlay();
+	}
+}
 
 void Afirepjt_firstPlayerController::OpenPhoneUI()
 {

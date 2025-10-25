@@ -245,6 +245,7 @@ void AASequencePlayer::SequencePlay()
 // 시퀀스 끝나면 호출
 void AASequencePlayer::SequenceEnd()
 {
+	
 	// 산소 차감 진행
 	IsPlayingCinematic = false;
 	// UI 끄기
@@ -256,6 +257,29 @@ void AASequencePlayer::SequenceEnd()
 	pc->SetIgnoreLookInput(false);
 	pc->SetIgnoreMoveInput(false);
 	
+	/*
+	IsPlayingCinematic = false;
+	
+	for (FConstPlayerControllerIterator It = GetWorld()->GetPlayerControllerIterator(); It; It++)
+	{
+		APlayerController* PC = It->Get();
+		if (PC && PC->IsLocalController())
+		{
+			auto* FirePC = Cast<Afirepjt_firstPlayerController>(PC);
+			if (FirePC)
+			{
+				FirePC->bShowMouseCursor = false;
+				FirePC->SetIgnoreLookInput(false);
+				FirePC->SetIgnoreMoveInput(false);
+
+				if (cinematicUI)
+				{
+					cinematicUI->CloseWidget();
+				}
+			}
+		}
+	}
+	*/
 }
 
 

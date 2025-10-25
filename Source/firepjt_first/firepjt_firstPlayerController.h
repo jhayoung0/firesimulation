@@ -104,6 +104,9 @@ public:
 	UFUNCTION(Server, Reliable)
 	void Server_CinematicSkip();
 
+	UFUNCTION(Server, Reliable)
+	void Server_PlayMissionTwoCinematic();
+
 public: // widget	
 	UFUNCTION(BlueprintCallable)
 	void OpenPhoneUI();
