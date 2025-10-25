@@ -27,6 +27,7 @@ enum class EGamePhase :uint8
 	MissionStart    UMETA(DisplayName = "Mission"),
 	MissionComplete UMETA(DisplayName = "Mission Complete"),
 	GameOver        UMETA(DisplayName = "Game Over"),
+	Outro			UMETA(DisplayName = "Outro"),
 	Victory         UMETA(DisplayName = "Victory")
 };
 

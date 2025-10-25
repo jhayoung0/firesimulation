@@ -200,6 +200,14 @@ void Afirepjt_firstPlayerController::OnGamePhaseChanged(EGamePhase NewPhase)
 				
 		}
 	}
+	else if (NewPhase == EGamePhase::Outro)
+	{
+		AHouseGameState* HouseGS = GetWorld()->GetGameState<AHouseGameState>();
+		if (HouseGS)
+		{
+			Server_PlayMissionThreeCinematic();
+		}
+	}
 	else if (NewPhase == EGamePhase::Victory)
 	{
 		InGameWidget->RemoveFromParent();
@@ -249,13 +257,21 @@ void Afirepjt_firstPlayerController::Server_SetPlayerRole_Implementation(EPlayer
 
 void Afirepjt_firstPlayerController::Server_PlayMissionTwoCinematic_Implementation()
 {
-	UE_LOG(LogTemp, Warning, TEXT("mission two cine"));
-	
 	auto* seq = Cast<AASequencePlayer>(UGameplayStatics::GetActorOfClass(GetWorld(),
 		AASequencePlayer::StaticClass()));
 	if (seq)
 	{
 		seq->MultiCastRPC_MissionTwoSequencePlay();
+	}
+}
+
+void Afirepjt_firstPlayerController::Server_PlayMissionThreeCinematic_Implementation()
+{
+	auto* seq = Cast<AASequencePlayer>(UGameplayStatics::GetActorOfClass(GetWorld(),
+		AASequencePlayer::StaticClass()));
+	if (seq)
+	{
+		seq->MultiCastRPC_MissionThreeSequencePlay();
 	}
 }
 

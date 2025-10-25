@@ -127,6 +127,9 @@ public:
 	
 	UFUNCTION(NetMulticast, Reliable)
 	void MultiCastRPC_MissionThreeSequencePlay();
+
+	UFUNCTION()
+	void LastSequenceFinished();
 	
 public: // widget
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = UI)
