@@ -60,11 +60,6 @@ void AASequencePlayer::PlayIntroSequence()
 	}
 }
 
-void AASequencePlayer::Multicast_PlayIntroSequence_Implementation()
-{
-	PlayIntroSequence();
-}
-
 void AASequencePlayer::OnFirstSequenceFinished()
 {
 	cinematicUI->OpenWidgetToggle(3);
@@ -162,27 +157,11 @@ void AASequencePlayer::MissionTwoSequencePlay()
 		Mission2_Fireman_Player =
 			ULevelSequencePlayer::CreateLevelSequencePlayer(GetWorld(), Mission2_Fireman_Sequence, Settings, SeqActor);
 		// 이건 시퀀스 끝나면 호출
-		Mission2_Fireman_Player->OnFinished.AddDynamic(this, &AASequencePlayer::OnMissionTwoSequenceFinished);
+		Mission2_Fireman_Player->OnFinished.AddDynamic(this, &AASequencePlayer::SequenceEnd);
 		// 시퀀스 재생
 		Mission2_Fireman_Player->Play();
 		// 산소 차감 막기 위한 bool 값
 		IsPlayingCinematic = true;
-	}
-}
-
-void AASequencePlayer::OnMissionTwoSequenceFinished()
-{
-	SequenceEnd();
-
-	
-	// 두 번째까지 끝나면 게임 시작
-	if (HasAuthority())
-	{
-		AHouseGameMode* GM = Cast<AHouseGameMode>(GetWorld()->GetAuthGameMode());
-		if (GM)
-		{
-			GM->StartMission(2);
-		}
 	}
 }
 
@@ -217,27 +196,11 @@ void AASequencePlayer::MissionThreeSequencePlay()
 		Mission3_Player =
 			ULevelSequencePlayer::CreateLevelSequencePlayer(GetWorld(), Mission3_Sequence, Settings, SeqActor);
 		// 이건 시퀀스 끝나면 호출 (1번만 호출될 수 있도록 임의로 우측 시네마틱에 연결)
-		Mission3_Player->OnFinished.AddDynamic(this, &AASequencePlayer::OnMissionThreeSequenceFinished);
+		Mission3_Player->OnFinished.AddDynamic(this, &AASequencePlayer::SequenceEnd);
 		// 시퀀스 재생
 		Mission3_Player->Play();
 		// 산소 차감 막기 위한 bool 값
 		IsPlayingCinematic = true;
-	}
-}
-
-void AASequencePlayer::OnMissionThreeSequenceFinished()
-{
-	SequenceEnd();
-
-	
-	// 두 번째까지 끝나면 게임 시작
-	if (HasAuthority())
-	{
-		AHouseGameMode* GM = Cast<AHouseGameMode>(GetWorld()->GetAuthGameMode());
-		if (GM)
-		{
-			GM->Victory();
-		}
 	}
 }
 

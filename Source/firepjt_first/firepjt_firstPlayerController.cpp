@@ -149,7 +149,6 @@ void Afirepjt_firstPlayerController::OnGamePhaseChanged(EGamePhase NewPhase)
 {
 	if (NewPhase == EGamePhase::Intro)
 	{
-		/*
 		// 맵에 있는 Sequence player 준비
 		SequenceActor = UGameplayStatics::GetActorOfClass(GetWorld(), AASequencePlayer::StaticClass());
 		if (SequenceActor)
@@ -164,7 +163,6 @@ void Afirepjt_firstPlayerController::OnGamePhaseChanged(EGamePhase NewPhase)
 		{
 			UE_LOG(LogTemp, Warning, TEXT("SequencePlayer not found!"));
 		}
-		*/
 	}
 	if (NewPhase == EGamePhase::GameStart)
 	{
