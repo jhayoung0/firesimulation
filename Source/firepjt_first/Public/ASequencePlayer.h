@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "CinematicSC.h"
 #include "CinematicUI.h"
 #include "LevelSequence.h"
 #include "LevelSequenceActor.h"
@@ -137,8 +138,29 @@ public: // widget
 
 	UPROPERTY(Transient)
 	UCinematicUI* cinematicUI = nullptr;
+	
+public: // scene capture actor
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category =Camera)
+	ACinematicSC* leftSC;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category =Camera)
+	ACinematicSC* rightSC;
 
+	// 씬 캡쳐 온 오프
+	UFUNCTION()
+	void SetCaptureActive(ACinematicSC* CaptureActor, bool bEnable);
+
+	// 시네마틱에서 액터들 숨기기
+public:
+	UFUNCTION(BlueprintCallable)
+	void SetCinematicActive(bool bActive);
+private:
+	UFUNCTION(NetMulticast, Reliable)
+	void Multicast_SetActorsHidden(bool bHiddenActor);
+
+	UFUNCTION(Client, Reliable)
+	void Client_ApplyCinematicMode(bool bEnable);
+	
 public: // 스킵
 	void Skip();
 	

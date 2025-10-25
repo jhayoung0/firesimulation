@@ -29,7 +29,37 @@ public:
 
 	UPROPERTY(meta = (BindWidget))
 	class UButton* Btn_Citizen;
+
+	// 안내 텍스트
+	UPROPERTY(meta = (BindWidget))
+	class UTextBlock* TextHead;
+
+	// 스타트 버튼 텍스트
+	UPROPERTY(meta=(BindWidget))
+	class UTextBlock* TextStart;
 	
+	// 체크 이미지
+	UPROPERTY(meta = (BindWidget))
+	class UImage* img_check_fire;
+
+	UPROPERTY(meta = (BindWidget))
+	class UImage* img_check_citizen;
+
+	// 역할 이미지
+	// 소방관
+	UPROPERTY(meta = (BindWidget))
+	class UImage* image_1;
+
+	// 시민
+	UPROPERTY(meta = (BindWidget))
+	class UImage* image_2;
+
+	
+	// 체크 이미지 활성화
+	UFUNCTION()
+	void ShowCheckImg(bool isFireman);
+	
+	// 역할 클릭 시 호출되는 함수
 	UFUNCTION()
 	void OnStartClicked();
 
