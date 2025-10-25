@@ -13,6 +13,7 @@
 #include "PeopleBase.h"
 #include "Camera/CameraComponent.h"
 #include "Components/BoxComponent.h"
+#include "Components/CapsuleComponent.h"
 #include "Components/SceneComponent.h"
 #include "EnhancedInput/Public/InputMappingContext.h"
 #include "Kismet/GameplayStatics.h"
@@ -25,6 +26,8 @@ AFireMan::AFireMan()
 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
+	GetCapsuleComponent()->OnComponentBeginOverlap.AddDynamic(this, &AFireMan::OnCapsuleBeginOverlap);
+	
 	// Fireman Mesh
 	ConstructorHelpers::FObjectFinder<USkeletalMesh> firemanMeshRef(TEXT("/Script/Engine.SkeletalMesh'/Game/PROJECTS/HELLDIVERS_2/CHARACTERS/PLAYER/B-01_TACTICAL/fix_v2/SKM_B-01_v4_BRAWNY_SIMPLE.SKM_B-01_v4_BRAWNY_SIMPLE'"));
 	if (firemanMeshRef.Succeeded())
@@ -276,6 +279,7 @@ void AFireMan::ServerRPC_OnGetFireHose_Implementation()
 		if (dist <= InteractDist)
 		{
 			bCanUseFireHose = true;
+			OnChangeCanUseTool();
 			Multicast_OnEquipFireHose();
 		}
 	}
@@ -351,6 +355,7 @@ void AFireMan::ServerRPC_OnGetCrowbar_Implementation()
 		{
 			bCanUseCrowbar = true;
 			FireTruckCrowbarActor->Destroy();
+			OnChangeCanUseTool();
 			Multicast_OnEquipCrowbar();
 		}
 	}
@@ -536,8 +541,19 @@ void AFireMan::OnMissionComplete()
 
 	if (AHousePlayerState* hps = Cast<AHousePlayerState>(GetPlayerState()))
 	{
-		UE_LOG(LogTemp, Warning, TEXT("ㅁ러ㅣㅏㄴㅇㄷ텀리ㅏㄴㄷ러ㅣㅈㄷ나러믿나ㅓㄹ"));
 		CurrentMissionIndex++;
 		hps->SetMissionComplete();
 	}
+}
+
+void AFireMan::OnCapsuleBeginOverlap(UPrimitiveComponent* OverlappedComp,
+	AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex,
+	bool bFromSweep, const FHitResult& SweepResult)
+{
+	if (!OtherActor || !OtherComp) return;
+	
+	const FName Profile = OtherComp->GetCollisionProfileName();
+	if (Profile != SafeZoneCollisionProfileName) return;
+
+	OnMissionComplete();
 }

@@ -119,7 +119,7 @@ private:
 	TSubclassOf<class AFireTruckFireHose> FireTruckFireHoseClass;
 	UPROPERTY()
 	TObjectPtr<class AFireTruckFireHose> FireTruckFireHoseActor;
-	UPROPERTY(ReplicatedUsing=OnChangeCanUseTool)
+	UPROPERTY(Replicated)
 	bool bCanUseFireHose = false;
 	void OnGetFireHose();
 	UFUNCTION(Server, Reliable)
@@ -136,7 +136,7 @@ private:
 	TSubclassOf<class AFireTruckCrowbar> FireTruckCrowbarClass;
 	UPROPERTY()
 	TObjectPtr<class AFireTruckCrowbar> FireTruckCrowbarActor;
-	UPROPERTY(ReplicatedUsing=OnChangeCanUseTool)
+	UPROPERTY(Replicated)
 	bool bCanUseCrowbar = false;
 	void OnGetCrowbar();
 	UFUNCTION(Server, Reliable)
@@ -184,4 +184,8 @@ private:
 	int32 MaxMissionIndex = 3;
 	int32 CurrentMissionIndex = 1;
 	void OnMissionComplete();
+
+	FName SafeZoneCollisionProfileName = FName(TEXT("Mission"));
+	UFUNCTION()
+	void OnCapsuleBeginOverlap(UPrimitiveComponent* OverlappedComp,	AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 };
