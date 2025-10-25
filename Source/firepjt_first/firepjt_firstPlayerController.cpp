@@ -254,7 +254,6 @@ void Afirepjt_firstPlayerController::Server_SetPlayerRole_Implementation(EPlayer
 	}
 }
 
-
 void Afirepjt_firstPlayerController::Server_PlayMissionTwoCinematic_Implementation()
 {
 	auto* seq = Cast<AASequencePlayer>(UGameplayStatics::GetActorOfClass(GetWorld(),
