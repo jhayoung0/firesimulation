@@ -106,7 +106,7 @@ void APeopleBase::Tick(float DeltaSeconds)
 	if (SequenceActor && SequenceActor->IsPlayingCinematic) {return;}
 	
 	// 플레이어 죽음 처리
-	if (currOxygen <= 0.0f)
+	if (currOxygen <= 0.0f && !housePs->bIsOutOfOxygen)
 	{
 		if (!housePs)
 		{
@@ -448,8 +448,10 @@ void APeopleBase::OnCapsuleBeginOverlap(UPrimitiveComponent* OverlappedComp,
 			Cap->SetGenerateOverlapEvents(false);
 		}
 
-		// 다음 미션으로 가기
+		// 다음 미션으로 가기 / 마지막 미션임.
 		this->GoNextMission();
+		// 산소바 ui 삭제하기
+		mainui->RemoveFromParent(); 
 
 		// 5초뒤에 콜리젼 다시 켜기
 		FTimerHandle colhandle;
