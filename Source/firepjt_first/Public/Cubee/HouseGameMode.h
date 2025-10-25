@@ -52,13 +52,15 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Mission")
 	void ReportMissionComplete(APlayerController* Player);
 
-public:
+protected:
 	// 미션 시작
 	void StartMission(int32 MissionIndex);
 	// 모든 플레이어 미션 완료 체크
 	void CheckMissionProgress();
 	// 다음 미션으로
 	void AdvanceToNextMission();
+
+public:
 	// 미션 실패
 	void FailMission();
 	// 미션 성공

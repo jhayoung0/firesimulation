@@ -88,11 +88,6 @@ void AASequencePlayer::PlayIntroSequence()
 	}
 }
 
-void AASequencePlayer::Multicast_PlayIntroSequence_Implementation()
-{
-	PlayIntroSequence();
-}
-
 void AASequencePlayer::OnFirstSequenceFinished()
 {
 	cinematicUI->OpenWidgetToggle(3);
@@ -115,7 +110,6 @@ void AASequencePlayer::OnFirstSequenceFinished()
 void AASequencePlayer::OnSecondSequenceFinished()
 {
 	SequenceEnd();
-
 	
 	// 두 번째까지 끝나면 게임 시작
 	if (HasAuthority())
@@ -190,27 +184,11 @@ void AASequencePlayer::MissionTwoSequencePlay()
 		Mission2_Fireman_Player =
 			ULevelSequencePlayer::CreateLevelSequencePlayer(GetWorld(), Mission2_Fireman_Sequence, Settings, SeqActor);
 		// 이건 시퀀스 끝나면 호출
-		Mission2_Fireman_Player->OnFinished.AddDynamic(this, &AASequencePlayer::OnMissionTwoSequenceFinished);
+		Mission2_Fireman_Player->OnFinished.AddDynamic(this, &AASequencePlayer::SequenceEnd);
 		// 시퀀스 재생
 		Mission2_Fireman_Player->Play();
 		// 산소 차감 막기 위한 bool 값
 		IsPlayingCinematic = true;
-	}
-}
-
-void AASequencePlayer::OnMissionTwoSequenceFinished()
-{
-	SequenceEnd();
-
-	
-	// 두 번째까지 끝나면 게임 시작
-	if (HasAuthority())
-	{
-		AHouseGameMode* GM = Cast<AHouseGameMode>(GetWorld()->GetAuthGameMode());
-		if (GM)
-		{
-			GM->StartMission(2);
-		}
 	}
 }
 
@@ -228,6 +206,8 @@ void AASequencePlayer::MultiCastRPC_MissionTwoSequencePlay_Implementation()
 // 미션 3 완료 후 나오는 시네마틱
 void AASequencePlayer::MissionThreeSequencePlay()
 {
+	UE_LOG(LogTemp, Warning, TEXT("play multicast third sequence"));
+	
 	SequencePlay();
 	cinematicUI->ChangeCompleteText(FString(TEXT("미션3 성공!")));
 
@@ -245,7 +225,7 @@ void AASequencePlayer::MissionThreeSequencePlay()
 		Mission3_Player =
 			ULevelSequencePlayer::CreateLevelSequencePlayer(GetWorld(), Mission3_Sequence, Settings, SeqActor);
 		// 이건 시퀀스 끝나면 호출 (1번만 호출될 수 있도록 임의로 우측 시네마틱에 연결)
-		Mission3_Player->OnFinished.AddDynamic(this, &AASequencePlayer::OnMissionThreeSequenceFinished);
+		Mission3_Player->OnFinished.AddDynamic(this, &AASequencePlayer::LastSequenceFinished);
 		// 시퀀스 재생
 		Mission3_Player->Play();
 		// 산소 차감 막기 위한 bool 값
@@ -253,12 +233,11 @@ void AASequencePlayer::MissionThreeSequencePlay()
 	}
 }
 
-void AASequencePlayer::OnMissionThreeSequenceFinished()
+void AASequencePlayer::LastSequenceFinished()
 {
 	SequenceEnd();
-
 	
-	// 두 번째까지 끝나면 게임 시작
+	// 마지막 끝나면 Victory로 스테이트 변경
 	if (HasAuthority())
 	{
 		AHouseGameMode* GM = Cast<AHouseGameMode>(GetWorld()->GetAuthGameMode());
@@ -343,7 +322,6 @@ void AASequencePlayer::SequenceEnd()
 	pc->bShowMouseCursor = false;
 	pc->SetIgnoreLookInput(false);
 	pc->SetIgnoreMoveInput(false);
-	
 }
 
 

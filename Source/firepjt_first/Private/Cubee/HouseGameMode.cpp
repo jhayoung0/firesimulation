@@ -109,14 +109,6 @@ void AHouseGameMode::BeginPlay()
 		{
 			ChangeGamePhase(EGamePhase::Intro);
 
-			// SequencePlayer 찾아서 Multicast 호출                                                                                                                                                                                       
-			AASequencePlayer* SequencePlayer = Cast<AASequencePlayer>(
-			UGameplayStatics::GetActorOfClass(GetWorld(), AASequencePlayer::StaticClass()));
-			if (SequencePlayer)
-			{
-				SequencePlayer->Multicast_PlayIntroSequence();
-			}
-
 		}), 1.f, false);
 	}
 }
@@ -221,45 +213,27 @@ void AHouseGameMode::AdvanceToNextMission()
 {
 	AHouseGameState* HouseGS = GetGameState<AHouseGameState>();
 	if (!HouseGS) return;
-
-	int32 CurrentMissionIndex = HouseGS->CurrentMissionIndex;
+	
 	int32 NextMissionIndex = HouseGS->CurrentMissionIndex + 1;
 
 	if (NextMissionIndex >= TotalMissions)
 	{
 		// 승리!
-		GetWorldTimerManager().ClearTimer(MissionTimerHandle);
+		ChangeGamePhase(EGamePhase::Outro);
 
-		AASequencePlayer* SequencePlayer = Cast<AASequencePlayer>(
-			UGameplayStatics::GetActorOfClass(GetWorld(), AASequencePlayer::StaticClass()));
-		if (SequencePlayer)
-		{
-			SequencePlayer->MultiCastRPC_MissionThreeSequencePlay();
-		}
-		
+		GetWorldTimerManager().ClearTimer(MissionTimerHandle);
 		return;
 	}
 	
+	// 다음 미션 시작
 	ChangeGamePhase(EGamePhase::MissionComplete);
 
-	if (CurrentMissionIndex == 1)
+	FTimerHandle TimerHandle;
+	GetWorldTimerManager().SetTimer(TimerHandle, FTimerDelegate::CreateLambda([this, NextMissionIndex]
 	{
-		AASequencePlayer* SequencePlayer = Cast<AASequencePlayer>(
-			UGameplayStatics::GetActorOfClass(GetWorld(), AASequencePlayer::StaticClass()));
-		if (SequencePlayer)
-		{
-			SequencePlayer->MultiCastRPC_MissionTwoSequencePlay();
-		}
-	}
-	else
-	{
-		FTimerHandle TimerHandle;
-		GetWorldTimerManager().SetTimer(TimerHandle, FTimerDelegate::CreateLambda([this, NextMissionIndex]
-		{
-			StartMission(NextMissionIndex);
+		StartMission(NextMissionIndex);
 		
-		}),1.f, false);
-	}
+	}),1.f, false);
 }
 
 void AHouseGameMode::FailMission()
@@ -274,6 +248,7 @@ void AHouseGameMode::FailMission()
 
 void AHouseGameMode::Victory()
 {
+	// 승리!
 	ChangeGamePhase(EGamePhase::Victory);
 }
 
@@ -339,4 +314,5 @@ void AHouseGameMode::SetAllPlayersStart()
 		}
 	}
 }
+
 

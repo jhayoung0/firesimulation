@@ -149,7 +149,6 @@ void Afirepjt_firstPlayerController::OnGamePhaseChanged(EGamePhase NewPhase)
 {
 	if (NewPhase == EGamePhase::Intro)
 	{
-		/*
 		// 맵에 있는 Sequence player 준비
 		SequenceActor = UGameplayStatics::GetActorOfClass(GetWorld(), AASequencePlayer::StaticClass());
 		if (SequenceActor)
@@ -164,7 +163,6 @@ void Afirepjt_firstPlayerController::OnGamePhaseChanged(EGamePhase NewPhase)
 		{
 			UE_LOG(LogTemp, Warning, TEXT("SequencePlayer not found!"));
 		}
-		*/
 	}
 	if (NewPhase == EGamePhase::GameStart)
 	{
@@ -188,6 +186,26 @@ void Afirepjt_firstPlayerController::OnGamePhaseChanged(EGamePhase NewPhase)
 		{
 			UE_LOG(LogTemp, Warning, TEXT("Current mission idx : %d"), HouseGS->CurrentMissionIndex);
 			InGameWidget->SetMissionTextFromIndex(HouseGS->CurrentMissionIndex);
+		}
+	}
+	else if (NewPhase == EGamePhase::MissionComplete)
+	{
+		AHouseGameState* HouseGS = GetWorld()->GetGameState<AHouseGameState>();
+		if (HouseGS)
+		{
+			if (HasAuthority() && HouseGS->CurrentMissionIndex == 1)
+			{
+				Server_PlayMissionTwoCinematic();
+			}
+				
+		}
+	}
+	else if (NewPhase == EGamePhase::Outro)
+	{
+		AHouseGameState* HouseGS = GetWorld()->GetGameState<AHouseGameState>();
+		if (HouseGS)
+		{
+			Server_PlayMissionThreeCinematic();
 		}
 	}
 	else if (NewPhase == EGamePhase::Victory)
@@ -236,6 +254,25 @@ void Afirepjt_firstPlayerController::Server_SetPlayerRole_Implementation(EPlayer
 	}
 }
 
+void Afirepjt_firstPlayerController::Server_PlayMissionTwoCinematic_Implementation()
+{
+	auto* seq = Cast<AASequencePlayer>(UGameplayStatics::GetActorOfClass(GetWorld(),
+		AASequencePlayer::StaticClass()));
+	if (seq)
+	{
+		seq->MultiCastRPC_MissionTwoSequencePlay();
+	}
+}
+
+void Afirepjt_firstPlayerController::Server_PlayMissionThreeCinematic_Implementation()
+{
+	auto* seq = Cast<AASequencePlayer>(UGameplayStatics::GetActorOfClass(GetWorld(),
+		AASequencePlayer::StaticClass()));
+	if (seq)
+	{
+		seq->MultiCastRPC_MissionThreeSequencePlay();
+	}
+}
 
 void Afirepjt_firstPlayerController::OpenPhoneUI()
 {
