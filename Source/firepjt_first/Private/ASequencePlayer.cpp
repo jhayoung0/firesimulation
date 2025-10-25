@@ -38,7 +38,9 @@ void AASequencePlayer::BeginPlay()
 
 	
 	TArray<AActor*> Actors;
-
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(),
+		ACinematicSC::StaticClass(), Actors);
+	
 	for (AActor* A : Actors)
 	{
 		TArray<UActorComponent*> Components;
@@ -358,7 +360,12 @@ void AASequencePlayer::BindToWidget(UPhoneWidget* InWidget)
 void AASequencePlayer::SetCaptureActive(ACinematicSC* CaptureActor,
 	bool bEnable)
 {
-	if (!CaptureActor) return;
+	UE_LOG(LogTemp,Warning, TEXT("setcaptureactive 호출"));
+	if (!CaptureActor)
+	{
+		UE_LOG(LogTemp,Warning, TEXT("capture actor 없음"));
+		return;
+	}
 
 	if (USceneCaptureComponent2D* SC = CaptureActor->GetCaptureComponent2D())
 	{
