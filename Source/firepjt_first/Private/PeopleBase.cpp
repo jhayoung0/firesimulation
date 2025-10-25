@@ -451,7 +451,11 @@ void APeopleBase::OnCapsuleBeginOverlap(UPrimitiveComponent* OverlappedComp,
 		// 다음 미션으로 가기 / 마지막 미션임.
 		this->GoNextMission();
 		// 산소바 ui 삭제하기
-		mainui->RemoveFromParent(); 
+		if (mainui)
+		{
+			mainui->RemoveFromParent(); 
+		}
+
 
 		// 5초뒤에 콜리젼 다시 켜기
 		FTimerHandle colhandle;
