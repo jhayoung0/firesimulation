@@ -2,6 +2,8 @@
 
 
 #include "ASequencePlayer.h"
+
+#include "FireMan.h"
 #include "firepjt_firstPlayerController.h"
 #include "LevelSequencePlayer.h"       
 #include "MovieSceneSequencePlayer.h" 
@@ -33,6 +35,30 @@ void AASequencePlayer::Tick(float DeltaTime)
 void AASequencePlayer::BeginPlay()
 {
 	Super::BeginPlay();
+
+	
+	TArray<AActor*> Actors;
+
+	for (AActor* A : Actors)
+	{
+		TArray<UActorComponent*> Components;
+		A->GetComponents(Components);
+
+		for (UActorComponent* Comp : Components)
+		{
+			if (!Comp) continue;
+
+			if (!leftSC && Comp->ComponentHasTag("LEFT_SC"))
+				leftSC = Cast<ACinematicSC>(A);
+
+			else if (!rightSC && Comp->ComponentHasTag("RIGHT_SC"))
+				rightSC = Cast<ACinematicSC>(A);
+
+			if (leftSC && rightSC)
+				break;
+		}
+	}
+
 	
 }
 
@@ -241,6 +267,8 @@ void AASequencePlayer::OnMissionThreeSequenceFinished()
 	}
 }
 
+
+
 void AASequencePlayer::ServerRPC_MissionThreeSequencePlay_Implementation()
 {
 	MultiCastRPC_MissionThreeSequencePlay();
@@ -254,6 +282,20 @@ void AASequencePlayer::MultiCastRPC_MissionThreeSequencePlay_Implementation()
 // 시퀀스 시작시 호출
 void AASequencePlayer::SequencePlay()
 {
+
+	// 시네마틱 켜서 액터들 숨기기
+	SetCinematicActive(true);
+	
+	// 씬 캡쳐 on
+	SetCaptureActive(leftSC,  true);
+	SetCaptureActive(rightSC, true);
+
+	// 첫 프레임 끊김 방지용 한 번 캡처
+	if (leftSC)  leftSC->GetCaptureComponent2D()->CaptureScene();
+	if (rightSC) rightSC->GetCaptureComponent2D()->CaptureScene();
+
+
+	
 	for (FConstPlayerControllerIterator It = GetWorld()->GetPlayerControllerIterator(); It; It++)
 	{
 		APlayerController* PC = It->Get();
@@ -282,6 +324,13 @@ void AASequencePlayer::SequencePlay()
 // 시퀀스 끝나면 호출
 void AASequencePlayer::SequenceEnd()
 {
+	// 시네마틱 꺼서 액터들 표시
+	SetCinematicActive(false);
+	
+	// 씬 캡쳐 off
+	SetCaptureActive(leftSC,  false);
+	SetCaptureActive(rightSC, false);
+		
 	// 산소 차감 진행
 	IsPlayingCinematic = false;
 	// UI 끄기
@@ -303,6 +352,109 @@ void AASequencePlayer::BindToWidget(UPhoneWidget* InWidget)
 	if (!InWidget) return;
 	InWidget->OnRequestPlayCinematic.AddDynamic(this, &AASequencePlayer::ServerRPC_MissionOneSequencePlay);
 
+}
+
+
+void AASequencePlayer::SetCaptureActive(ACinematicSC* CaptureActor,
+	bool bEnable)
+{
+	if (!CaptureActor) return;
+
+	if (USceneCaptureComponent2D* SC = CaptureActor->GetCaptureComponent2D())
+	{
+		SC->bCaptureEveryFrame = bEnable;
+		SC->bCaptureOnMovement = false;
+
+		if (bEnable)
+		{
+			// 켤 때 품질/비용 세팅
+			SC->CaptureSource = ESceneCaptureSource::SCS_FinalColorLDR;
+
+			FEngineShowFlags& SF = SC->ShowFlags;
+			SF.SetBloom(false);
+			SF.SetMotionBlur(false);
+			SF.SetVolumetricFog(false);
+			SF.SetAmbientOcclusion(false);
+			SF.SetSeparateTranslucency(false);
+			SF.SetSubsurfaceScattering(false);
+		}
+	}
+}
+
+void AASequencePlayer::SetCinematicActive(bool bActive)
+{
+	// 서버면 리턴
+	if (!HasAuthority())
+		return;
+
+	// 1) 모든 클라에 "메시 숨김/복구" 전파
+	Multicast_SetActorsHidden(bActive);
+
+	// 2) 각 로컬 클라에서 입력/HUD/카메라 제어 비활성 토글
+	//    (SetCinematicMode는 "로컬 컨트롤러" 기준이므로 Client RPC로 각자 적용)
+	Client_ApplyCinematicMode(bActive);
+}
+
+
+void AASequencePlayer::Multicast_SetActorsHidden_Implementation(bool bHiddenActor)
+{
+	UWorld* World = GetWorld();
+	if (!World) return;
+
+	// 시민 숨기기
+	{
+		TArray<AActor*> Found;
+		UGameplayStatics::GetAllActorsOfClass(World, APeopleBase::StaticClass(), Found);
+		for (AActor* A : Found)
+		{
+			if (ACharacter* C = Cast<ACharacter>(A))
+			{
+				if (USkeletalMeshComponent* Mesh = C->GetMesh())
+				{
+					Mesh->SetHiddenInGame(bHiddenActor, true);   // 하위 컴포넌트 포함
+				}
+			}
+			else
+			{
+				A->SetActorHiddenInGame(bHiddenActor);
+			}
+		}
+	}
+
+	// 소방관 숨기기
+	{
+		TArray<AActor*> Found;
+		UGameplayStatics::GetAllActorsOfClass(World, AFireMan::StaticClass(), Found);
+		for (AActor* A : Found)
+		{
+			if (ACharacter* C = Cast<ACharacter>(A))
+			{
+				if (USkeletalMeshComponent* Mesh = C->GetMesh())
+				{
+					Mesh->SetHiddenInGame(bHiddenActor, true);
+				}
+			}
+			else
+			{
+				A->SetActorHiddenInGame(bHiddenActor);
+			}
+		}
+	}
+}
+
+void AASequencePlayer::Client_ApplyCinematicMode_Implementation(bool bEnable)
+{
+	// 각 클라 로컬에서만 적용됨(입력/HUD/카메라 제어)
+	if (APlayerController* PC = UGameplayStatics::GetPlayerController(this, 0))
+	{
+		PC->SetCinematicMode(
+			bEnable, // bInCinematicMode
+			true,    // bHidePlayer(로컬 기준 숨김) — 이미 Multicast로 숨겼지만 중복 무해
+			true,    // bAffectsHUD
+			true,    // bDisableMovement
+			true     // bDisableTurning
+		);
+	}
 }
 
 
