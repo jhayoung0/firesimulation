@@ -11,6 +11,7 @@
 #include "Components/CapsuleComponent.h"
 #include "Camera/CameraComponent.h"
 #include "MainUI.h"
+#include "Components/AudioComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
@@ -289,6 +290,12 @@ void APeopleBase::AttachActor()
 			if (IsLocallyControlled())
 			{
 				mainui->ShowMaskUI(true);
+				if (masksfx) 
+                {
+                	// AudioComponent를 생성하고 루프 설정
+                	MaskAudioComp = UGameplayStatics::SpawnSound2D(GetWorld(), masksfx, 1.0f, 1.0f, 0.0f, nullptr, true);
+                }
+
 			}
 
 		}
@@ -387,6 +394,12 @@ void APeopleBase::DetachActor(AInteractActor* tempActor)
 			if (IsLocallyControlled())
 			{
 				mainui->ShowMaskUI(false);
+				// 마스크 sound 끄기
+                if (MaskAudioComp && MaskAudioComp->IsPlaying())
+                {
+                	MaskAudioComp->Stop();
+                }
+                				
 			}
 			
 		}

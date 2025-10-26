@@ -128,6 +128,15 @@ public: // widget
 	UMainUI* mainui = nullptr;
 
 
+public: // s
+
+// ound
+	UPROPERTY()
+	UAudioComponent* MaskAudioComp;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Sfx)
+	USoundBase* masksfx;
+	
 public: // 다음 미션으로 넘기는 함수
 	UFUNCTION()
 	void GoNextMission();
