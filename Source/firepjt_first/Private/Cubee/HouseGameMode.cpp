@@ -238,10 +238,7 @@ void AHouseGameMode::AdvanceToNextMission()
 
 void AHouseGameMode::FailMission()
 {
-	AHouseGameState* HouseGS = GetGameState<AHouseGameState>();
-	if (!HouseGS) return;
-
-	HouseGS->CurrentPhase = EGamePhase::GameOver;
+	ChangeGamePhase(EGamePhase::GameOver);
 	
 	GetWorldTimerManager().ClearTimer(MissionTimerHandle);
 }
