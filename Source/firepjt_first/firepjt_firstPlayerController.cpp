@@ -11,6 +11,7 @@
 #include "Blueprint/UserWidget.h"
 #include "firepjt_first.h"
 #include "Cubee/FireGameInstance.h"
+#include "Cubee/GameOverWidget.h"
 #include "Cubee/HouseGameState.h"
 #include "Cubee/InGameWidget.h"
 #include "Cubee/LobbyGameMode.h"
@@ -198,6 +199,17 @@ void Afirepjt_firstPlayerController::OnGamePhaseChanged(EGamePhase NewPhase)
 				Server_PlayMissionTwoCinematic();
 			}
 				
+		}
+	}
+	else if (NewPhase == EGamePhase::GameOver)
+	{
+		if (GameOverWidgetClass)
+		{
+			GameOverWidget = CreateWidget<UGameOverWidget>(this, GameOverWidgetClass);
+			if (GameOverWidget)
+			{
+				GameOverWidget->AddToViewport();
+			}
 		}
 	}
 	else if (NewPhase == EGamePhase::Outro)

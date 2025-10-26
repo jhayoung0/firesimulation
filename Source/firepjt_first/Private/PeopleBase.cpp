@@ -11,6 +11,7 @@
 #include "Components/CapsuleComponent.h"
 #include "Camera/CameraComponent.h"
 #include "MainUI.h"
+
 #include "Components/AudioComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
@@ -18,6 +19,7 @@
 #include "Kismet/KismetMathLibrary.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "Trace/Analysis.h"
+#include "Cubee/HouseGameMode.h"
 
 APeopleBase::APeopleBase()
 {
@@ -107,15 +109,21 @@ void APeopleBase::Tick(float DeltaSeconds)
 	if (SequenceActor && SequenceActor->IsPlayingCinematic) {return;}
 	
 	// 플레이어 죽음 처리
-	if (currOxygen <= 0.0f && !housePs->bIsOutOfOxygen)
+	if (currOxygen <= 0.0f && !bIsDead)
 	{
-		if (!housePs)
-		{
-			return;
-		}
+		bIsDead = true;
 
-		housePs->bIsOutOfOxygen = true;
-		return; 
+		if (IsLocallyControlled())
+		{
+			if (HasAuthority())
+			{
+				OutOfOxygen();
+			}
+			else
+			{
+				ServerRPC_OutOfOxygen();
+			}
+		}
 	}
 	
 	// 상태별 계수 먼저 갱신
@@ -185,6 +193,19 @@ void APeopleBase::FindInteractActor()
 	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AInteractActor::StaticClass(), allInteractActor);
 }
 
+void APeopleBase::OutOfOxygen()
+{
+	AHouseGameMode* GM = Cast<AHouseGameMode>(GetWorld()->GetAuthGameMode());
+	if (GM)
+	{
+		GM->FailMission();
+	}
+}
+
+void APeopleBase::ServerRPC_OutOfOxygen_Implementation()
+{
+	OutOfOxygen();
+}
 
 // c 키 
 void APeopleBase::crawlAction()

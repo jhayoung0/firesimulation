@@ -203,6 +203,11 @@ public:
 	UPROPERTY(EditAnywhere)
 	bool HasMaskFirst = false;
 
+	// 산소 고갈
+	bool bIsDead = false;
+	void OutOfOxygen();
 	
+	UFUNCTION(Server, Reliable)
+	void ServerRPC_OutOfOxygen();
 	
 };
