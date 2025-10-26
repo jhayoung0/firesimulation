@@ -11,6 +11,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "LevelSequenceActor.h"
 #include "PeopleBase.h"
+#include "Components/AudioComponent.h"
 #include "Engine/SceneCapture2D.h"
 #include "Engine/TextureRenderTarget2D.h"
 #include "Components/SceneCaptureComponent2D.h"
@@ -235,7 +236,18 @@ void AASequencePlayer::MissionThreeSequencePlay()
 
 void AASequencePlayer::LastSequenceFinished()
 {
+	
 	SequenceEnd();
+
+	// 배경음악 끄기
+	if (BGM_Sound) 
+	{
+		// 마스크 sound 끄기
+		if (BGMComp && BGMComp->IsPlaying())
+		{
+			BGMComp->Stop();
+		}
+	}
 	
 	// 마지막 끝나면 Victory로 스테이트 변경
 	if (HasAuthority())
@@ -263,6 +275,15 @@ void AASequencePlayer::MultiCastRPC_MissionThreeSequencePlay_Implementation()
 // 시퀀스 시작시 호출
 void AASequencePlayer::SequencePlay()
 {
+	// 배경음악 끄기
+	if (BGM_Sound) 
+	{
+		// 마스크 sound 끄기
+		if (BGMComp && BGMComp->IsPlaying())
+		{
+			BGMComp->Stop();
+		}
+	}
 
 	// 시네마틱 켜서 액터들 숨기기
 	SetCinematicActive(true);
@@ -282,13 +303,15 @@ void AASequencePlayer::SequencePlay()
 		APlayerController* PC = It->Get();
 		if (PC && PC->IsLocalController())
 		{
-			auto* FirePC = Cast<Afirepjt_firstPlayerController>(PC);
+			FirePC = Cast<Afirepjt_firstPlayerController>(PC);
 			if (FirePC)
 			{
 				FirePC->bShowMouseCursor = true;
 				FirePC->SetIgnoreLookInput(true);
 				FirePC->SetIgnoreMoveInput(true);
 
+			
+				
 				if (cinematicwidget)
 				{
 					cinematicUI = CreateWidget<UCinematicUI>(FirePC, cinematicwidget);
@@ -305,6 +328,14 @@ void AASequencePlayer::SequencePlay()
 // 시퀀스 끝나면 호출
 void AASequencePlayer::SequenceEnd()
 {
+	// 배경음악 다시 시작
+	if (BGM_Sound) 
+	{
+		// AudioComponent를 생성하고 루프 설정
+		BGMComp = UGameplayStatics::SpawnSound2D(GetWorld(), BGM_Sound, 1.0f, 1.0f, 0.0f, nullptr, true);
+	}
+
+	
 	// 시네마틱 꺼서 액터들 표시
 	SetCinematicActive(false);
 	
@@ -338,13 +369,7 @@ void AASequencePlayer::BindToWidget(UPhoneWidget* InWidget)
 void AASequencePlayer::SetCaptureActive(ACinematicSC* CaptureActor,
 	bool bEnable)
 {
-	UE_LOG(LogTemp,Warning, TEXT("setcaptureactive 호출"));
-	if (!CaptureActor)
-	{
-		UE_LOG(LogTemp,Warning, TEXT("capture actor 없음"));
-		return;
-	}
-
+	
 	if (USceneCaptureComponent2D* SC = CaptureActor->GetCaptureComponent2D())
 	{
 		SC->bCaptureEveryFrame = bEnable;
@@ -456,6 +481,7 @@ void AASequencePlayer::Skip()
 
 	OnSecondSequenceFinished();
 }
+
 
 void AASequencePlayer::MultiCast_Skip_Implementation()
 {
