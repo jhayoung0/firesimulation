@@ -131,6 +131,12 @@ public:
 
 	UFUNCTION()
 	void LastSequenceFinished();
+
+
+public:
+	// 시퀀스 플레이어
+	UPROPERTY(EditDefaultsOnly)
+	class Afirepjt_firstPlayerController* FirePC;
 	
 public: // widget
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = UI)
@@ -166,4 +172,13 @@ public: // 스킵
 	
 	UFUNCTION(NetMulticast, Reliable)
 	void MultiCast_Skip();
+
+public: // sfx
+	
+	UPROPERTY()
+	class UAudioComponent* BGMComp = nullptr;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = sfx)
+	class USoundBase* BGM_Sound;
+	
 };
