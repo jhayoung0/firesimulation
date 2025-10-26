@@ -76,7 +76,7 @@ public:
 
 	// Interact
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float InteractDist = 250.f;
+	float InteractDist = 200.f;
 
 	// Get
 	float GetRotationSpine02();
@@ -124,6 +124,8 @@ private:
 	void OnGetFireHose();
 	UFUNCTION(Server, Reliable)
 	void ServerRPC_OnGetFireHose();
+	UFUNCTION(Client, Reliable)
+	void ClientRPC_OnGetFireHose();
 	
 	void OnEquipFireHose();
 	UFUNCTION(Server, Reliable)
@@ -141,6 +143,8 @@ private:
 	void OnGetCrowbar();
 	UFUNCTION(Server, Reliable)
 	void ServerRPC_OnGetCrowbar();
+	UFUNCTION(Client, Reliable)
+	void ClientRPC_OnGetCrowbar();
 	
 	void OnEquipCrowbar();
 	UFUNCTION(Server, Reliable)
@@ -188,4 +192,11 @@ private:
 	FName SafeZoneCollisionProfileName = FName(TEXT("Mission"));
 	UFUNCTION()
 	void OnCapsuleBeginOverlap(UPrimitiveComponent* OverlappedComp,	AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+
+	// UI
+	UPROPERTY(VisibleAnywhere, Category = UI)
+	TSubclassOf<class UFiremanMainUI> MainUIClass;
+
+	UPROPERTY(Transient)
+	TObjectPtr<class UFiremanMainUI> MainUIWidget;
 };

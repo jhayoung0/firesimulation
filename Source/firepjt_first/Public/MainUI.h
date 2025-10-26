@@ -35,6 +35,9 @@ public:
 	
 	// 산소 바
 	UPROPERTY(meta=(BindWidget))
+	class UImage* Outline_Img;
+	
+	UPROPERTY(meta=(BindWidget))
 	class UProgressBar* OxygenBar;
 
 	// 숨차는 느낌 UI 

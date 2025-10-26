@@ -7,9 +7,11 @@
 #include "EnhancedInputSubsystems.h"
 #include "FireHose.h"
 #include "FiremanAnim.h"
+#include "FiremanMainUI.h"
 #include "FireTruckCrowbar.h"
 #include "FireTruckFireHose.h"
 #include "InteractActor.h"
+#include "MainUI.h"
 #include "PeopleBase.h"
 #include "Camera/CameraComponent.h"
 #include "Components/BoxComponent.h"
@@ -158,6 +160,13 @@ AFireMan::AFireMan()
 	{
 		FireTruckCrowbarClass = fireTruckCrowbarRef.Class;
 	}
+
+	// FiremanMainUI
+	ConstructorHelpers::FClassFinder<UFiremanMainUI> mainUIRef(TEXT("/Game/CustomContents/UI/WBP_FiremanMainUI.WBP_FiremanMainUI_C"));
+	if (mainUIRef.Succeeded())
+	{
+		MainUIClass = mainUIRef.Class;
+	}
 }
 
 // Called when the game starts or when spawned
@@ -180,6 +189,16 @@ void AFireMan::BeginPlay()
 	Person2Actor = Cast<AInteractActor>(UGameplayStatics::GetActorOfClass(GetWorld(), Person2Class));
 	FireTruckFireHoseActor = Cast<AFireTruckFireHose>(UGameplayStatics::GetActorOfClass(GetWorld(), FireTruckFireHoseClass));
 	FireTruckCrowbarActor = Cast<AFireTruckCrowbar>(UGameplayStatics::GetActorOfClass(GetWorld(), FireTruckCrowbarClass));
+
+	// only fireman can see
+	if (MainUIClass && IsLocallyControlled())
+	{
+		MainUIWidget = CreateWidget<UFiremanMainUI>(GetWorld(), MainUIClass);
+		if (MainUIWidget)
+		{
+			MainUIWidget->AddToViewport();
+		}
+	}
 }
 
 // Called every frame
@@ -252,27 +271,19 @@ void AFireMan::ServerRPC_AddPitchInputToSpine_Implementation(float pitch)
 
 void AFireMan::OnChangeCanUseTool()
 {
-	if (HasAuthority())
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Server get somewhat : bCanUseFireHose - %d"), bCanUseFireHose);
-	}
-	else
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Local get somewhat : bCanUseFireHose - %d"), bCanUseFireHose);
-	}
 	if (bCanUseCrowbar && bCanUseFireHose)
 		OnMissionComplete();
 }
 
 void AFireMan::OnGetFireHose()
 {
+	if (bCanUseFireHose) return;
+	
 	ServerRPC_OnGetFireHose();
 }
 
 void AFireMan::ServerRPC_OnGetFireHose_Implementation()
 {
-	if (bCanUseFireHose) return;
-	
 	if (FireTruckFireHoseActor)
 	{
 		float dist = FVector::Distance(GetActorLocation(), FireTruckFireHoseActor->GetActorLocation());
@@ -280,28 +291,24 @@ void AFireMan::ServerRPC_OnGetFireHose_Implementation()
 		{
 			bCanUseFireHose = true;
 			OnChangeCanUseTool();
+			ClientRPC_OnGetFireHose();
 			Multicast_OnEquipFireHose();
 		}
 	}
 }
 
+void AFireMan::ClientRPC_OnGetFireHose_Implementation()
+{
+	MainUIWidget->AddInfoUI(0);
+}
+
 void AFireMan::OnEquipFireHose()
 {
-	if (!HasAuthority())
-		UE_LOG(LogTemp, Warning, TEXT("onequipfirehose in localplayer : %d, %d"), bCanUseFireHose, bDoesEquipFireHose);
 	ServerRPC_OnEquipFireHose();
 }
 
 void AFireMan::ServerRPC_OnEquipFireHose_Implementation()
 {
-	if (HasAuthority())
-	{
-		UE_LOG(LogTemp, Warning, TEXT("serveronequipfirehose in serverplayer : %d, %d, %d"), bCanUseFireHose, bDoesEquipFireHose, bDoesCarryingPerson);
-	}
-	else
-	{
-		UE_LOG(LogTemp, Warning, TEXT("serveronequipfirehose in localplayer : %d, %d, %d"), bCanUseFireHose, bDoesEquipFireHose, bDoesCarryingPerson);
-	}
 	if (!bCanUseFireHose || bDoesCarryingPerson) return;
 
 	Multicast_OnEquipFireHose();
@@ -309,15 +316,6 @@ void AFireMan::ServerRPC_OnEquipFireHose_Implementation()
 
 void AFireMan::Multicast_OnEquipFireHose_Implementation()
 {
-	if (!HasAuthority())
-	{
-		UE_LOG(LogTemp, Warning, TEXT("multicastonequipfirehose in localplayer : %d, %d"), bCanUseFireHose, bDoesEquipFireHose);
-	}
-	else
-	{
-		UE_LOG(LogTemp, Warning, TEXT("multicastonequipfirehose in serverplayer : %d, %d"), bCanUseFireHose, bDoesEquipFireHose);
-	}
-	
 	if (bDoesEquipFireHose)
 	{
 		// off
@@ -341,13 +339,13 @@ void AFireMan::Multicast_OnEquipFireHose_Implementation()
 
 void AFireMan::OnGetCrowbar()
 {
+	if (bCanUseCrowbar) return;
+
 	ServerRPC_OnGetCrowbar();
 }
 
 void AFireMan::ServerRPC_OnGetCrowbar_Implementation()
 {
-	if (bCanUseCrowbar) return;
-
 	if (FireTruckCrowbarActor)
 	{
 		float dist = FVector::Distance(GetActorLocation(), FireTruckCrowbarActor->GetActorLocation());
@@ -356,9 +354,15 @@ void AFireMan::ServerRPC_OnGetCrowbar_Implementation()
 			bCanUseCrowbar = true;
 			FireTruckCrowbarActor->Destroy();
 			OnChangeCanUseTool();
+			ClientRPC_OnGetCrowbar();
 			Multicast_OnEquipCrowbar();
 		}
 	}
+}
+
+void AFireMan::ClientRPC_OnGetCrowbar_Implementation()
+{
+	MainUIWidget->AddInfoUI(1);
 }
 
 void AFireMan::OnEquipCrowbar()

@@ -56,7 +56,7 @@ void UInfoWidget::SetInfoTextFromIndex(int32 Index)
 	}
 
 	const FInfoTextEntry Entry = InfoDataAsset->InfoTexts[Index];
-
+	
 	Txt_Title->SetText(Entry.Title);
 	Txt_Description->SetText(Entry.Description);
 }
