@@ -188,6 +188,8 @@ private:
 	int32 MaxMissionIndex = 3;
 	int32 CurrentMissionIndex = 1;
 	void OnMissionComplete();
+	UFUNCTION(NetMulticast, Reliable)
+	void Multicast_OnMissionComplete();
 
 	FName SafeZoneCollisionProfileName = FName(TEXT("Mission"));
 	UFUNCTION()
@@ -195,8 +197,8 @@ private:
 
 	// UI
 	UPROPERTY(VisibleAnywhere, Category = UI)
-	TSubclassOf<class UFiremanMainUI> MainUIClass;
+	TSubclassOf<class UFiremanMainUI> FireManMainUIClass;
 
 	UPROPERTY(Transient)
-	TObjectPtr<class UFiremanMainUI> MainUIWidget;
+	TObjectPtr<class UFiremanMainUI> FireManMainUIWidget;
 };

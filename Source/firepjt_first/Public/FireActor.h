@@ -34,6 +34,7 @@ public:
 	
 	void PutOutFire();
 
+protected:
 	// Fire Vanish Rate Variable
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=PutOutFire)
 	float vanishAlpha = 0.2f;

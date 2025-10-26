@@ -6,9 +6,12 @@
 #include "Blueprint/UserWidget.h"
 #include "FiremanMainUI.generated.h"
 
-/**
- * 
- */
+UENUM()
+enum class ESubMissions : uint8
+{
+	FireOff = 0, MaskOut, ForceOpenDoor
+};
+
 UCLASS()
 class FIREPJT_FIRST_API UFiremanMainUI : public UUserWidget
 {
@@ -16,10 +19,18 @@ class FIREPJT_FIRST_API UFiremanMainUI : public UUserWidget
 
 protected:
 	UFiremanMainUI(const FObjectInitializer& ObjectInitializer);
+
+	virtual void NativeOnInitialized() override;
 	
 public:
-	// INFO UI 추가 함수
+	// INFO UI
 	void AddInfoUI(int32 idx);
+
+	// Mission Ui
+	UFUNCTION()
+	void ShowSubMissionUI(ESubMissions subMission);
+	UFUNCTION()
+	void SuccessSubMission();
 	
 protected:
 	// Info UI
@@ -32,4 +43,35 @@ protected:
 	// Info UI DataAsset
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TObjectPtr<class UInfoDataAsset> DAFireman;
+
+	// SubMission UI
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<class UOverlay> OverlaySubMission;
+
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<class UTextBlock> TextSubMission;
+
+	UPROPERTY(EditAnywhere, meta=(MultiLine="true"))
+	TObjectPtr<class UTextBlock> TextContent;
+
+	// SubMission Variable
+	int32 CurrentSubMission = 0;
+	
+	// fire off submission
+	UPROPERTY()
+	TSubclassOf<class AFireActor> FireActorClass;
+	int32 FireMaxNum;
+	int32 FireCurrentNum;
+	UFUNCTION()
+	void ShowFireOffSubMission();
+	UFUNCTION()
+	void UpdateFireCurrentNum(AActor* DestroyedActor);
+
+	// mask out submission
+	UFUNCTION()
+	void ShowMaskOutSubMission();
+
+	// force open door submission
+	UFUNCTION()
+	void ShowForceOpenDoorSubMission();
 };

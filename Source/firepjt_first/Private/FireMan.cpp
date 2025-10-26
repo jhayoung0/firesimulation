@@ -165,7 +165,7 @@ AFireMan::AFireMan()
 	ConstructorHelpers::FClassFinder<UFiremanMainUI> mainUIRef(TEXT("/Game/CustomContents/UI/WBP_FiremanMainUI.WBP_FiremanMainUI_C"));
 	if (mainUIRef.Succeeded())
 	{
-		MainUIClass = mainUIRef.Class;
+		FireManMainUIClass = mainUIRef.Class;
 	}
 }
 
@@ -191,12 +191,12 @@ void AFireMan::BeginPlay()
 	FireTruckCrowbarActor = Cast<AFireTruckCrowbar>(UGameplayStatics::GetActorOfClass(GetWorld(), FireTruckCrowbarClass));
 
 	// only fireman can see
-	if (MainUIClass && IsLocallyControlled())
+	if (FireManMainUIClass && IsLocallyControlled())
 	{
-		MainUIWidget = CreateWidget<UFiremanMainUI>(GetWorld(), MainUIClass);
-		if (MainUIWidget)
+		FireManMainUIWidget = CreateWidget<UFiremanMainUI>(GetWorld(), FireManMainUIClass);
+		if (FireManMainUIWidget)
 		{
-			MainUIWidget->AddToViewport();
+			FireManMainUIWidget->AddToViewport();
 		}
 	}
 }
@@ -299,7 +299,7 @@ void AFireMan::ServerRPC_OnGetFireHose_Implementation()
 
 void AFireMan::ClientRPC_OnGetFireHose_Implementation()
 {
-	MainUIWidget->AddInfoUI(0);
+	FireManMainUIWidget->AddInfoUI(0);
 }
 
 void AFireMan::OnEquipFireHose()
@@ -362,7 +362,7 @@ void AFireMan::ServerRPC_OnGetCrowbar_Implementation()
 
 void AFireMan::ClientRPC_OnGetCrowbar_Implementation()
 {
-	MainUIWidget->AddInfoUI(1);
+	FireManMainUIWidget->AddInfoUI(1);
 }
 
 void AFireMan::OnEquipCrowbar()
@@ -462,8 +462,8 @@ void AFireMan::Multicast_OnMaskOut_Implementation()
 		if (dist <= InteractDist)
 		{
 			GetWorld()->SpawnActor<AInteractActor>(MaskActor, FTransform(GetActorLocation() + GetActorForwardVector() * MaskSpawnDist));
-			if (CurrentMissionIndex == 2)
-				OnMissionComplete();
+			
+			OnMissionComplete();
 		}
 	}
 }
@@ -482,6 +482,11 @@ void AFireMan::Multicast_OpenDoor_Implementation()
 	{
 		DoorActor->ToggleWidget(false);
 		DoorActor->ToggleDoor();
+
+		if (IsLocallyControlled())
+		{
+			FireManMainUIWidget->SuccessSubMission();
+		}
 	}
 }
 
@@ -541,18 +546,34 @@ void AFireMan::OffFireHose()
 
 void AFireMan::OnMissionComplete()
 {
+	Multicast_OnMissionComplete();
+}
+
+void AFireMan::Multicast_OnMissionComplete_Implementation()
+{
 	if (CurrentMissionIndex > MaxMissionIndex) return;
 
 	if (AHousePlayerState* hps = Cast<AHousePlayerState>(GetPlayerState()))
 	{
+		if (IsLocallyControlled())
+		{
+			if (CurrentMissionIndex == 1)
+			{
+				FireManMainUIWidget->ShowSubMissionUI(ESubMissions::FireOff);
+			}
+			else if (CurrentMissionIndex == 2)
+			{
+				FireManMainUIWidget->SuccessSubMission();
+			}
+		}
+		
+		UE_LOG(LogTemp, Warning, TEXT("fireman %d mission complete ㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁ"), CurrentMissionIndex);
 		CurrentMissionIndex++;
 		hps->SetMissionComplete();
 	}
 }
 
-void AFireMan::OnCapsuleBeginOverlap(UPrimitiveComponent* OverlappedComp,
-	AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex,
-	bool bFromSweep, const FHitResult& SweepResult)
+void AFireMan::OnCapsuleBeginOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	if (!OtherActor || !OtherComp) return;
 	
