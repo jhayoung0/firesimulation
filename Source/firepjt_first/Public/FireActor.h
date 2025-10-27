@@ -56,34 +56,34 @@ protected:
 	float DebrisRate = 80.f;
 	// Flame
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="NiagaraVariable|Flame")
-	float FlameSpawnRate = 50.f;
+	float FlameSpawnRate = 320.f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="NiagaraVariable|Flame")
-	float FlameRadius = 2.f;
+	float FlameRadius = 35.f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="NiagaraVariable|Flame")
-	float FlameVelocity = 150.f;
+	float FlameVelocity = 250.f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="NiagaraVariable|Flame")
-	float FlameConeAngle = 32.f;
+	float FlameConeAngle = 64.f;
 	// Smoke
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="NiagaraVariable|Smoke")
 	float SmokeSpriteSizeMin = 60.f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="NiagaraVariable|Smoke")
-	float SmokeSpriteSizeMax = 80.f;
+	float SmokeSpriteSizeMax = 100.f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="NiagaraVariable|Smoke")
-	float SmokeLifetime = 1.8f;
+	float SmokeLifetime = 3.f;
 	// Fire Debris
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="NiagaraVariable|FireDebris")
-	float DebrisVelocity = 150.f;
+	float DebrisVelocity = 250.f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="NiagaraVariable|FireDebris")
-	float DebrisConeAngle = 32.f;
+	float DebrisConeAngle = 64.f;
 	// Heat Distortion
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="NiagaraVariable|HeatDistortion")
 	float DistortionSpawnRate = 50.f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="NiagaraVariable|HeatDistortion")
-	float DistortionRadius = 9.f;
+	float DistortionRadius = 20.f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="NiagaraVariable|HeatDistortion")
-	float DistortionVelocity = 150.f;
+	float DistortionVelocity = 200.f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="NiagaraVariable|HeatDistortion")
-	float DistortionConeAngle = 32.f;
+	float DistortionConeAngle = 48.f;
 
 private:
 	UPROPERTY(VisibleAnywhere)
