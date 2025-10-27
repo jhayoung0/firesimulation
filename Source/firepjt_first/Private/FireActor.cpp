@@ -5,6 +5,7 @@
 
 #include "NiagaraComponent.h"
 #include "NiagaraSystem.h"
+#include "Components/PointLightComponent.h"
 #include "Components/SphereComponent.h"
 #include "Net/UnrealNetwork.h"
 
@@ -31,7 +32,16 @@ AFireActor::AFireActor()
 		FireComp->SetAsset(FireRef.Object);
 	}
 	FireComp->SetupAttachment(RootComponent);
-	
+
+	FireLight = CreateDefaultSubobject<UPointLightComponent>(TEXT("FireLight"));
+	FireLight->SetupAttachment(RootComponent);
+	FireLight->SetRelativeLocation(FVector(0, 0, 30));
+	FireLight->SetLightBrightness(500.f);
+	FireLight->SetLightFColor(FColor(255, 206, 161));
+	FireLight->SetAttenuationRadius(400.f);
+	FireLight->SetSourceRadius(32.f);
+	FireLight->SetUseTemperature(true);
+	FireLight->SetTemperature(1200.f);
 }
 
 void AFireActor::BeginPlay()

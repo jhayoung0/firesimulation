@@ -124,7 +124,7 @@ void UFiremanMainUI::UpdateFireCurrentNum(AActor* DestroyedActor)
 void UFiremanMainUI::ShowMaskOutSubMission()
 {
 	TextSubMission->SetText(FText::FromString(TEXT("산소 마스크 지급")));
-	TextContent->SetText(FText::FromString(TEXT("요구조자에게 가까이 다가가 R키 누르기")));
+	TextContent->SetText(FText::FromString(TEXT("요구조자에게 가까이 다가가\nR키 누르기")));
 
 	
 }

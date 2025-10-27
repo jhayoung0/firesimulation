@@ -27,10 +27,13 @@ public:
 #endif
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TObjectPtr<class USphereComponent> SphereCollision;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TObjectPtr<class UNiagaraComponent> FireComp;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TObjectPtr<class USphereComponent> SphereCollision;
+	TObjectPtr<class UPointLightComponent> FireLight;
 	
 	void PutOutFire();
 
