@@ -194,6 +194,11 @@ void Afirepjt_firstPlayerController::OnGamePhaseChanged(EGamePhase NewPhase)
 		AHouseGameState* HouseGS = GetWorld()->GetGameState<AHouseGameState>();
 		if (HouseGS)
 		{
+			if (HasAuthority() && HouseGS->CurrentMissionIndex == 0)
+			{
+				Server_PlayMissionOneCinematic();
+			}
+			
 			if (HasAuthority() && HouseGS->CurrentMissionIndex == 1)
 			{
 				Server_PlayMissionTwoCinematic();
@@ -230,6 +235,17 @@ void Afirepjt_firstPlayerController::OnGamePhaseChanged(EGamePhase NewPhase)
 			VictoryWidget->AddToViewport();
 		}
 	}
+}
+
+void Afirepjt_firstPlayerController::Server_PlayMissionOneCinematic_Implementation()
+{
+	auto* seq = Cast<AASequencePlayer>(UGameplayStatics::GetActorOfClass(GetWorld(),
+	AASequencePlayer::StaticClass()));
+	if (seq)
+	{
+		seq->MultiCastRPC_MissionOneSequencePlay();
+	}
+	
 }
 
 
