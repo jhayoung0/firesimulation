@@ -13,5 +13,14 @@ UCLASS()
 class FIREPJT_FIRST_API UVictoryWidget : public UUserWidget
 {
 	GENERATED_BODY()
-	
+
+protected:
+	virtual void NativeConstruct() override;
+
+public:
+	UPROPERTY(meta = (BindWidget))
+	class UButton* Btn_Back;
+
+	UFUNCTION()
+	void OnBackButtonClicked();
 };

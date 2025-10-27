@@ -208,6 +208,9 @@ void Afirepjt_firstPlayerController::OnGamePhaseChanged(EGamePhase NewPhase)
 	}
 	else if (NewPhase == EGamePhase::GameOver)
 	{
+		SetShowMouseCursor(true);
+		SetInputMode(FInputModeUIOnly());
+		
 		if (GameOverWidgetClass)
 		{
 			GameOverWidget = CreateWidget<UGameOverWidget>(this, GameOverWidgetClass);
@@ -229,6 +232,9 @@ void Afirepjt_firstPlayerController::OnGamePhaseChanged(EGamePhase NewPhase)
 	{
 		InGameWidget->RemoveFromParent();
 
+		SetShowMouseCursor(true);
+		SetInputMode(FInputModeUIOnly());
+		
 		VictoryWidget = CreateWidget<UVictoryWidget>(this, VictoryWidgetClass);
 		if (VictoryWidget)
 		{
