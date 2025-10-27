@@ -120,7 +120,7 @@ void UPhoneWidget::TryCall()
 		UGameplayStatics::PlaySound2D(this, callSound);
 
 		// 델리게이트 브로드캐스트 (시네마틱 재생)
-		OnRequestPlayCinematic.Broadcast();
+		//OnRequestPlayCinematic.Broadcast();
 
 		// 다음 미션으로 넘기기
 		peoplebase->GoNextMission();

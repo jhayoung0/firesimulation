@@ -111,6 +111,9 @@ public:
 	void Server_CinematicSkip();
 
 	UFUNCTION(Server, Reliable)
+	void Server_PlayMissionOneCinematic();
+	
+	UFUNCTION(Server, Reliable)
 	void Server_PlayMissionTwoCinematic();
 
 	UFUNCTION(Server, Reliable)

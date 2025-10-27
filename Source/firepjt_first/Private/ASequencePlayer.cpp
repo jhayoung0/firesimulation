@@ -417,17 +417,7 @@ void AASequencePlayer::Multicast_SetActorsHidden_Implementation(bool bHiddenActo
 		UGameplayStatics::GetAllActorsOfClass(World, APeopleBase::StaticClass(), Found);
 		for (AActor* A : Found)
 		{
-			if (ACharacter* C = Cast<ACharacter>(A))
-			{
-				if (USkeletalMeshComponent* Mesh = C->GetMesh())
-				{
-					Mesh->SetHiddenInGame(bHiddenActor, true);   // 하위 컴포넌트 포함
-				}
-			}
-			else
-			{
-				A->SetActorHiddenInGame(bHiddenActor);
-			}
+			A->SetActorHiddenInGame(bHiddenActor);
 		}
 	}
 
@@ -437,17 +427,7 @@ void AASequencePlayer::Multicast_SetActorsHidden_Implementation(bool bHiddenActo
 		UGameplayStatics::GetAllActorsOfClass(World, AFireMan::StaticClass(), Found);
 		for (AActor* A : Found)
 		{
-			if (ACharacter* C = Cast<ACharacter>(A))
-			{
-				if (USkeletalMeshComponent* Mesh = C->GetMesh())
-				{
-					Mesh->SetHiddenInGame(bHiddenActor, true);
-				}
-			}
-			else
-			{
-				A->SetActorHiddenInGame(bHiddenActor);
-			}
+			A->SetActorHiddenInGame(bHiddenActor);
 		}
 	}
 }
