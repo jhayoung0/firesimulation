@@ -27,10 +27,16 @@ public:
 #endif
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TObjectPtr<class UNiagaraComponent> FireComp;
+	TObjectPtr<class USphereComponent> SphereCollision;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TObjectPtr<class USphereComponent> SphereCollision;
+	TObjectPtr<class UNiagaraComponent> FireComp;
+
+	// UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	// TObjectPtr<class UPointLightComponent> FireLight;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TObjectPtr<class UInteractWidgetComp> InteractWidgetComp;
 	
 	void PutOutFire();
 
@@ -82,4 +88,6 @@ protected:
 private:
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<class USceneComponent> SceneRootComp;
+
+	void BillboardInteractKey();
 };

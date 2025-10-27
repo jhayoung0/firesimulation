@@ -96,7 +96,9 @@ void AInteractActor::ToggleWidget(bool check)
 		if (meshComp)
 		{
 			// AnimBP를 거치지 않고 단일 애니메이션 모드로 전환
-			meshComp->SetAnimationMode(EAnimationMode::Type::AnimationBlueprint);
+			meshComp->SetAnimationMode(EAnimationMode::AnimationSingleNode);
+			// 루프 재생
+			meshComp->PlayAnimation(InteractAnim_Detach, true);
 			meshComp->SetRenderCustomDepth(true);
 			boxComp->SetSimulatePhysics(true);
 		}
