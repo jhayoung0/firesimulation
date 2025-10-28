@@ -10,11 +10,11 @@ AFireTruckFireHose::AFireTruckFireHose()
 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = false;
 
-	FireHoseComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("FireHoseComp"));
-	ConstructorHelpers::FObjectFinder<UStaticMesh> fireHoseRef(TEXT("/Script/Engine.StaticMesh'/Game/CustomContents/Fireman/FireTruck/emergency_fire_hose_9_mb/StaticMeshes/emergency_fire_hose_9_mb.emergency_fire_hose_9_mb'"));
+	FireHoseComp = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("FireHoseComp"));
+	ConstructorHelpers::FObjectFinder<USkeletalMesh> fireHoseRef(TEXT("/Script/Engine.SkeletalMesh'/Game/CustomContents/Fireman/FireTruck/emergency_fire_hose_9_mb/StaticMeshes/SKM_emergency_fire_hose_9_mb.SKM_emergency_fire_hose_9_mb'"));
 	if (fireHoseRef.Succeeded())
 	{
-		FireHoseComp->SetStaticMesh(fireHoseRef.Object);
+		FireHoseComp->SetSkeletalMesh(fireHoseRef.Object);
 	}
 }
 

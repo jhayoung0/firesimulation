@@ -7,7 +7,10 @@
 #include "NiagaraComponent.h"
 #include "NiagaraSystem.h"
 #include "Components/SkeletalMeshComponent.h"
+#include "CableComponent.h"
+#include "Kismet/GameplayStatics.h"
 #include "Net/UnrealNetwork.h"
+#include "FireTruckFireHose.h"
 
 #define FirehoseWater ECC_GameTraceChannel3
 
@@ -31,7 +34,7 @@ AFireHose::AFireHose()
 	}
 
 	// Niagara Component
-	NiagaraParticleSystemComp = CreateDefaultSubobject<UNiagaraComponent>("ParticleSystemComponent");
+	NiagaraParticleSystemComp = CreateDefaultSubobject<UNiagaraComponent>(TEXT("NiagaraParticleSystemComp"));
 	ConstructorHelpers::FObjectFinder<UNiagaraSystem> niagaraCompRef(TEXT("/Script/Niagara.NiagaraSystem'/Game/CustomContents/Fireman/Water/NS_Water.NS_Water'"));
 	if (niagaraCompRef.Succeeded())
 	{
@@ -41,6 +44,21 @@ AFireHose::AFireHose()
 		NiagaraParticleSystemComp->SetRelativeRotation(FRotator(-90, 0, 0));
 		NiagaraParticleSystemComp->SetAutoActivate(false);
 	}
+
+	// Cable Component
+	HoseComp = CreateDefaultSubobject<UCableComponent>(TEXT("HoseComp"));
+	HoseComp->SetupAttachment(FirehoseComp, FName(TEXT("HoseSocket")));
+	HoseComp->CableLength = 1000.f;
+	HoseComp->bEnableCollision = true;
+	HoseComp->EndLocation = FVector(0, 0, 0);
+	HoseComp->CableLength = 2200.f;
+	HoseComp->NumSegments = 44;
+
+	ConstructorHelpers::FClassFinder<AFireTruckFireHose> fireTruckFireHoseRef(TEXT("/Game/CustomContents/Fireman/FireTruck/BP_FirehoseInTruck.BP_FirehoseInTruck_C"));
+	if (fireTruckFireHoseRef.Succeeded())
+	{
+		FireTruckFireHoseClass = fireTruckFireHoseRef.Class;
+	}
 }
 
 void AFireHose::BeginPlay()
@@ -48,6 +66,8 @@ void AFireHose::BeginPlay()
 	Super::BeginPlay();
 
 	NiagaraParticleSystemComp->SetActorParameter(FName("UserCallbackHandler"), this);
+	AActor* fireTruckFireHose = UGameplayStatics::GetActorOfClass(GetWorld(), FireTruckFireHoseClass);
+	HoseComp->SetAttachEndTo(fireTruckFireHose, FName(TEXT("FireHoseComp")),FName(TEXT("HoseSocket")));
 }
 
 void AFireHose::Tick(float DeltaTime)

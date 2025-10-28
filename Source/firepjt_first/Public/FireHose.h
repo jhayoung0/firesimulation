@@ -18,7 +18,6 @@ public:
 protected:
 	virtual void BeginPlay() override;
 
-public:
 	virtual void Tick(float DeltaTime) override;
 	virtual void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;
 
@@ -31,6 +30,14 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TObjectPtr<class UNiagaraComponent> NiagaraParticleSystemComp;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TObjectPtr<class UCableComponent> HoseComp;
+
+	// FireTruck FireHose
+	UPROPERTY(VisibleAnywhere)
+	TSubclassOf<class AFireTruckFireHose> FireTruckFireHoseClass;
+
+public:
 	// Water Shot
 	UFUNCTION(NetMulticast, Reliable, BlueprintCallable)
 	void OnWaterShot();

@@ -24,7 +24,8 @@ public class firepjt_first : ModuleRules
 			"Niagara",
 			"MovieScene",
 			"MovieSceneTracks",
-			"LevelSequence"
+			"LevelSequence",
+			"CableComponent"
 		});
 
 	

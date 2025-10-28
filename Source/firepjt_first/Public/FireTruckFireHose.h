@@ -20,5 +20,5 @@ protected:
 	virtual void BeginPlay() override;
 
 	UPROPERTY(VisibleAnywhere)
-	TObjectPtr<class UStaticMeshComponent> FireHoseComp;
+	TObjectPtr<class USkeletalMeshComponent> FireHoseComp;
 };
