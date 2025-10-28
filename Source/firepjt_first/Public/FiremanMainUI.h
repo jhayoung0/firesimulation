@@ -34,6 +34,10 @@ public:
 	void SuccessSubMission();
 	int32 GetCurSubMissionNum() { return CurrentSubMission; }
 	int32 GetMaxSubMissionNum() { return MaxSubMission; }
+
+	// Text Alert
+	UFUNCTION()
+	void ShowAlert();
 	
 protected:
 	// Info UI
@@ -56,6 +60,9 @@ protected:
 
 	UPROPERTY(EditAnywhere, meta=(MultiLine="true"))
 	TObjectPtr<class UTextBlock> TextContent;
+
+	UPROPERTY(EditAnywhere, meta=(MultiLine="true"))
+	TObjectPtr<class UTextBlock> TextAlert;
 
 	// SubMission Variable
 	int32 CurrentSubMission = 0;
