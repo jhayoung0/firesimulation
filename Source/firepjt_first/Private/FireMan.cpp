@@ -444,6 +444,13 @@ void AFireMan::OnUseTool()
 
 void AFireMan::OnMaskOut()
 {
+	// 서브미션 인덱스 검사
+	if (FireManMainUIWidget->GetCurSubMissionNum() < 1)
+	{
+		// 서브미션 완료 후 다시 시도하세요 알림 출력
+		UE_LOG(LogTemp, Warning, TEXT("서브 미션을 완료하고 다시 시도하세요."));
+		return;
+	}
 	ServerRPC_OnMaskOut();
 }
 
@@ -567,7 +574,7 @@ void AFireMan::Multicast_OnMissionComplete_Implementation()
 			}
 		}
 		
-		UE_LOG(LogTemp, Warning, TEXT("fireman %d mission complete ㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁ"), CurrentMissionIndex);
+		
 		CurrentMissionIndex++;
 		hps->SetMissionComplete();
 	}

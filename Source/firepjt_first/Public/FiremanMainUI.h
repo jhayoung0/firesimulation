@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
+#include "UObject/ObjectMacros.h"
 #include "FiremanMainUI.generated.h"
 
 UENUM()
@@ -31,6 +32,8 @@ public:
 	void ShowSubMissionUI(ESubMissions subMission);
 	UFUNCTION()
 	void SuccessSubMission();
+	int32 GetCurSubMissionNum() { return CurrentSubMission; }
+	int32 GetMaxSubMissionNum() { return MaxSubMission; }
 	
 protected:
 	// Info UI
@@ -56,6 +59,7 @@ protected:
 
 	// SubMission Variable
 	int32 CurrentSubMission = 0;
+	int32 MaxSubMission = 3;
 	
 	// fire off submission
 	UPROPERTY()

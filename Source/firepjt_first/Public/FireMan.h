@@ -156,17 +156,21 @@ private:
 	void OnFireHoseShot();
 	UFUNCTION(Server, Reliable)
 	void ServerRPC_OnFireHoseShot();
-	
+
+	// Use Tool
 	void OnUseTool();
+	// Mask Out
 	void OnMaskOut();
 	UFUNCTION(Server, Reliable)
 	void ServerRPC_OnMaskOut();
 	UFUNCTION(NetMulticast, Reliable)
 	void Multicast_OnMaskOut();
+	// Open Door
 	UFUNCTION(Server, Reliable)
 	void ServerRPC_OpenDoor();
 	UFUNCTION(NetMulticast, Reliable)
 	void Multicast_OpenDoor();
+	// Carry Person
 	UFUNCTION(Server, Reliable)
 	void ServerRPC_CarryPerson();
 	UFUNCTION(NetMulticast, Reliable)
