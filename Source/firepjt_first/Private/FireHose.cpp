@@ -47,6 +47,11 @@ AFireHose::AFireHose()
 
 	// Cable Component
 	HoseComp = CreateDefaultSubobject<UCableComponent>(TEXT("HoseComp"));
+	ConstructorHelpers::FObjectFinder<UMaterialInterface> hoseMaterialRef(TEXT("/Script/Engine.Material'/Game/CustomContents/House/Assets/Apartments/vray_low_wall_white.vray_low_wall_white'"));
+	if (hoseMaterialRef.Succeeded())
+	{
+		HoseComp->SetMaterial(0, hoseMaterialRef.Object);
+	}
 	HoseComp->SetupAttachment(FirehoseComp, FName(TEXT("HoseSocket")));
 	HoseComp->CableLength = 1000.f;
 	HoseComp->bEnableCollision = true;

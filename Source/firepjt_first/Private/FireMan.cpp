@@ -18,6 +18,7 @@
 #include "Components/CapsuleComponent.h"
 #include "Components/SceneComponent.h"
 #include "EnhancedInput/Public/InputMappingContext.h"
+#include "GameFramework/SpringArmComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Net/UnrealNetwork.h"
 
@@ -40,14 +41,14 @@ AFireMan::AFireMan()
 	GetMesh()->SetRelativeLocation(FVector(0, 0, -90));
 
 	// Camera Collision
-	BoxCollision = CreateDefaultSubobject<UBoxComponent>(TEXT("BoxCollision"));
-	BoxCollision->SetupAttachment(GetMesh(), TEXT("head"));
-	BoxCollision->SetRelativeLocationAndRotation(FVector(-9.396923,-3.420199,0), FRotator(0,20,-90));
+	FiremanSpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("FiremanSpringArm"));
+	FiremanSpringArm->SetupAttachment(GetMesh(), TEXT("head"));
+	FiremanSpringArm->SetRelativeLocationAndRotation(FVector(9.396923,3.420199,-0), FRotator(0, 20, -90));
+	FiremanSpringArm->TargetArmLength = 0.f;
 
 	// Fireman Camera
 	FiremanCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("FiremanCamera"));
-	FiremanCamera->SetupAttachment(BoxCollision);
-	FiremanCamera->SetRelativeLocation(FVector(47,1,0));
+	FiremanCamera->SetupAttachment(FiremanSpringArm);
 	FiremanCamera->bUsePawnControlRotation = true;
 
 	// Person2 Attach Position
@@ -61,9 +62,9 @@ AFireMan::AFireMan()
 	if (WaterRef.Succeeded())
 	{
 		WaterComp->SetChildActorClass(WaterRef.Class);
-		WaterComp->SetupAttachment(GetMesh(), TEXT("cc_weaponbone_l"));
+		WaterComp->SetupAttachment(GetMesh(), TEXT("cc_weaponbone_r"));
 		WaterComp->SetVisibility(false);
-		WaterComp->SetRelativeLocationAndRotation(FVector(7,-7.5,1.5), FRotator(32,-94.5,99));
+		WaterComp->SetRelativeLocationAndRotation(FVector(-2.365337,-7.737841,-0.118154), FRotator(8.503906,-79.604077,259.078693));
 	}
 
 	// Crowbar Mesh
@@ -432,6 +433,13 @@ void AFireMan::OnUseTool()
 	
 	if (bDoesEquipCrowbar)
 	{
+		// Check SubMission Index
+		if (FireManMainUIWidget->GetCurSubMissionNum() < 2)
+		{
+			// Print Alert Text
+			FireManMainUIWidget->ShowAlert();
+			return;
+		}
 		// force open the door
 		ServerRPC_OpenDoor();
 	}
