@@ -272,7 +272,6 @@ void APeopleBase::MultiCastRPC_DetachActor_Implementation(
 
 void APeopleBase::AttachActor()
 {
-	
 	ActorRotation = InteractingActor->GetActorRotation();
 	ActorLocation = InteractingActor->GetActorLocation();
 
@@ -297,8 +296,21 @@ void APeopleBase::AttachActor()
 
 			if (IsLocallyControlled())
 			{
-				// 물수건 정보성 UI
-				mainui->AddInfoUI(1);
+				if (mainui)
+				{
+					// 물수건 정보성 UI
+					mainui->AddInfoUI(1);
+					
+					if (mainui->CurrentSubMission == 4)
+					{
+						mainui->SuccessSubMission();
+					}
+					else if (mainui->CurrentSubMission < 4)
+					{
+						mainui->SubMissionWarning();
+					}
+				}
+			
 			}
 		}
 		else if (InteractingActor->ActorHasTag(FName("Phone")))
@@ -344,6 +356,12 @@ void APeopleBase::AttachActor()
 				// compActor에 붙이자.
 				InteractingActor->AttachToComponent(compActorPeople_first, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
 				RescuePeople = true;
+			}
+
+			// 서브미션 할 차례가 아니면 워닝 뜨게 하자.
+			if (mainui && mainui->CurrentSubMission < 3)
+			{
+				mainui->SubMissionWarning();
 			}
 	
 		}
@@ -444,6 +462,7 @@ void APeopleBase::ServerRPC_AttachMask_Implementation()
 
 void APeopleBase::NetmultiCastRPC_AttachMask_Implementation()
 {
+	
 	// mask 를 찾기
 	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AMask::StaticClass(), MaskActors);
 	// 찾은 mask actor들과의 모든 거리를 구하기.
@@ -467,10 +486,28 @@ void APeopleBase::NetmultiCastRPC_AttachMask_Implementation()
 	// has mask 설정해주기
 	HasMask = true;
 	HasWetTowel = false;
-	// 최초 1회만 호출됨. (미션 넘기기)
-	if (!HasMaskFirst) {GoNextMission();}
-	// 최초 1회를 위한 변수 (1번 바뀌면 값 변경 안됨)
-	HasMaskFirst = true;
+
+	// 미션 넘기기
+	if (IsLocallyControlled())
+	{
+		if (mainui && mainui->CurrentSubMission == 5)
+		{
+			// 서브미션 넘기기
+			mainui->SuccessSubMission();
+			// 최초 1회만 호출됨. (미션 넘기기)
+			if (!HasMaskFirst) {GoNextMission();}
+			// 최초 1회를 위한 변수 (1번 바뀌면 값 변경 안됨)
+			HasMaskFirst = true;
+			
+		}
+		else if (mainui && mainui->CurrentSubMission < 5)
+		{
+			mainui->SubMissionWarning();
+		}
+	}
+
+	
+
 	
 	// 못찾으면 리턴
 	if (!MaskActor) {UE_LOG(LogTemp, Warning, TEXT("maskactor없음")); return;}
@@ -545,30 +582,47 @@ void APeopleBase::OnCapsuleBeginOverlap(UPrimitiveComponent* OverlappedComp,
 
 	if (AllowedProfiles.Contains(Profile))
 	{
-		if (UCapsuleComponent* Cap = GetCapsuleComponent())
-		{
-			Cap->SetGenerateOverlapEvents(false);
-		}
-
 		// 첫번째 서브미션 성공
 		if (OtherActor->ActorHasTag(FName("OneSubMission")))
 		{
-			if (mainui->CurrentSubMission == 1)
+			if (mainui)
 			{
-				// 서브미션 성공
-				mainui->SuccessSubMission();
+				UE_LOG(LogTemp,Warning,TEXT("%d"), mainui->CurrentSubMission);
+				if (mainui->CurrentSubMission == 1)
+				{
+					if (IsLocallyControlled())
+					{
+						// 서브미션 성공
+						mainui->SuccessSubMission();
+					}
+				}
 			}
+		
 		}
 		
 		// 다음 미션으로 가기 / 마지막 미션임.
 		if (OtherActor->ActorHasTag(FName("MainLastMission")))
 		{
-			this->GoNextMission();
-			// 산소바 ui 삭제하기
-			if (mainui)
+			UE_LOG(LogTemp,Warning,TEXT("MainLastMission"));
+
+			if (mainui && mainui->CurrentSubMission == 6)
 			{
-				mainui->RemoveFromParent(); 
+				this->GoNextMission();
+				// 산소바 ui 삭제하기
+				if (mainui)
+				{
+					mainui->RemoveFromParent();
+					// 서브미션 성공
+					mainui->SuccessSubMission();
+				
+				}
 			}
+			else if (mainui && mainui->CurrentSubMission < 6)
+			{
+				// 서브미션 순서대로 해라!
+				mainui->SubMissionWarning();
+			}
+			
 		}
 
 	}

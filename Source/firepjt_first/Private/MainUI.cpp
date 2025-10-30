@@ -88,6 +88,20 @@ void UMainUI::SuccessSubMission()
 	GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &UMainUI::NextSubMission, 1.0f, false);
 }
 
+void UMainUI::SubMissionWarning()
+{
+	// 텍스트 알럿 보여주기 3초 뒤에 닫기
+	TextAlert->SetVisibility(ESlateVisibility::Visible);
+	TextAlert->SetText(FText::FromString(TEXT("미션을 순서대로 수행해주세요.")));
+
+	FTimerHandle timerhandle;
+	GetWorld()->GetTimerManager().SetTimer(timerhandle, [&]()
+	{
+		TextAlert->SetVisibility(ESlateVisibility::Hidden);
+	}, 3, false);
+	
+}
+
 
 void UMainUI::ShowOneSubMission()
 {

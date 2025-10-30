@@ -130,6 +130,10 @@ void UPhoneWidget::TryCall()
 			// 다음 서브미션으로 넘기기
 			peoplebase->mainui->SuccessSubMission();
 		}
+		else if (peoplebase->mainui->CurrentSubMission < 2)
+		{
+			peoplebase->mainui->SubMissionWarning();
+		}
 
 	}
 	else

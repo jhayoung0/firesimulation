@@ -71,7 +71,11 @@ public:
 
 	UPROPERTY(EditAnywhere, meta=(MultiLine="true"))
 	TObjectPtr<class UTextBlock> TextContent;
+	
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<class UTextBlock> TextAlert;
 
+	
 	// SubMission Variable
 	int32 CurrentSubMission = 1;
 
@@ -85,6 +89,12 @@ public:
 	// Submission 넘기기
 	UFUNCTION()
 	void SuccessSubMission();
+
+
+	// Submission 순서대로 해라 임마
+	UFUNCTION()
+	void SubMissionWarning();
+
 	
 	// Submission 1
 	UFUNCTION()
@@ -109,7 +119,6 @@ public:
 	// Submission 6
 	UFUNCTION()
 	void ShowSixSubMission(); // 서브미션 : 소방관 따라가기
-
 
 	
 
