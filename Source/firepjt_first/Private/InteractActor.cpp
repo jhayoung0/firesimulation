@@ -18,8 +18,6 @@ AInteractActor::AInteractActor()
 {
 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-
-
 	
 	boxComp= CreateDefaultSubobject<UBoxComponent>(TEXT("boxComp"));
 	SetRootComponent(boxComp);
@@ -116,12 +114,10 @@ void AInteractActor::ToggleWidget(bool check)
 			meshComp->SetRenderCustomDepth(false);
 			boxComp->SetSimulatePhysics(false);
 		}
-		
-		
 	}
-	
-	
 }
+
+
 
 void AInteractActor::BillboardInteractKey()
 {
