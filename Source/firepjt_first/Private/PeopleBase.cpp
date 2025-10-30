@@ -84,6 +84,8 @@ void APeopleBase::BeginPlay()
 			currOxygen = maxOxygen;
 			const float InitPercent = maxOxygen > 0.f ? currOxygen / maxOxygen : 0.f;
 			mainui->SetOxygenPercent(InitPercent);
+			// 서브미션 설정
+			mainui->HandleMission(1);
 		}
 	}
 }
@@ -189,27 +191,7 @@ void APeopleBase::GetLifetimeReplicatedProps(
 	
 }
 
-// 상호작용 액터 찾기
-void APeopleBase::FindInteractActor()
-{
-	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AInteractActor::StaticClass(), allInteractActor);
-}
-
-void APeopleBase::OutOfOxygen()
-{
-	AHouseGameMode* GM = Cast<AHouseGameMode>(GetWorld()->GetAuthGameMode());
-	if (GM)
-	{
-		GM->FailMission();
-	}
-}
-
-void APeopleBase::ServerRPC_OutOfOxygen_Implementation()
-{
-	OutOfOxygen();
-}
-
-// c 키 
+// c 키  : 기기 
 void APeopleBase::crawlAction()
 {
 	if (!IsCrouched())
@@ -218,6 +200,13 @@ void APeopleBase::crawlAction()
 		UnCrouch();
 }
 
+
+// 상호작용 관련
+// 상호작용 액터 찾기
+void APeopleBase::FindInteractActor()
+{
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AInteractActor::StaticClass(), allInteractActor);
+}
 
 // e 키
 void APeopleBase::Interaction()
@@ -533,18 +522,21 @@ void APeopleBase::NetmultiCastRPC_DetachMask_Implementation()
 }
 
 
+
+// 다음 미션으로 넘기기
 void APeopleBase::GoNextMission()
 {
-	// 다음 미션으로 넘기기
+	
 	if (!housePs){return;}
 	housePs->SetMissionComplete();
 }
 
+// 마지막 미션 및 첫번째 서브미션 완료 처리 조건
 void APeopleBase::OnCapsuleBeginOverlap(UPrimitiveComponent* OverlappedComp,
 	AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex,
 	bool bFromSweep, const FHitResult& SweepResult)
 {
-
+	
 	if (!OtherActor || !OtherComp) return;
 	if (OtherActor == this) return; // 자기 자신 무시
 
@@ -558,28 +550,43 @@ void APeopleBase::OnCapsuleBeginOverlap(UPrimitiveComponent* OverlappedComp,
 			Cap->SetGenerateOverlapEvents(false);
 		}
 
-		// 다음 미션으로 가기 / 마지막 미션임.
-		this->GoNextMission();
-		// 산소바 ui 삭제하기
-		if (mainui)
+		// 첫번째 서브미션 성공
+		if (OtherActor->ActorHasTag(FName("OneSubMission")))
 		{
-			mainui->RemoveFromParent(); 
+			if (mainui->CurrentSubMission == 1)
+			{
+				// 서브미션 성공
+				mainui->SuccessSubMission();
+			}
+		}
+		
+		// 다음 미션으로 가기 / 마지막 미션임.
+		if (OtherActor->ActorHasTag(FName("MainLastMission")))
+		{
+			this->GoNextMission();
+			// 산소바 ui 삭제하기
+			if (mainui)
+			{
+				mainui->RemoveFromParent(); 
+			}
 		}
 
-		// 5초뒤에 콜리젼 다시 켜기
-		FTimerHandle colhandle;
-		GetWorldTimerManager().SetTimer(
-			colhandle, this, &APeopleBase::CollisionActivate,
-			5.0f, false );
 	}
 }
 
-void APeopleBase::CollisionActivate()
+
+
+// 죽음 처리
+void APeopleBase::OutOfOxygen()
 {
-	if (UCapsuleComponent* Cap = GetCapsuleComponent())
+	AHouseGameMode* GM = Cast<AHouseGameMode>(GetWorld()->GetAuthGameMode());
+	if (GM)
 	{
-		Cap->SetGenerateOverlapEvents(true);
+		GM->FailMission();
 	}
 }
 
-
+void APeopleBase::ServerRPC_OutOfOxygen_Implementation()
+{
+	OutOfOxygen();
+}

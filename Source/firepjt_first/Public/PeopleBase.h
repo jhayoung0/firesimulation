@@ -174,10 +174,7 @@ public:
 	// 서버에서 interacting actor 값이 바뀌면 클라에서 attach actor 호출
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Interaction, ReplicatedUsing=AttachActor)
 	AInteractActor* InteractingActor = nullptr;
-
 	
-	UFUNCTION()
-	void CollisionActivate();
 	UFUNCTION()
 	void Interaction();
 	
