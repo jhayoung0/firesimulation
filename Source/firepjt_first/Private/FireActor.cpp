@@ -3,6 +3,7 @@
 
 #include "FireActor.h"
 
+#include "FireWidget.h"
 #include "InteractWidgetComp.h"
 #include "NiagaraComponent.h"
 #include "NiagaraSystem.h"
@@ -37,29 +38,18 @@ AFireActor::AFireActor()
 	{
 		FireComp->SetAsset(FireRef.Object);
 		FireComp->SetupAttachment(RootComponent);
-
 	}
 
-	// Fire Light
-	// FireLight = CreateDefaultSubobject<UPointLightComponent>(TEXT("FireLight"));
-	// FireLight->SetupAttachment(RootComponent);
-	// FireLight->SetRelativeLocation(FVector(0, 0, 30));
-	// FireLight->SetIntensityUnits(ELightUnits::Unitless);
-	// FireLight->SetIntensity(500.f);
-	// FireLight->SetLightFColor(FColor(255, 206, 161));
-	// FireLight->SetAttenuationRadius(400.f);
-	// FireLight->SetSourceRadius(32.f);
-	// FireLight->SetUseTemperature(true);
-	// FireLight->SetTemperature(1200.f);
-
-	// Interact Widget Comp
-	InteractWidgetComp = CreateDefaultSubobject<UInteractWidgetComp>(TEXT("InteractWidgetComp"));
-	InteractWidgetComp->SetWidgetSpace(EWidgetSpace::World);
-	InteractWidgetComp->SetupAttachment(RootComponent);
-	InteractWidgetComp->SetTwoSided(true);
-	InteractWidgetComp->SetCollisionProfileName(FName("UI"));
-	// 위치 변경
-	
+	// Fire Widget
+	FireWidgetComp = CreateDefaultSubobject<UWidgetComponent>(TEXT("FireWidgetComp"));
+	ConstructorHelpers::FClassFinder<UFireWidget> fireWidgetCompRef(TEXT("/Game/CustomContents/Fireman/Fire/WBP_Fire.WBP_Fire_C"));
+	if (fireWidgetCompRef.Succeeded())
+	{
+		FireWidgetComp->SetWidgetClass(fireWidgetCompRef.Class);
+		FireWidgetComp->SetupAttachment(FireComp);
+		FireWidgetComp->SetRelativeScale3D(FVector(0.1));
+		FireWidgetComp->SetRelativeLocation(FVector(0, 0, 135.f));
+	}
 }
 
 void AFireActor::BeginPlay()
@@ -145,10 +135,10 @@ void AFireActor::PutOutFire()
 
 void AFireActor::BillboardInteractKey()
 {
-	// 내가 컨트롤하고 있는 카메라를 가져오자.
+	// get camera which i control
 	AActor* cam = UGameplayStatics::GetPlayerCameraManager(GetWorld(), 0);
-	// 카메라의 앞 방향 (반대), 윗 방향을 이용해서 Rotator 를 구하자.
+	// get rotator using camera backward, up vector
 	FRotator rot = UKismetMathLibrary::MakeRotFromXZ(-cam->GetActorForwardVector(), cam->GetActorUpVector());
-	// 구한 Rotator 를 comHP 에 설정
-	InteractWidgetComp->SetWorldRotation(rot); 
+	// set rotation
+	FireWidgetComp->SetWorldRotation(rot);
 }
