@@ -33,6 +33,9 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TObjectPtr<class UCableComponent> HoseComp;
 
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<class UAudioComponent> FireHoseSound;
+
 	// FireTruck FireHose
 	UPROPERTY(VisibleAnywhere)
 	TSubclassOf<class AFireTruckFireHose> FireTruckFireHoseClass;

@@ -591,7 +591,7 @@ void AFireMan::Multicast_OnMissionComplete_Implementation()
 void AFireMan::OnCapsuleBeginOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	if (!OtherActor || !OtherComp) return;
-	
+	if (!OtherActor->ActorHasTag(FName("MainLastMission"))) return;
 	const FName Profile = OtherComp->GetCollisionProfileName();
 	if (Profile != SafeZoneCollisionProfileName) return;
 

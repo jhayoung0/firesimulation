@@ -11,6 +11,8 @@
 #include "Kismet/GameplayStatics.h"
 #include "Net/UnrealNetwork.h"
 #include "FireTruckFireHose.h"
+#include "MetasoundSource.h"
+#include "Components/AudioComponent.h"
 
 #define FirehoseWater ECC_GameTraceChannel3
 
@@ -64,6 +66,14 @@ AFireHose::AFireHose()
 	{
 		FireTruckFireHoseClass = fireTruckFireHoseRef.Class;
 	}
+
+	FireHoseSound = CreateDefaultSubobject<UAudioComponent>(TEXT("FireHoseSound"));
+	ConstructorHelpers::FObjectFinder<UMetaSoundSource> fireHoseSoundRef(TEXT("/Script/MetasoundEngine.MetaSoundSource'/Game/CustomContents/Fireman/Water/MSS_FireHose.MSS_FireHose'"));
+	if (fireHoseSoundRef.Succeeded())
+	{
+		FireHoseSound->SetSound(fireHoseSoundRef.Object);
+		FireHoseSound->SetAutoActivate(false);
+	}
 }
 
 void AFireHose::BeginPlay()
@@ -95,11 +105,13 @@ void AFireHose::OnWaterShot_Implementation()
 	if (bDoesWaterShotNow)
 	{
 		NiagaraParticleSystemComp->Deactivate();
+		FireHoseSound->Stop();
 		bDoesWaterShotNow = false;
 	}
 	else
 	{
 		NiagaraParticleSystemComp->Activate(true);
+		FireHoseSound->Play();
 		bDoesWaterShotNow = true;
 	}
 }
