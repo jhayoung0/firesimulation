@@ -143,7 +143,7 @@ AFireMan::AFireMan()
 	}
 	
 	// Mask Actor
-	ConstructorHelpers::FClassFinder<AInteractActor> maskRef(TEXT("/Game/CustomContents/People/Blueprints/BP_Mask.BP_Mask_C"));
+	ConstructorHelpers::FClassFinder<AMask> maskRef(TEXT("/Game/CustomContents/People/Blueprints/BP_Mask.BP_Mask_C"));
 	if (maskRef.Succeeded())
 	{
 		MaskActor = maskRef.Class;

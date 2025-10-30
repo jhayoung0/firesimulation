@@ -69,7 +69,7 @@ public:
 
 	// Mask
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	TSubclassOf<class AInteractActor> MaskActor;
+	TSubclassOf<class AMask> MaskActor;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float MaskSpawnDist = 100.f;
