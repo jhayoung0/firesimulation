@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Net/UnrealNetwork.h"
 #include "firepjt_firstCharacter.h"
+#include "Mask.h"
 #include "PhoneWidget.h"
 #include "Cubee/HousePlayerState.h"
 #include "PeopleBase.generated.h"
@@ -43,11 +44,13 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)    
 	bool IsCrawl = false;
 	
-	
-	
 	// 물건 상호작용
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category= Input)
 	class UInputAction* InteractionInput;
+
+	// 마스크 상호작용
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category= Input)
+	class UInputAction* MaskInput;
 	
 	// 초기 카메라 위치
 	FVector CameraLocation = FVector(2.000000,-30.000000,20.000000);
@@ -128,9 +131,9 @@ public: // widget
 	UMainUI* mainui = nullptr;
 
 
-public: // s
+public: 
 
-// ound
+// Sound
 	UPROPERTY()
 	UAudioComponent* MaskAudioComp;
 	
@@ -190,6 +193,36 @@ public:
 	void AttachActor();
 	void DetachActor(AInteractActor* tempActor);
 
+
+public:
+	// mask action
+	UFUNCTION()
+	void InteractWithMask();
+
+	// 서버에게 attcah 하라고 요청
+	UFUNCTION(Server, Reliable)
+	void ServerRPC_AttachMask();
+	// 모든 클라에게 attach 하라고 요청
+	UFUNCTION(NetMulticast, Reliable)
+	void NetmultiCastRPC_AttachMask();
+	
+	// 서버에게 detach 하라고 요청
+	UFUNCTION(Server, Reliable)
+	void ServerRPC_DetachMask();
+	// 모든 클라에게 detach 하라고 요청
+	UFUNCTION(NetMulticast, Reliable)
+	void NetmultiCastRPC_DetachMask();
+	
+	
+	UPROPERTY(EditDefaultsOnly)
+	TArray<AActor*> MaskActors;
+	UPROPERTY(EditDefaultsOnly)
+	AMask* MaskActor = nullptr;
+	
+	FRotator MaskActorRotation;
+	FVector MaskActorLocation;
+
+	
 	UFUNCTION()
 	void crawlAction();
 

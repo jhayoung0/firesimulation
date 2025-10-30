@@ -11,6 +11,7 @@
 #include "Components/CapsuleComponent.h"
 #include "Camera/CameraComponent.h"
 #include "MainUI.h"
+#include "Mask.h"
 
 #include "Components/AudioComponent.h"
 #include "GameFramework/SpringArmComponent.h"
@@ -98,6 +99,7 @@ void APeopleBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 	{
 		PlayerInput->BindAction(crawlInput, ETriggerEvent::Started, this, &APeopleBase::crawlAction);
 		PlayerInput->BindAction(InteractionInput, ETriggerEvent::Started, this, &APeopleBase::Interaction);
+		PlayerInput->BindAction(MaskInput, ETriggerEvent::Started, this, &APeopleBase::InteractWithMask);
 	}
 }
 
@@ -282,46 +284,20 @@ void APeopleBase::MultiCastRPC_DetachActor_Implementation(
 void APeopleBase::AttachActor()
 {
 	
-	
-	IsInteracting = true;
-	//InteractingActor->IsInteracting = true;
-	InteractingActor->ToggleWidget(false);
 	ActorRotation = InteractingActor->GetActorRotation();
 	ActorLocation = InteractingActor->GetActorLocation();
 
-	
-	// tag에 따라서 구분하자.
 	if (InteractingActor)
 	{
-		if (InteractingActor->ActorHasTag(FName("Mask")))
+		// tag에 따라서 구분하자.
+		if (InteractingActor->ActorHasTag(FName("WetTowel")))
 		{
-			// compActor에 붙이자.
-			InteractingActor->AttachToComponent(compActorMask, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
-		
-			HasMask = true;
-			HasWetTowel = false;
+			// mask 가지고 있으면 못씀
+			if (HasMask) {return;}
 
-			// 최초 1회만 호출됨.
-			if (!HasMaskFirst) {GoNextMission();};
+			IsInteracting = true;
+			InteractingActor->ToggleWidget(false);
 			
-			// 최초 1회를 위한 변수 (1번 바뀌면 값 변경 안됨)
-			HasMaskFirst = true;
-			
-			
-			if (IsLocallyControlled())
-			{
-				mainui->ShowMaskUI(true);
-				if (masksfx) 
-                {
-                	// AudioComponent를 생성하고 루프 설정
-                	MaskAudioComp = UGameplayStatics::SpawnSound2D(GetWorld(), masksfx, 1.0f, 1.0f, 0.0f, nullptr, true);
-                }
-
-			}
-
-		}
-		else if (InteractingActor->ActorHasTag(FName("WetTowel")))
-		{
 			// compActor에 붙이자.
 			InteractingActor->AttachToComponent(compActorTowel, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
 		
@@ -341,7 +317,10 @@ void APeopleBase::AttachActor()
 			// compActor에 붙이자.
 			InteractingActor->AttachToComponent(compActor, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
 			HasPhone = true;
-		
+
+			IsInteracting = true;
+			InteractingActor->ToggleWidget(false);
+			
 			if (IsLocallyControlled())
 			{
 				// 위젯 띄우기
@@ -354,6 +333,9 @@ void APeopleBase::AttachActor()
 		}
 		else if (InteractingActor->ActorHasTag(FName("People")))
 		{
+			IsInteracting = true;
+			InteractingActor->ToggleWidget(false);
+			
 			if (IsLocallyControlled())
 			{
 				// 사람 정보성 UI
@@ -377,18 +359,23 @@ void APeopleBase::AttachActor()
 	
 		}
 		else if (InteractingActor->ActorHasTag(FName("Door")))
-    		{
-				InteractingActor->ToggleDoor();
-    		}
+		{
+			InteractingActor->ToggleDoor();
+			IsInteracting = true;
+			InteractingActor->ToggleWidget(false);
+			
+		}
 		else
 		{
+			IsInteracting = true;
+			InteractingActor->ToggleWidget(false);
 			// compActor에 붙이자.
 			InteractingActor->AttachToComponent(compActor, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
 			UE_LOG(LogTemp, Log, TEXT("태그 없음 또는 알 수 없는 타입"));
 		}
 	}
-
 }
+
 
 void APeopleBase::DetachActor(AInteractActor* tempActor)
 {
@@ -409,22 +396,7 @@ void APeopleBase::DetachActor(AInteractActor* tempActor)
 	// tag에 따라서 구분하자.
 	if (tempActor)
 	{
-		if (tempActor->ActorHasTag(FName("Mask")))
-		{
-			HasMask = false;
-			if (IsLocallyControlled())
-			{
-				mainui->ShowMaskUI(false);
-				// 마스크 sound 끄기
-                if (MaskAudioComp && MaskAudioComp->IsPlaying())
-                {
-                	MaskAudioComp->Stop();
-                }
-                				
-			}
-			
-		}
-		else if (tempActor->ActorHasTag(FName("WetTowel")))
+		if (tempActor->ActorHasTag(FName("WetTowel")))
 		{
 			
 			HasWetTowel = false;
@@ -454,6 +426,110 @@ void APeopleBase::DetachActor(AInteractActor* tempActor)
 		}
 	}
 	InteractingActor = nullptr;
+}
+
+
+
+// mask랑 상호작용
+void APeopleBase::InteractWithMask()
+{
+	// 젖은 타월과 상호작용하고 있으면 호출 안됨.
+	if (HasWetTowel) {return;}
+	
+	// 이미 마스크를 가지고 있다면 detach 아니면 attach
+	if (HasMask)
+	{
+		ServerRPC_DetachMask();
+	}
+	else
+	{
+		ServerRPC_AttachMask();
+	}
+}
+
+void APeopleBase::ServerRPC_AttachMask_Implementation()
+{
+	// 모든 클라에서 마스크 붙이기 요청
+	NetmultiCastRPC_AttachMask();
+}
+
+void APeopleBase::NetmultiCastRPC_AttachMask_Implementation()
+{
+	// mask 를 찾기
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AMask::StaticClass(), MaskActors);
+	// 찾은 mask actor들과의 모든 거리를 구하기.
+	float dist = 200;
+	
+	for (int32 i = 0; i < MaskActors.Num(); i++)
+	{
+		// 거리 구하기 
+		if (FVector::Dist(MaskActors[i]->GetActorLocation(), this->GetActorLocation()) < dist)
+		{
+			// 거리가 더 작으면 업데이트
+			dist = FVector::Dist(MaskActors[i]->GetActorLocation(), this->GetActorLocation());
+			MaskActor = Cast<AMask>(MaskActors[i]);
+		}
+	}
+
+	// 가장 가까운 mask actor 못찾으면 리턴
+	if (MaskActor==nullptr) {return;}
+	// 찾았으면 회전값 저장해두기
+	MaskActorRotation = MaskActor->GetActorRotation();
+	// has mask 설정해주기
+	HasMask = true;
+	HasWetTowel = false;
+	// 최초 1회만 호출됨. (미션 넘기기)
+	if (!HasMaskFirst) {GoNextMission();}
+	// 최초 1회를 위한 변수 (1번 바뀌면 값 변경 안됨)
+	HasMaskFirst = true;
+	
+	// 못찾으면 리턴
+	if (!MaskActor) {UE_LOG(LogTemp, Warning, TEXT("maskactor없음")); return;}
+
+	// 찾았으면 시뮬레이터 꺼주고 붙이기
+	MaskActor->ToggleMask(true);
+	MaskActor->AttachToComponent(compActorMask, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+	
+	// mask ui 설정해주기
+	if (IsLocallyControlled())
+	{
+		mainui->ShowMaskUI(true);
+		if (masksfx) 
+		{
+			// AudioComponent를 생성하고 루프 설정
+			MaskAudioComp = UGameplayStatics::SpawnSound2D(GetWorld(), masksfx, 1.0f, 1.0f, 0.0f, nullptr, true);
+		}
+	}
+}
+
+void APeopleBase::ServerRPC_DetachMask_Implementation()
+{
+	NetmultiCastRPC_DetachMask();
+}
+
+
+void APeopleBase::NetmultiCastRPC_DetachMask_Implementation()
+{
+	HasMask = false;
+	// 분리하자
+	if (MaskActor)
+	{
+		MaskActor->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
+		MaskActor->SetActorRotation(MaskActorRotation);
+		MaskActor->ToggleMask(false);
+	}
+	if (IsLocallyControlled())
+	{
+		// mask ui 끄기
+		mainui->ShowMaskUI(false);
+		// 마스크 sound 끄기
+		if (MaskAudioComp && MaskAudioComp->IsPlaying())
+		{
+			MaskAudioComp->Stop();
+		}
+	}
+	// mask actor 다시 null 처리
+	MaskActor = nullptr;
 }
 
 
@@ -489,7 +565,6 @@ void APeopleBase::OnCapsuleBeginOverlap(UPrimitiveComponent* OverlappedComp,
 		{
 			mainui->RemoveFromParent(); 
 		}
-
 
 		// 5초뒤에 콜리젼 다시 켜기
 		FTimerHandle colhandle;
