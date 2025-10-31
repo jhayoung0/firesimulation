@@ -38,7 +38,6 @@ APeopleBase::APeopleBase()
 	compActorMask = CreateDefaultSubobject<USceneComponent>(TEXT("InteractingMask"));
 	compActorMask ->SetupAttachment(GetMesh(), TEXT("headsocket"));
 	
-	
 	compActorTowel = CreateDefaultSubobject<USceneComponent>(TEXT("InteractingTowel"));
 	compActorTowel ->SetupAttachment(GetMesh(), TEXT("headsocket2"));
 
@@ -48,6 +47,13 @@ APeopleBase::APeopleBase()
 	compActorPeople ->SetupAttachment(GetMesh(), TEXT("SpineSocket"));
 	compActorPeople_first ->SetupAttachment(GetFirstPersonMesh(), TEXT("SpineSocket_first"));
 
+	compActorJinsang = CreateDefaultSubobject<USceneComponent>(TEXT("InteractingJinsang"));
+	compActorJinsang ->SetupAttachment(GetMesh(), TEXT("JinsangSocket"));
+
+	compActorJinsang_first = CreateDefaultSubobject<USceneComponent>(TEXT("InteractingJinsang_first"));
+	compActorJinsang_first ->SetupAttachment(GetFirstPersonMesh(), TEXT("JinsangSocket_First"));
+	
+	
 	// 캡슐 hit	
 	UCapsuleComponent* Cap = GetCapsuleComponent();
 	Cap->SetGenerateOverlapEvents(true);
@@ -514,9 +520,6 @@ void APeopleBase::NetmultiCastRPC_AttachMask_Implementation()
 		}
 	}
 
-	
-
-	
 	// 못찾으면 리턴
 	if (!MaskActor) {UE_LOG(LogTemp, Warning, TEXT("maskactor없음")); return;}
 
@@ -639,14 +642,7 @@ void APeopleBase::OnCapsuleBeginOverlap(UPrimitiveComponent* OverlappedComp,
 				// 서브미션 순서대로 해라!
 				mainui->SubMissionWarning();
 			}
-			
 		}
-
-
-
-
-		
-
 	}
 }
 
@@ -662,7 +658,31 @@ void APeopleBase::OutOfOxygen()
 	}
 }
 
+
 void APeopleBase::ServerRPC_OutOfOxygen_Implementation()
 {
 	OutOfOxygen();
+}
+
+
+
+// NPC 상호작용
+void APeopleBase::AttachJinsang()
+{
+	// 진상 찾을래
+	jinsang = Cast<AJinsang>(UGameplayStatics::GetActorOfClass(GetWorld(), AJinsang::StaticClass()));
+	// 진상 붙일래
+	jinsang->AttachToComponent(compActorJinsang, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+	// 진상 붙일래 (1인칭)
+	jinsang->AttachToComponent(compActorJinsang_first, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+}
+
+void APeopleBase::ServerRPC_AttachJinsang_Implementation()
+{
+	MultiCastRPC_AttachJinsang();
+}
+
+void APeopleBase::MultiCastRPC_AttachJinsang_Implementation()
+{
+	AttachJinsang();
 }

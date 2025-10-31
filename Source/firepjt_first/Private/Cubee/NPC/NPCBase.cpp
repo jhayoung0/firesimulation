@@ -100,6 +100,7 @@ void ANPCBase::EndDialogue()
 	IsTalking = false;
 	
 	NPCWidget->RemoveFromParent();
+	
 }
 
 
