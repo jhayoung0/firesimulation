@@ -3,6 +3,7 @@
 
 #include "Cubee/NPC/NPCWidget.h"
 
+#include "firepjt_firstPlayerController.h"
 #include "Components/Button.h"
 #include "Components/TextBlock.h"
 #include "Cubee/NPC/NPCBase.h"
@@ -24,23 +25,44 @@ void UNPCWidget::NativeConstruct()
 	}
 }
 
+void UNPCWidget::NativeDestruct()
+{
+	Super::NativeDestruct();
+
+	APlayerController* PC = GetWorld()->GetFirstPlayerController();
+	if (PC)
+	{
+		PC->SetShowMouseCursor(false);
+		PC->SetInputMode(FInputModeGameOnly());
+	}
+}
+
 void UNPCWidget::OnNextClicked()
 {
+	Afirepjt_firstPlayerController* PC = Cast<Afirepjt_firstPlayerController>(GetWorld()->GetFirstPlayerController());
+	if (PC && OwningNPC)
+	{
+		FDialogueEntry* CurrentDialogue = OwningNPC->GetDialogueByID(OwningNPC->GetCurrentDialogueID());
+		if (CurrentDialogue)
+		{
+			PC->Server_ProgressDialogue(CurrentDialogue->NextDialogueID);
+		}
+	}
+	
+	/*
 	if (OwningNPC)
 	{
 		FDialogueEntry* CurrentDialogue = OwningNPC->GetDialogueByID(OwningNPC->GetCurrentDialogueID());
 		if (CurrentDialogue)
 		{
 			OwningNPC->ProgressDialogue(CurrentDialogue->NextDialogueID);
-			UE_LOG(LogTemp, Warning, TEXT("Button pressed"));
 		}
 	}
-}
+	*/
+}	
 
 void UNPCWidget::SetDialogueText(int32 Index)
 {
-	UE_LOG(LogTemp, Display, TEXT("SetDialogueText"));
-	
 	if (OwningNPC)
 	{
 		FDialogueEntry* Dialogue = OwningNPC->GetDialogueByID(Index);

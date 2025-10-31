@@ -13,6 +13,8 @@ ANPCBase::ANPCBase()
 	PrimaryActorTick.bCanEverTick = true;
 
 	CurrentDialogueID = -1;
+
+	SetReplicates(true);
 }
 
 // Called when the game starts or when spawned
@@ -34,8 +36,9 @@ void ANPCBase::StartDialogue()
 	if (!DialogueTable) return;
 
 	CurrentDialogueID = 0;
+	IsTalking = true;
 
-	// 서버, 클라 양쪽에 어떻게 띄우는지는 스킵 버튼 추적할 것 (아마 RPC썼을 거 같긴 한데)
+	// 위젯 띄우기
 	if (NPCWidgetClass)
 	{
 		NPCWidget = CreateWidget<UNPCWidget>(GetWorld(), NPCWidgetClass);
@@ -47,6 +50,11 @@ void ANPCBase::StartDialogue()
 			NPCWidget->SetDialogueText(0);
 		}
 	}
+}
+
+void ANPCBase::Multicast_StartDialogue_Implementation()
+{
+	StartDialogue();
 }
 
 FDialogueEntry* ANPCBase::GetDialogueByID(int32 DialogueID)
@@ -69,16 +77,29 @@ void ANPCBase::ProgressDialogue(int32 NextID)
 	}
 
 	CurrentDialogueID = NextID;
-
+	
 	NPCWidget->SetDialogueText(CurrentDialogueID);
+
+	// 애님 몽타주 실행
+	FDialogueEntry* CurrentDialogue = GetDialogueByID(CurrentDialogueID);
+	if (CurrentDialogue && CurrentDialogue->DialogueAnimation)
+	{
+		GetMesh()->GetAnimInstance()->StopAllMontages(0.1f);
+		PlayAnimMontage(CurrentDialogue->DialogueAnimation);
+	}
+}
+
+void ANPCBase::Multicast_ProgressDialogue_Implementation(int32 NextID)
+{
+	ProgressDialogue(NextID);
 }
 
 void ANPCBase::EndDialogue()
 {
 	CurrentDialogueID = -1;
-	NPCWidget->RemoveFromParent();
+	IsTalking = false;
 	
-	UE_LOG(LogTemp, Log, TEXT("Dialogue Ended"));
+	NPCWidget->RemoveFromParent();
 }
 
 

@@ -16,6 +16,7 @@ class FIREPJT_FIRST_API UNPCWidget : public UUserWidget
 
 protected:
 	virtual void NativeConstruct() override;
+	virtual void NativeDestruct() override;
 
 public:
 	UPROPERTY(meta = (BindWidget))

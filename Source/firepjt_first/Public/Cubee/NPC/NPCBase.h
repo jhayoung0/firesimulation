@@ -24,6 +24,9 @@ struct FDialogueEntry : public FTableRowBase
 	// 다음 대화 ID (-1 : 대화 종료)
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int32 NextDialogueID = -1;
+	// 애님 몽타주
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UAnimMontage* DialogueAnimation = nullptr;
 };
 
 UCLASS()
@@ -64,14 +67,25 @@ public:
 	FORCEINLINE int32 GetCurrentDialogueID() {return CurrentDialogueID;}
 
 public:
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Dialogue)
+	bool IsTalking = false;
+	
 	// 대화 시작
 	UFUNCTION(BlueprintCallable, Category = Dialogue)
 	void StartDialogue();
+
+	UFUNCTION(NetMulticast, Reliable)
+	void Multicast_StartDialogue();
+	
 	// 데이터 테이블에서 특정 ID 데이터 가져오기
 	FDialogueEntry* GetDialogueByID(int32 DialogueID);
 	// 다음 대화로 진행
 	UFUNCTION(BlueprintCallable, Category = Dialogue)
 	void ProgressDialogue(int32 NextID);
+
+	UFUNCTION(BlueprintCallable, NetMulticast, Reliable)
+	void Multicast_ProgressDialogue(int32 NextID);
+	
 	// 대화 종료
 	UFUNCTION(BlueprintCallable, Category = Dialogue)
 	void EndDialogue();

@@ -17,6 +17,7 @@
 #include "Components/BoxComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/SceneComponent.h"
+#include "Cubee/NPC/NPCBase.h"
 #include "EnhancedInput/Public/InputMappingContext.h"
 #include "Kismet/GameplayStatics.h"
 #include "Net/UnrealNetwork.h"
@@ -578,7 +579,22 @@ void AFireMan::OnCapsuleBeginOverlap(UPrimitiveComponent* OverlappedComp, AActor
 	if (!OtherActor || !OtherComp) return;
 	
 	const FName Profile = OtherComp->GetCollisionProfileName();
-	if (Profile != SafeZoneCollisionProfileName) return;
+	if (Profile == SafeZoneCollisionProfileName)
+	{
+		OnMissionComplete();
+	}
 
-	OnMissionComplete();
+	ANPCBase* NPC = Cast<ANPCBase>(OtherActor);
+	if (NPC && !IsDetected)
+	{
+		IsDetected = true;
+
+		FTimerHandle TimerHandle;
+		GetWorldTimerManager().SetTimer(TimerHandle, FTimerDelegate::CreateLambda([this]
+		{
+			IsDetected = false;
+			
+		}), 3.f, false);
+	}
 }
+
