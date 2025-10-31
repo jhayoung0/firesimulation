@@ -112,9 +112,39 @@ void AInteractActor::ToggleWidget(bool check)
 {
 	if (check)
 	{
+		IsInteracting = false;
 		// detach 되었을 때
 		InteractUI->SetVisibility(ESlateVisibility::Visible);
-		if (meshComp)
+
+		// people
+		if (ActorHasTag(FName("People")))
+		{
+			meshComp->SetRenderCustomDepth(true);
+			boxComp->SetSimulatePhysics(true);
+			
+			// abp 사용
+			meshComp->SetAnimationMode(EAnimationMode::Type::AnimationBlueprint);
+			UAnimInstance* AnimInstance = meshComp->GetAnimInstance();
+			if (AnimInstance)
+			{
+				UE_LOG(LogTemp, Warning, TEXT("people anim instance")); 
+				AnimInstance->Montage_Play(People_CarryEnd_Montage, 1.0f);
+			}
+			
+			
+
+			FTimerHandle handle;
+			GetWorld()->GetTimerManager().SetTimer(handle, [&]()
+			{
+				// AnimBP를 거치지 않고 단일 애니메이션 모드로 전환
+				meshComp->SetAnimationMode(EAnimationMode::Type::AnimationSingleNode);
+				// 루프 재생
+				meshComp->PlayAnimation(InteractAnim_Detach, true);
+				//meshComp->SetRenderCustomDepth(true);
+				//boxComp->SetSimulatePhysics(true);
+			} ,3, false);
+		}
+		else if (meshComp)
 		{
 			// AnimBP를 거치지 않고 단일 애니메이션 모드로 전환
 			meshComp->SetAnimationMode(EAnimationMode::AnimationSingleNode);
@@ -123,10 +153,13 @@ void AInteractActor::ToggleWidget(bool check)
 			meshComp->SetRenderCustomDepth(true);
 			boxComp->SetSimulatePhysics(true);
 		}
+
+		
 	}
 	else
 	{
 		// attach 되었을 때
+		IsInteracting = true;
 		InteractUI->SetVisibility(ESlateVisibility::Hidden);
 		if (meshComp)
 		{
