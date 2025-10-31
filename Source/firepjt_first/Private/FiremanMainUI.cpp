@@ -44,6 +44,10 @@ void UFiremanMainUI::NativeOnInitialized()
 	{
 		fireActor->OnDestroyed.AddDynamic(this, &UFiremanMainUI::UpdateFireCurrentNum);
 	}
+
+	// Set Alert Text
+	TextAlert->SetText(FText::FromString(TEXT("서브 미션을 완료하고\n 다시 시도하세요.")));
+	TextAlert->SetVisibility(ESlateVisibility::Hidden);
 }
 
 void UFiremanMainUI::AddInfoUI(int32 idx)
@@ -101,6 +105,16 @@ void UFiremanMainUI::SuccessSubMission()
 	}, 0.5f, false);
 }
 
+void UFiremanMainUI::ShowAlert()
+{
+	TextAlert->SetVisibility(ESlateVisibility::Visible);
+	FTimerHandle TimerHandle;
+	GetWorld()->GetTimerManager().SetTimer(TimerHandle, [&]()
+	{
+		TextAlert->SetVisibility(ESlateVisibility::Hidden);
+	}, 1.f, false);
+}
+
 void UFiremanMainUI::ShowFireOffSubMission()
 {
 	OverlaySubMission->SetVisibility(ESlateVisibility::Visible);
@@ -125,8 +139,6 @@ void UFiremanMainUI::ShowMaskOutSubMission()
 {
 	TextSubMission->SetText(FText::FromString(TEXT("산소 마스크 지급")));
 	TextContent->SetText(FText::FromString(TEXT("요구조자에게 가까이 다가가\nR키 누르기")));
-
-	
 }
 
 void UFiremanMainUI::ShowForceOpenDoorSubMission()

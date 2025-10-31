@@ -430,6 +430,17 @@ void AASequencePlayer::Multicast_SetActorsHidden_Implementation(bool bHiddenActo
 			A->SetActorHiddenInGame(bHiddenActor);
 		}
 	}
+
+	// 마스크 숨기기
+	{
+		TArray<AActor*> Found;
+		UGameplayStatics::GetAllActorsOfClass(World, AMask::StaticClass(), Found);
+		for (AActor* A : Found)
+		{
+			A->SetActorHiddenInGame(bHiddenActor);
+		}
+	}
+	
 }
 
 void AASequencePlayer::Client_ApplyCinematicMode_Implementation(bool bEnable)

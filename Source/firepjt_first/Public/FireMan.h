@@ -28,7 +28,7 @@ public:
 
 	// Components
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TObjectPtr<class UBoxComponent> BoxCollision;
+	TObjectPtr<class USpringArmComponent> FiremanSpringArm;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TObjectPtr<class UCameraComponent> FiremanCamera;
@@ -69,7 +69,7 @@ public:
 
 	// Mask
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	TSubclassOf<class AInteractActor> MaskActor;
+	TSubclassOf<class AMask> MaskActor;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float MaskSpawnDist = 100.f;
@@ -156,17 +156,21 @@ private:
 	void OnFireHoseShot();
 	UFUNCTION(Server, Reliable)
 	void ServerRPC_OnFireHoseShot();
-	
+
+	// Use Tool
 	void OnUseTool();
+	// Mask Out
 	void OnMaskOut();
 	UFUNCTION(Server, Reliable)
 	void ServerRPC_OnMaskOut();
 	UFUNCTION(NetMulticast, Reliable)
 	void Multicast_OnMaskOut();
+	// Open Door
 	UFUNCTION(Server, Reliable)
 	void ServerRPC_OpenDoor();
 	UFUNCTION(NetMulticast, Reliable)
 	void Multicast_OpenDoor();
+	// Carry Person
 	UFUNCTION(Server, Reliable)
 	void ServerRPC_CarryPerson();
 	UFUNCTION(NetMulticast, Reliable)

@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
+#include "UObject/ObjectMacros.h"
 #include "FiremanMainUI.generated.h"
 
 UENUM()
@@ -31,6 +32,12 @@ public:
 	void ShowSubMissionUI(ESubMissions subMission);
 	UFUNCTION()
 	void SuccessSubMission();
+	int32 GetCurSubMissionNum() { return CurrentSubMission; }
+	int32 GetMaxSubMissionNum() { return MaxSubMission; }
+
+	// Text Alert
+	UFUNCTION()
+	void ShowAlert();
 	
 protected:
 	// Info UI
@@ -54,8 +61,12 @@ protected:
 	UPROPERTY(EditAnywhere, meta=(MultiLine="true"))
 	TObjectPtr<class UTextBlock> TextContent;
 
+	UPROPERTY(EditAnywhere, meta=(MultiLine="true"))
+	TObjectPtr<class UTextBlock> TextAlert;
+
 	// SubMission Variable
 	int32 CurrentSubMission = 0;
+	int32 MaxSubMission = 3;
 	
 	// fire off submission
 	UPROPERTY()

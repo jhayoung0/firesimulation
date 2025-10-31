@@ -5,6 +5,8 @@
 
 #include "InteractWidget.h"
 #include "InteractWidgetComp.h"
+#include "MainUI.h"
+#include "PeopleBase.h"
 #include "Animation/AnimInstance.h"
 #include "Components/BoxComponent.h"
 #include "Components/SkeletalMeshComponent.h"
@@ -18,8 +20,6 @@ AInteractActor::AInteractActor()
 {
 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-
-
 	
 	boxComp= CreateDefaultSubobject<UBoxComponent>(TEXT("boxComp"));
 	SetRootComponent(boxComp);
@@ -63,6 +63,10 @@ void AInteractActor::BeginPlay()
 		}
 	}
 
+	// 콜리젼 이벤트 바인딩
+	boxComp->OnComponentBeginOverlap.AddDynamic(this, &AInteractActor::OnBoxBeginOverlap);
+	
+
 }
 
 
@@ -82,10 +86,27 @@ void AInteractActor::GetLifetimeReplicatedProps(
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	// Replicate 할 변수 등록
-	//DOREPLIFETIME(AInteractActor, IsInteracting);
+	// DOREPLIFETIME(AInteractActor, IsInteracting);
 }
 
 
+void AInteractActor::OnBoxBeginOverlap(UPrimitiveComponent* OverlappedComp,
+	AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex,
+	bool bFromSweep, const FHitResult& SweepResult)
+{
+	if (!ActorHasTag(FName("People"))) {return;}
+	if (!OtherActor || !OtherComp) return;
+	if (!OtherActor->ActorHasTag(FName("ThreeSubMission"))) return;
+
+	APeopleBase* player = Cast<APeopleBase>(GetWorld()->GetFirstPlayerController()->GetPawn());
+
+	// 다음 미션으로 넘기기
+	if (player && player->mainui->CurrentSubMission == 3)
+	{
+		player->mainui->SuccessSubMission();
+	}
+
+}
 
 void AInteractActor::ToggleWidget(bool check)
 {
@@ -116,12 +137,10 @@ void AInteractActor::ToggleWidget(bool check)
 			meshComp->SetRenderCustomDepth(false);
 			boxComp->SetSimulatePhysics(false);
 		}
-		
-		
 	}
-	
-	
 }
+
+
 
 void AInteractActor::BillboardInteractKey()
 {

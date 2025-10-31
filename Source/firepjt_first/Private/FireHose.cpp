@@ -7,7 +7,12 @@
 #include "NiagaraComponent.h"
 #include "NiagaraSystem.h"
 #include "Components/SkeletalMeshComponent.h"
+#include "CableComponent.h"
+#include "Kismet/GameplayStatics.h"
 #include "Net/UnrealNetwork.h"
+#include "FireTruckFireHose.h"
+#include "MetasoundSource.h"
+#include "Components/AudioComponent.h"
 
 #define FirehoseWater ECC_GameTraceChannel3
 
@@ -31,7 +36,7 @@ AFireHose::AFireHose()
 	}
 
 	// Niagara Component
-	NiagaraParticleSystemComp = CreateDefaultSubobject<UNiagaraComponent>("ParticleSystemComponent");
+	NiagaraParticleSystemComp = CreateDefaultSubobject<UNiagaraComponent>(TEXT("NiagaraParticleSystemComp"));
 	ConstructorHelpers::FObjectFinder<UNiagaraSystem> niagaraCompRef(TEXT("/Script/Niagara.NiagaraSystem'/Game/CustomContents/Fireman/Water/NS_Water.NS_Water'"));
 	if (niagaraCompRef.Succeeded())
 	{
@@ -41,6 +46,34 @@ AFireHose::AFireHose()
 		NiagaraParticleSystemComp->SetRelativeRotation(FRotator(-90, 0, 0));
 		NiagaraParticleSystemComp->SetAutoActivate(false);
 	}
+
+	// Cable Component
+	HoseComp = CreateDefaultSubobject<UCableComponent>(TEXT("HoseComp"));
+	ConstructorHelpers::FObjectFinder<UMaterialInterface> hoseMaterialRef(TEXT("/Script/Engine.Material'/Game/CustomContents/House/Assets/Apartments/vray_low_wall_white.vray_low_wall_white'"));
+	if (hoseMaterialRef.Succeeded())
+	{
+		HoseComp->SetMaterial(0, hoseMaterialRef.Object);
+	}
+	HoseComp->SetupAttachment(FirehoseComp, FName(TEXT("HoseSocket")));
+	HoseComp->CableLength = 1000.f;
+	HoseComp->bEnableCollision = true;
+	HoseComp->EndLocation = FVector(0, 0, 0);
+	HoseComp->CableLength = 2200.f;
+	HoseComp->NumSegments = 44;
+
+	ConstructorHelpers::FClassFinder<AFireTruckFireHose> fireTruckFireHoseRef(TEXT("/Game/CustomContents/Fireman/FireTruck/BP_FirehoseInTruck.BP_FirehoseInTruck_C"));
+	if (fireTruckFireHoseRef.Succeeded())
+	{
+		FireTruckFireHoseClass = fireTruckFireHoseRef.Class;
+	}
+
+	FireHoseSound = CreateDefaultSubobject<UAudioComponent>(TEXT("FireHoseSound"));
+	ConstructorHelpers::FObjectFinder<UMetaSoundSource> fireHoseSoundRef(TEXT("/Script/MetasoundEngine.MetaSoundSource'/Game/CustomContents/Fireman/Water/MSS_FireHose.MSS_FireHose'"));
+	if (fireHoseSoundRef.Succeeded())
+	{
+		FireHoseSound->SetSound(fireHoseSoundRef.Object);
+		FireHoseSound->SetAutoActivate(false);
+	}
 }
 
 void AFireHose::BeginPlay()
@@ -48,6 +81,8 @@ void AFireHose::BeginPlay()
 	Super::BeginPlay();
 
 	NiagaraParticleSystemComp->SetActorParameter(FName("UserCallbackHandler"), this);
+	AActor* fireTruckFireHose = UGameplayStatics::GetActorOfClass(GetWorld(), FireTruckFireHoseClass);
+	HoseComp->SetAttachEndTo(fireTruckFireHose, FName(TEXT("FireHoseComp")),FName(TEXT("HoseSocket")));
 }
 
 void AFireHose::Tick(float DeltaTime)
@@ -70,11 +105,13 @@ void AFireHose::OnWaterShot_Implementation()
 	if (bDoesWaterShotNow)
 	{
 		NiagaraParticleSystemComp->Deactivate();
+		FireHoseSound->Stop();
 		bDoesWaterShotNow = false;
 	}
 	else
 	{
 		NiagaraParticleSystemComp->Activate(true);
+		FireHoseSound->Play();
 		bDoesWaterShotNow = true;
 	}
 }

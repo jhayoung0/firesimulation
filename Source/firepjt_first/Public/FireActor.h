@@ -32,11 +32,8 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TObjectPtr<class UNiagaraComponent> FireComp;
 
-	// UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	// TObjectPtr<class UPointLightComponent> FireLight;
-
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TObjectPtr<class UInteractWidgetComp> InteractWidgetComp;
+	TObjectPtr<class UWidgetComponent> FireWidgetComp;
 	
 	void PutOutFire();
 

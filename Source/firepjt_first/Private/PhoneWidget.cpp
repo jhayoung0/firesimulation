@@ -122,8 +122,19 @@ void UPhoneWidget::TryCall()
 		// 델리게이트 브로드캐스트 (시네마틱 재생)
 		//OnRequestPlayCinematic.Broadcast();
 
-		// 다음 미션으로 넘기기
-		peoplebase->GoNextMission();
+		// 서브미션 안넘겼으면 미션 안넘어감
+		if (peoplebase->mainui->CurrentSubMission == 2)
+		{
+			// 다음 미션으로 넘기기
+			peoplebase->GoNextMission();
+			// 다음 서브미션으로 넘기기
+			peoplebase->mainui->SuccessSubMission();
+		}
+		else if (peoplebase->mainui->CurrentSubMission < 2)
+		{
+			peoplebase->mainui->SubMissionWarning();
+		}
+
 	}
 	else
 	{
