@@ -10,7 +10,7 @@
 UENUM()
 enum class ESubMissions : uint8
 {
-	FireOff = 0, MaskOut, ForceOpenDoor
+	FireOff = 0, MaskOut, Evacuation, ForceOpenDoor
 };
 
 UCLASS()
@@ -66,7 +66,7 @@ protected:
 
 	// SubMission Variable
 	int32 CurrentSubMission = 0;
-	int32 MaxSubMission = 3;
+	int32 MaxSubMission = 4;
 	
 	// fire off submission
 	UPROPERTY()
@@ -81,6 +81,10 @@ protected:
 	// mask out submission
 	UFUNCTION()
 	void ShowMaskOutSubMission();
+
+	// evacuation submission
+	UFUNCTION()
+	void ShowEvacuationSubMission();
 
 	// force open door submission
 	UFUNCTION()

@@ -15,10 +15,15 @@ public:
 	// Sets default values for this actor's properties
 	AFireTruckFireHose();
 
+	void HideInteractWidget();
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<class USkeletalMeshComponent> FireHoseComp;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TObjectPtr<class UInteractWidgetComp> InteractWidgetComp;
 };

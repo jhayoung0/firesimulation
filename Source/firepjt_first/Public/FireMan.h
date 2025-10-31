@@ -88,6 +88,8 @@ private:
 	// Animation Blueprint
 	UPROPERTY()
 	TObjectPtr<class UFiremanAnim> FiremanAnimInstance;
+	UPROPERTY()
+	TObjectPtr<class UAnimMontage> DoorOpenAnimMontage;
 	
 	// Inputs
 	UPROPERTY(VisibleAnywhere)

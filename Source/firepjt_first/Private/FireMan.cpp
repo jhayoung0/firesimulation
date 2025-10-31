@@ -11,6 +11,7 @@
 #include "FireTruckCrowbar.h"
 #include "FireTruckFireHose.h"
 #include "InteractActor.h"
+#include "InteractWidgetComp.h"
 #include "MainUI.h"
 #include "PeopleBase.h"
 #include "Camera/CameraComponent.h"
@@ -84,6 +85,11 @@ AFireMan::AFireMan()
 	if (animInstanceRef.Succeeded())
 	{
 		GetMesh()->SetAnimInstanceClass(animInstanceRef.Class);
+	}
+	ConstructorHelpers::FObjectFinder<UAnimMontage> doorOpenAnimMontageRef(TEXT("/Script/Engine.AnimMontage'/Game/CustomContents/Fireman/Blueprints/Animations/AM_Fireman_Crowbar_Door_Break.AM_Fireman_Crowbar_Door_Break'"));
+	if (doorOpenAnimMontageRef.Succeeded())
+	{
+		DoorOpenAnimMontage = doorOpenAnimMontageRef.Object;
 	}
 
 	// Inputs
@@ -292,6 +298,7 @@ void AFireMan::ServerRPC_OnGetFireHose_Implementation()
 		{
 			bCanUseFireHose = true;
 			OnChangeCanUseTool();
+			FireTruckFireHoseActor->HideInteractWidget();
 			ClientRPC_OnGetFireHose();
 			Multicast_OnEquipFireHose();
 		}
@@ -434,12 +441,12 @@ void AFireMan::OnUseTool()
 	if (bDoesEquipCrowbar)
 	{
 		// Check SubMission Index
-		if (FireManMainUIWidget->GetCurSubMissionNum() < 2)
-		{
-			// Print Alert Text
-			FireManMainUIWidget->ShowAlert();
-			return;
-		}
+		// if (FireManMainUIWidget->GetCurSubMissionNum() < 2)
+		// {
+		// 	// Print Alert Text
+		// 	FireManMainUIWidget->ShowAlert();
+		// 	return;
+		// }
 		// force open the door
 		ServerRPC_OpenDoor();
 	}
@@ -509,7 +516,8 @@ void AFireMan::Multicast_OpenDoor_Implementation()
 	if (dist <= InteractDist)
 	{
 		DoorActor->ToggleWidget(false);
-		DoorActor->ToggleDoor();
+		// start anim montage
+		PlayAnimMontage(DoorOpenAnimMontage);
 
 		if (IsLocallyControlled())
 		{
@@ -604,16 +612,28 @@ void AFireMan::Multicast_OnMissionComplete_Implementation()
 void AFireMan::OnCapsuleBeginOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	if (!OtherActor || !OtherComp) return;
+	
+	// Detect Roof Door
+	if (OtherActor->GetName().Contains(FString(TEXT("BP_DoorCollision"))))
+	{
+		if (IsLocallyControlled() && FireManMainUIWidget->GetCurSubMissionNum() == 2)
+		{
+			FireManMainUIWidget->SuccessSubMission();
+		}
+	}
+
+	// Detect SafeZone Collision
 	if (OtherActor->ActorHasTag(FName("MainLastMission")))
 	{
 		const FName Profile = OtherComp->GetCollisionProfileName();
 		if (Profile == SafeZoneCollisionProfileName)
 		{
 			OnMissionComplete();
+			return;
 		}
 	}
 
-	// NPC 감지
+	// Detect NPC
 	ANPCBase* NPC = Cast<ANPCBase>(OtherActor);
 	if (NPC && !IsDetected)
 	{

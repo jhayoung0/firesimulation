@@ -17,6 +17,9 @@ class FIREPJT_FIRST_API UFiremanAnim : public UAnimInstance
 protected:
 	virtual void NativeInitializeAnimation() override;
 	virtual void NativeUpdateAnimation(float DeltaSeconds) override;
+
+	UFUNCTION()
+	void AnimNotify_DoorBreak();
 	
 	UPROPERTY()
 	TObjectPtr<class AFireMan> pawnOwner;

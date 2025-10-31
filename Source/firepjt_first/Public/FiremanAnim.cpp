@@ -3,6 +3,7 @@
 
 #include "FiremanAnim.h"
 #include "Fireman.h"
+#include "InteractActor.h"
 
 
 void UFiremanAnim::NativeInitializeAnimation()
@@ -34,4 +35,10 @@ void UFiremanAnim::NativeUpdateAnimation(float DeltaSeconds)
 
 	// Mask
 	bHasMask = pawnOwner->GetBHasMask();
+}
+
+void UFiremanAnim::AnimNotify_DoorBreak()
+{
+	if (!pawnOwner->DoorActor) return;
+	pawnOwner->DoorActor->ToggleDoor();
 }
