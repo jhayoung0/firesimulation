@@ -132,8 +132,8 @@ void UMainUI::ShowFourSubMission()
 
 void UMainUI::ShowFiveSubMission()
 {
-	TextSubMission->SetText(FText::FromString(TEXT("마스크 착용")));
-	TextContent->SetText(FText::FromString(TEXT("마스크를 건네받고\n착용하기")));	
+	TextSubMission->SetText(FText::FromString(TEXT("구조대 만나기")));
+	TextContent->SetText(FText::FromString(TEXT("구조대를 만나, 마스크\n건네받기")));	
 }
 
 void UMainUI::ShowSixSubMission()
