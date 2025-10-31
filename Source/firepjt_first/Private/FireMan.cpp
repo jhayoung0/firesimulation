@@ -456,6 +456,11 @@ void AFireMan::CheckMaskToPerson(bool bPersonHasMask)
 	bHasMask = !bPersonHasMask;
 }
 
+bool AFireMan::GetBHasMask()
+{
+	return bHasMask;
+}
+
 void AFireMan::OnMaskOut()
 {
 	// Check SubMission Index
@@ -484,6 +489,8 @@ void AFireMan::Multicast_OnMaskOut_Implementation()
 		{
 			AMask* mask = GetWorld()->SpawnActor<AMask>(MaskActor);
 			mask->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, TEXT("cc_weaponbone_r"));
+			mask->SetActorRelativeLocation(FVector(-1.37327,-13.538136,1.072029));
+			mask->SetActorRelativeRotation(FRotator(-66.178278,3.105074,90.862256));
 			bHasMask = true;
 			OnMissionComplete();
 		}

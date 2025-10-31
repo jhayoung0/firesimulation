@@ -31,4 +31,7 @@ void UFiremanAnim::NativeUpdateAnimation(float DeltaSeconds)
 	bDoesEquipCrowbar = pawnOwner->bDoesEquipCrowbar;
 	bDoesCarryingPerson = pawnOwner->bDoesCarryingPerson;
 	Rotation_Spine02 = pawnOwner->GetRotationSpine02();
+
+	// Mask
+	bHasMask = pawnOwner->GetBHasMask();
 }

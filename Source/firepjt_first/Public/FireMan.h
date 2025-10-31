@@ -82,6 +82,7 @@ public:
 	float GetRotationSpine02();
 	UFUNCTION()
 	void CheckMaskToPerson(bool bPersonHasMask);
+	bool GetBHasMask();
 	
 private:
 	// Animation Blueprint

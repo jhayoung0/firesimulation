@@ -42,4 +42,8 @@ protected:
 	// Spine Rotation
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Spine)
 	float Rotation_Spine02;
+
+	// FireMan has Mask
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Mask)
+	bool bHasMask = false;
 };
