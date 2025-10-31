@@ -273,7 +273,7 @@ void APeopleBase::MultiCastRPC_DetachActor_Implementation(
 void APeopleBase::AttachActor()
 {
 	ActorRotation = InteractingActor->GetActorRotation();
-	ActorLocation = InteractingActor->GetActorLocation();
+
 
 	if (InteractingActor)
 	{
@@ -315,12 +315,12 @@ void APeopleBase::AttachActor()
 		}
 		else if (InteractingActor->ActorHasTag(FName("Phone")))
 		{
+			IsInteracting = true;
+			InteractingActor->ToggleWidget(false);
+			
 			// compActor에 붙이자.
 			InteractingActor->AttachToComponent(compActor, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
 			HasPhone = true;
-
-			IsInteracting = true;
-			InteractingActor->ToggleWidget(false);
 			
 			if (IsLocallyControlled())
 			{
@@ -387,7 +387,6 @@ void APeopleBase::AttachActor()
 void APeopleBase::DetachActor(AInteractActor* tempActor)
 {
 	IsInteracting = false;
-	//tempActor->IsInteracting = false;
 	InteractingActor->ToggleWidget(true);
 	
 	

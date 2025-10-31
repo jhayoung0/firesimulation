@@ -66,9 +66,7 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Interaction)
 	float CanInteractDist = 300.f;
-
 	
-
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Interaction)
 	USceneComponent* compActor = nullptr;
 
@@ -83,7 +81,10 @@ public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Interaction)
 	USceneComponent* compActorPeople_first = nullptr;
-		
+
+
+	
+
 public: // stat
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Stats)
 	float maxOxygen = 100.f;
