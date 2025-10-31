@@ -14,7 +14,6 @@
 #include "MainUI.h"
 #include "PeopleBase.h"
 #include "Camera/CameraComponent.h"
-#include "Components/BoxComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/SceneComponent.h"
 #include "Cubee/NPC/NPCBase.h"
@@ -81,7 +80,7 @@ AFireMan::AFireMan()
 	}
 	
 	// Aniimation Blueprint
-	ConstructorHelpers::FClassFinder<UAnimInstance> animInstanceRef(TEXT("/Game/CustomContents/Fireman/Blueprints/ABP_Fireman.ABP_Fireman_C"));
+	ConstructorHelpers::FClassFinder<UAnimInstance> animInstanceRef(TEXT("/Game/CustomContents/Fireman/Blueprints/ABP_Fireman_FirstPerson.ABP_Fireman_FirstPerson_C"));
 	if (animInstanceRef.Succeeded())
 	{
 		GetMesh()->SetAnimInstanceClass(animInstanceRef.Class);
