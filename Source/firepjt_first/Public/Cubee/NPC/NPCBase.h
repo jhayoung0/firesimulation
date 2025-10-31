@@ -88,7 +88,7 @@ public:
 	
 	// 대화 종료
 	UFUNCTION(BlueprintCallable, Category = Dialogue)
-	void EndDialogue();
+	virtual void EndDialogue();
 	// 대화 중인지 확인
 	UFUNCTION(BlueprintCallable, Category = Dialogue)
 	FORCEINLINE bool IsInDialogue() const {return CurrentDialogueID >= 0;}

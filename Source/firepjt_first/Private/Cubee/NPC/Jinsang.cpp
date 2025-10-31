@@ -3,3 +3,10 @@
 
 #include "Cubee/NPC/Jinsang.h"
 
+void AJinsang::EndDialogue()
+{
+	Super::EndDialogue();
+
+	IsOnceTalked = true;
+	
+}
