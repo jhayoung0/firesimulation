@@ -80,6 +80,8 @@ public:
 
 	// Get
 	float GetRotationSpine02();
+	UFUNCTION()
+	void CheckMaskToPerson(bool bPersonHasMask);
 	
 private:
 	// Animation Blueprint
@@ -160,6 +162,8 @@ private:
 	// Use Tool
 	void OnUseTool();
 	// Mask Out
+	UPROPERTY(Replicated)
+	bool bHasMask = false;
 	void OnMaskOut();
 	UFUNCTION(Server, Reliable)
 	void ServerRPC_OnMaskOut();

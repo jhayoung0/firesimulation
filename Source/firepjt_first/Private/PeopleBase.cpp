@@ -5,6 +5,7 @@
 
 #include "ASequencePlayer.h"
 #include "EnhancedInputComponent.h"
+#include "FireMan.h"
 #include "firepjt_firstPlayerController.h"
 #include "InteractActor.h"
 #include "Blueprint/UserWidget.h"
@@ -456,6 +457,7 @@ void APeopleBase::InteractWithMask()
 
 void APeopleBase::ServerRPC_AttachMask_Implementation()
 {
+	
 	// 모든 클라에서 마스크 붙이기 요청
 	NetmultiCastRPC_AttachMask();
 }
@@ -515,6 +517,15 @@ void APeopleBase::NetmultiCastRPC_AttachMask_Implementation()
 	// 찾았으면 시뮬레이터 꺼주고 붙이기
 	MaskActor->ToggleMask(true);
 	MaskActor->AttachToComponent(compActorMask, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+
+	// 소방관에게 hasMask 여부를 알려준다.
+	if (HasAuthority())
+	{
+		if (AFireMan* firemanActor = Cast<AFireMan>(UGameplayStatics::GetActorOfClass(GetWorld(), fireManFactory)))
+		{
+			firemanActor->CheckMaskToPerson(true);
+		}
+	}
 	
 	// mask ui 설정해주기
 	if (IsLocallyControlled())

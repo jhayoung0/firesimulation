@@ -450,6 +450,11 @@ void AFireMan::OnUseTool()
 	}
 }
 
+void AFireMan::CheckMaskToPerson(bool bPersonHasMask)
+{
+	bHasMask = !bPersonHasMask;
+}
+
 void AFireMan::OnMaskOut()
 {
 	// Check SubMission Index
@@ -476,8 +481,9 @@ void AFireMan::Multicast_OnMaskOut_Implementation()
 		float dist = FVector::Distance(GetActorLocation(), person->GetActorLocation());
 		if (dist <= InteractDist)
 		{
-			GetWorld()->SpawnActor<AInteractActor>(MaskActor, FTransform(GetActorLocation() + GetActorForwardVector() * MaskSpawnDist));
-			
+			AMask* mask = GetWorld()->SpawnActor<AMask>(MaskActor);
+			mask->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, TEXT("cc_weaponbone_r"));
+			bHasMask = true;
 			OnMissionComplete();
 		}
 	}

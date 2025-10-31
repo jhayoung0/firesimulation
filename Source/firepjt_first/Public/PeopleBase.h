@@ -210,7 +210,8 @@ public:
 	UFUNCTION(NetMulticast, Reliable)
 	void NetmultiCastRPC_DetachMask();
 	
-	
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<class AFireMan> fireManFactory; 
 	UPROPERTY(EditDefaultsOnly)
 	TArray<AActor*> MaskActors;
 	UPROPERTY(EditDefaultsOnly)
