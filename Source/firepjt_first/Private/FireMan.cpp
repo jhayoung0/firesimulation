@@ -592,16 +592,20 @@ void AFireMan::Multicast_OnMissionComplete_Implementation()
 void AFireMan::OnCapsuleBeginOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	if (!OtherActor || !OtherComp) return;
-	if (!OtherActor->ActorHasTag(FName("MainLastMission"))) return;
-	const FName Profile = OtherComp->GetCollisionProfileName();
-	if (Profile == SafeZoneCollisionProfileName)
+	if (OtherActor->ActorHasTag(FName("MainLastMission")))
 	{
-		OnMissionComplete();
+		const FName Profile = OtherComp->GetCollisionProfileName();
+		if (Profile == SafeZoneCollisionProfileName)
+		{
+			OnMissionComplete();
+		}
 	}
 
+	// NPC 감지
 	ANPCBase* NPC = Cast<ANPCBase>(OtherActor);
 	if (NPC && !IsDetected)
 	{
+		//UE_LOG(LogTemp, Display, TEXT("OnCapsuleBeginOverlap"));
 		IsDetected = true;
 
 		FTimerHandle TimerHandle;
