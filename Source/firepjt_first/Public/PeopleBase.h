@@ -8,6 +8,7 @@
 #include "Mask.h"
 #include "PhoneWidget.h"
 #include "Cubee/HousePlayerState.h"
+#include "Cubee/NPC/Jinsang.h"
 #include "PeopleBase.generated.h"
 
 class AASequencePlayer;
@@ -82,7 +83,11 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Interaction)
 	USceneComponent* compActorPeople_first = nullptr;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Interaction)
+	USceneComponent* compActorJinsang = nullptr;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Interaction)
+	USceneComponent* compActorJinsang_first = nullptr;
 	
 
 public: // stat
@@ -241,5 +246,19 @@ public:
 	
 	UFUNCTION(Server, Reliable)
 	void ServerRPC_OutOfOxygen();
+
+
+public: // 진상 붙이기 함수
+	UPROPERTY(EditDefaultsOnly)
+	AJinsang* jinsang;
+	
+	UFUNCTION(BlueprintCallable)
+	void AttachJinsang();
+
+	UFUNCTION(Server, Reliable)
+	void ServerRPC_AttachJinsang();
+
+	UFUNCTION(NetMulticast, Reliable)
+	void MultiCastRPC_AttachJinsang();
 	
 };
