@@ -13,5 +13,11 @@ UCLASS()
 class FIREPJT_FIRST_API AJinsang : public ANPCBase
 {
 	GENERATED_BODY()
+
+public:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	bool IsOnceTalked = false;
+	
+	virtual void EndDialogue() override;
 	
 };

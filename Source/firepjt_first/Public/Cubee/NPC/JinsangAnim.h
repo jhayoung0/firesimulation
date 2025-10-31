@@ -23,4 +23,7 @@ protected:
 public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	bool IsTalking;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	bool IsOnceTalked;
 };
