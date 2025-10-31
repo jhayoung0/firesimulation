@@ -671,11 +671,23 @@ void APeopleBase::AttachJinsang()
 {
 	// 진상 찾을래
 	jinsang = Cast<AJinsang>(UGameplayStatics::GetActorOfClass(GetWorld(), AJinsang::StaticClass()));
-	// 진상 붙일래
-	jinsang->AttachToComponent(compActorJinsang, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
-	// 진상 붙일래 (1인칭)
-	jinsang->AttachToComponent(compActorJinsang_first, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+	
+	if (IsLocallyControlled())
+	{
+		// 진상 붙일래 (1인칭)
+		jinsang->AttachToComponent(compActorJinsang_first, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+	}
+	else
+	{
+		// 남이 보는 시선
+		// 진상 붙일래
+		jinsang->AttachToComponent(compActorJinsang, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+	}
+	
 }
+
+	
+
 
 void APeopleBase::ServerRPC_AttachJinsang_Implementation()
 {
