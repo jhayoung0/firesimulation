@@ -119,7 +119,8 @@ public:
 	UFUNCTION(Server, Reliable)
 	void Server_PlayMissionThreeCinematic();
 
-public: // widget	
+public:
+	// widget	
 	UFUNCTION(BlueprintCallable)
 	void OpenPhoneUI();
 
@@ -131,4 +132,12 @@ public: // widget
 
 	UPROPERTY(Transient)
 	UPhoneWidget* phoneUI = nullptr;
+
+public:
+	// NPC Interaction
+	UFUNCTION(BlueprintCallable, Server, Reliable)
+	void Server_StartDialogue();
+
+	UFUNCTION(Server, Reliable)
+	void Server_ProgressDialogue(int32 NextID);
 };

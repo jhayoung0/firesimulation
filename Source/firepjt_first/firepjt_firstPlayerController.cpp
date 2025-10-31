@@ -17,6 +17,7 @@
 #include "Cubee/LobbyGameMode.h"
 #include "Cubee/LobbyWidget.h"
 #include "Cubee/VictoryWidget.h"
+#include "Cubee/NPC/Jinsang.h"
 #include "Kismet/GameplayStatics.h"
 #include "Widgets/Input/SVirtualJoystick.h"
 
@@ -329,6 +330,26 @@ void Afirepjt_firstPlayerController::ClosePhoneUI()
 
 	SetIgnoreLookInput(false);
 	SetIgnoreMoveInput(false);
+}
+
+void Afirepjt_firstPlayerController::Server_ProgressDialogue_Implementation(int32 NextID)
+{
+	auto* NPC = Cast<AJinsang>(UGameplayStatics::GetActorOfClass(GetWorld(),
+		AJinsang::StaticClass()));
+	if (NPC)
+	{
+		NPC->Multicast_ProgressDialogue(NextID);
+	}
+}
+
+void Afirepjt_firstPlayerController::Server_StartDialogue_Implementation()
+{
+	auto* NPC = Cast<AJinsang>(UGameplayStatics::GetActorOfClass(GetWorld(),
+		AJinsang::StaticClass()));
+	if (NPC)
+	{
+		NPC->Multicast_StartDialogue();
+	}
 }
 
 void Afirepjt_firstPlayerController::Server_CinematicSkip_Implementation()

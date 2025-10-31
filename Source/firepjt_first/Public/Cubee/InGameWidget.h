@@ -35,7 +35,7 @@ public:
 
 	UPROPERTY()
 	class AHouseGameState* HouseGameState;
-
+	
 	// Mission DataTable (역할별로 다름)
 	UPROPERTY(BlueprintReadWrite, Category = "Mission")
 	class UDataTable* MissionDataTable;
