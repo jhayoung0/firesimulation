@@ -59,11 +59,12 @@ void UInGameWidget::SetMissionTextFromIndex(int32 Index)
 		{
 			Txt_Mission->SetText(MissionRow->mission_head);
 		}
-
+		/*
 		if (Txt_Description)
 		{
 			Txt_Description->SetText(MissionRow->mission_description);
 		}
+		*/
 	}
 	else
 	{

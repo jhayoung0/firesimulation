@@ -330,6 +330,13 @@ void APeopleBase::AttachActor()
 
 				// 핸드폰 정보성 UI
 				mainui->AddInfoUI(0);
+
+				// 두번째 미션 이전에 하려고 하면 워닝 뜨게 하기
+				if (mainui->CurrentSubMission < 2)
+				{
+					mainui->SubMissionWarning();
+				}
+				
 			}
 		}
 		else if (InteractingActor->ActorHasTag(FName("People")))
@@ -623,6 +630,11 @@ void APeopleBase::OnCapsuleBeginOverlap(UPrimitiveComponent* OverlappedComp,
 			}
 			
 		}
+
+
+
+
+		
 
 	}
 }

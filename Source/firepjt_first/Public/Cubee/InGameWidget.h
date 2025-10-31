@@ -30,8 +30,10 @@ public:
 	UPROPERTY(meta = (BindWidget))
 	class UTextBlock* Txt_Mission;
 
+	/*
 	UPROPERTY(meta = (BindWidget))
 	class UTextBlock* Txt_Description;
+	*/
 
 	UPROPERTY()
 	class AHouseGameState* HouseGameState;
