@@ -4,6 +4,7 @@
 #include "Cubee/NPC/NPCBase.h"
 
 #include "Blueprint/UserWidget.h"
+#include "Components/Button.h"
 #include "Cubee/NPC/NPCWidget.h"
 
 // Sets default values
@@ -76,16 +77,33 @@ void ANPCBase::ProgressDialogue(int32 NextID)
 		return;
 	}
 
+	NPCWidget->Btn_Select1->SetVisibility(ESlateVisibility::Hidden);
+	NPCWidget->Btn_Select2->SetVisibility(ESlateVisibility::Hidden);
+	NPCWidget->Btn_Next->SetVisibility(ESlateVisibility::Visible);
+
 	CurrentDialogueID = NextID;
 	
 	NPCWidget->SetDialogueText(CurrentDialogueID);
-
-	// 애님 몽타주 실행
+	
 	FDialogueEntry* CurrentDialogue = GetDialogueByID(CurrentDialogueID);
-	if (CurrentDialogue && CurrentDialogue->DialogueAnimation)
+	if (CurrentDialogue)
 	{
-		GetMesh()->GetAnimInstance()->StopAllMontages(0.1f);
-		PlayAnimMontage(CurrentDialogue->DialogueAnimation);
+		// 애님 몽타주 실행
+		if (CurrentDialogue->DialogueAnimation)
+		{
+			GetMesh()->GetAnimInstance()->StopAllMontages(0.1f);
+			PlayAnimMontage(CurrentDialogue->DialogueAnimation);
+		}
+
+		// 선택지 생성
+		if (CurrentDialogue->PlayerChoices.Num() > 0)
+		{
+			NPCWidget->Btn_Select1->SetVisibility(ESlateVisibility::Visible);
+			NPCWidget->Btn_Select2->SetVisibility(ESlateVisibility::Visible);
+			NPCWidget->Btn_Next->SetVisibility(ESlateVisibility::Hidden);
+
+			NPCWidget->SetSelectionText(CurrentDialogueID);
+		}
 	}
 }
 

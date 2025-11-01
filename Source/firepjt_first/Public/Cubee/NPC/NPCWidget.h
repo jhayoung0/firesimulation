@@ -28,8 +28,26 @@ public:
 	UPROPERTY(meta = (BindWidget))
 	class UButton* Btn_Next;
 
+	UPROPERTY(meta = (BindWidget))
+	class UButton* Btn_Select1;
+
+	UPROPERTY(meta = (BindWidget))
+	class UTextBlock* Txt_Select1;
+
+	UPROPERTY(meta = (BindWidget))
+	class UButton* Btn_Select2;
+
+	UPROPERTY(meta = (BindWidget))
+	class UTextBlock* Txt_Select2;
+
 	UFUNCTION()
 	void OnNextClicked();
+
+	UFUNCTION()
+	void OnSelectOneClicked();
+	
+	UFUNCTION()
+	void OnSelectOTwoClicked();
 
 public:
 	// Dialogue
@@ -37,4 +55,5 @@ public:
 	class ANPCBase* OwningNPC;
 
 	void SetDialogueText(int32 Index);
+	void SetSelectionText(int32 Index);
 };
