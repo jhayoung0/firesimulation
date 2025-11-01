@@ -19,5 +19,8 @@ public:
 	bool IsOnceTalked = false;
 	
 	virtual void EndDialogue() override;
-	
+
+public:
+	// Walk
+	bool IsWalking();
 };

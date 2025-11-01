@@ -6,6 +6,7 @@
 #include "GameFramework/GameModeBase.h"
 #include "LobbyGameMode.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnPlayersEnough);
 
 /**
  * 
@@ -32,8 +33,9 @@ protected:
 	UPROPERTY()
 	TArray<APlayerController*> ConnectedPlayers;
 
-	// 테스트용으로 2명 제한 풀어놓음
-	const int32 MaxPlayers = 1;
+	// 참여 인원 수
+	const int32 MaxPlayers = 2;
 
-	
+public:
+	FOnPlayersEnough OnPlayersEnough;
 };

@@ -29,3 +29,13 @@ void AJinsang::EndDialogue()
 	
 }
 
+bool AJinsang::IsWalking()
+{
+	if (IsOnceTalked && Cast<APeopleBase>(GetAttachParentActor()))
+	{
+		return GetAttachParentActor()->GetVelocity().Size() > 0.f;
+	}
+	
+	return true;
+}
+

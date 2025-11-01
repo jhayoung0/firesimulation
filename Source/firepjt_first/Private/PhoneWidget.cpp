@@ -145,7 +145,7 @@ void UPhoneWidget::CheckMission(FString text)
 		(
 		    text.Contains(TEXT("한 명")) || text.Contains(TEXT("1 명")) ||
 			 text.Contains(TEXT("한명")) || text.Contains(TEXT("1명"))
-		)
+		))
 	{
 		bContainsPeopleSituation = true;
 		peoplebase->mainui->ChangePhoneSubMission(2);

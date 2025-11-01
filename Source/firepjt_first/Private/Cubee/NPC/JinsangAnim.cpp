@@ -20,4 +20,5 @@ void UJinsangAnim::NativeUpdateAnimation(float DeltaSeconds)
 
 	IsTalking = OwningPawn->IsTalking;
 	IsOnceTalked = OwningPawn->IsOnceTalked;
+	IsWalking =  OwningPawn->IsWalking();
 }

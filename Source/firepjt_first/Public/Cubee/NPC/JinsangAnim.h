@@ -26,4 +26,7 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	bool IsOnceTalked;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	bool IsWalking;
 };

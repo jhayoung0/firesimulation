@@ -17,6 +17,11 @@ void ALobbyGameMode::PostLogin(APlayerController* NewPlayer)
 	Super::PostLogin(NewPlayer);
 
 	ConnectedPlayers.Add(NewPlayer);
+
+	if (ConnectedPlayers.Num() >= MaxPlayers)
+	{
+		OnPlayersEnough.Broadcast();
+	}
 }
 
 void ALobbyGameMode::Logout(AController* Exiting)

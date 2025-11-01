@@ -13,7 +13,7 @@
 void ULobbyWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
-
+	
 	if (Btn_Start)
 	{
 		Btn_Start->OnClicked.AddDynamic(this, &ULobbyWidget::OnStartClicked);
@@ -27,6 +27,24 @@ void ULobbyWidget::NativeConstruct()
 	if (Btn_Citizen)
 	{
 		Btn_Citizen->OnClicked.AddDynamic(this, &ULobbyWidget::OnCitizenClicked);
+	}
+	
+	if (APlayerController* PC = GetOwningPlayer())
+	{
+		if (PC->HasAuthority())
+		{
+			ALobbyGameMode* GM = Cast<ALobbyGameMode>(GetWorld()->GetAuthGameMode());
+			GM->OnPlayersEnough.AddDynamic(this, &ULobbyWidget::ActivateStartButton);
+
+			Btn_Start->SetIsEnabled(false);
+			TextStart->SetText(FText::FromString(TEXT("대기중...")));
+			
+		}
+		else
+		{
+			Btn_Start->SetIsEnabled(false);
+			TextStart->SetText(FText::FromString(TEXT("시작 대기")));
+		}
 	}
 	
 }
@@ -122,6 +140,12 @@ void ULobbyWidget::UpdatePlayerCount(int32 Current, int32 Max)
 	{
 		Txt_PlayerCount->SetText(FText::FromString(FString::Printf(TEXT("Players : %d / %d"), Current, Max)));
 	}
+}
+
+void ULobbyWidget::ActivateStartButton()
+{
+	Btn_Start->SetIsEnabled(true);
+	TextStart->SetText(FText::FromString(TEXT("훈련 시작")));
 }
 
 

@@ -72,4 +72,8 @@ public:
 public:
 	// Player count
 	void UpdatePlayerCount(int32 Current, int32 Max);
+
+	// Btn_Start 활성화
+	UFUNCTION()
+	void ActivateStartButton();
 };
