@@ -13,6 +13,7 @@
 #include "Camera/CameraComponent.h"
 #include "MainUI.h"
 #include "Mask.h"
+#include "Blueprint/WidgetBlueprintLibrary.h"
 
 #include "Components/AudioComponent.h"
 #include "GameFramework/SpringArmComponent.h"
@@ -331,18 +332,21 @@ void APeopleBase::AttachActor()
 			
 			if (IsLocallyControlled())
 			{
-				// 위젯 띄우기
-				auto* pc = Cast<Afirepjt_firstPlayerController>(GetWorld()->GetFirstPlayerController());
-				pc->OpenPhoneUI();
-
-				// 핸드폰 정보성 UI
-				mainui->AddInfoUI(0);
-
 				// 두번째 미션 이전에 하려고 하면 워닝 뜨게 하기
 				if (mainui->CurrentSubMission < 2)
 				{
 					mainui->SubMissionWarning();
 				}
+				else
+				{
+					// 위젯 띄우기
+					auto* pc = Cast<Afirepjt_firstPlayerController>(GetWorld()->GetFirstPlayerController());
+					pc->OpenPhoneUI();
+
+					// 핸드폰 정보성 UI
+					mainui->AddInfoUI(0);
+				}
+				
 				
 			}
 		}
@@ -641,7 +645,7 @@ void APeopleBase::OnCapsuleBeginOverlap(UPrimitiveComponent* OverlappedComp,
 			{
 				// 서브미션 순서대로 해라!
 				mainui->SubMissionWarning();
-			}
+			}	
 		}
 	}
 }

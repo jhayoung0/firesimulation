@@ -62,9 +62,9 @@ public:
 	UFUNCTION()
 	void SetOxygenPercent(float percent);
 	
-	// SubMission UI
+	// SubMission UI - 기본 submission
 	UPROPERTY(EditAnywhere)
-	TObjectPtr<class UOverlay> OverlaySubMission;
+	TObjectPtr<class UOverlay> OverlaySubMission_1;
 
 	UPROPERTY(EditAnywhere)
 	TObjectPtr<class UTextBlock> TextSubMission;
@@ -75,6 +75,25 @@ public:
 	UPROPERTY(EditAnywhere)
 	TObjectPtr<class UTextBlock> TextAlert;
 
+	// SubMission UI - 핸드폰 submission
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<class UOverlay> OverlaySubMission_2;
+
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<class UTextBlock> TextSubMission_1;
+
+	UPROPERTY(EditAnywhere, meta=(MultiLine="true"))
+	TObjectPtr<class UTextBlock> TextContent_1;
+	
+	UPROPERTY(EditAnywhere, meta=(MultiLine="true"))
+	TObjectPtr<class UTextBlock> TextContent_2;
+
+	UPROPERTY(EditAnywhere, meta=(MultiLine="true"))
+	TObjectPtr<class UTextBlock> TextContent_3;
+
+	// 오버레이 변경 함수
+	UFUNCTION()
+	void UpdateOverlayVisibility(bool bShown);
 	
 	// SubMission Variable
 	int32 CurrentSubMission = 1;
@@ -103,6 +122,10 @@ public:
 	// Submission 2
 	UFUNCTION()
 	void ShowTwoSubMission(); // 서브미션 : 신고하기 - 위치 , 사람 등.
+
+	// submission - 서브서브미션
+	UFUNCTION()
+	void ChangePhoneSubMission(int32 idx);
 	
 	// Submission 3
 	UFUNCTION()
