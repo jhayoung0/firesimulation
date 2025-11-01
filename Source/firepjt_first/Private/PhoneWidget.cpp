@@ -136,12 +136,16 @@ void UPhoneWidget::CheckMission(FString text)
 	auto* peoplebase = Cast<APeopleBase>(UGameplayStatics::GetPlayerPawn(GetWorld(),0));
 	
 	// 미션 완료 여부 검사 
-	if (text.Contains(TEXT("205")) && text.Contains(TEXT("원티드 아파트")))
+	if (text.Contains(TEXT("205")) && text.Contains(TEXT("아파트")))
 	{
 		bContainAddress = true;
 		peoplebase->mainui->ChangePhoneSubMission(1);
 	}
-	else if (text.Contains(TEXT("부상자")) && text.Contains(TEXT("한 명")))
+	else if (text.Contains(TEXT("부상자")) &&
+		(
+		    text.Contains(TEXT("한 명")) || text.Contains(TEXT("1 명")) ||
+			 text.Contains(TEXT("한명")) || text.Contains(TEXT("1명"))
+		)
 	{
 		bContainsPeopleSituation = true;
 		peoplebase->mainui->ChangePhoneSubMission(2);
