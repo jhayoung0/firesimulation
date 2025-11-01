@@ -41,6 +41,21 @@ void UMainUI::SetOxygenPercent(float percent)
 }
 
 
+void UMainUI::UpdateOverlayVisibility(bool bShown)
+{
+	// true면 핸드폰 미션 메시지 나오기
+	if (bShown)
+	{
+		OverlaySubMission_1->SetVisibility(ESlateVisibility::Hidden);
+		OverlaySubMission_2->SetVisibility(ESlateVisibility::Visible);
+	}
+	else
+	{
+		OverlaySubMission_1->SetVisibility(ESlateVisibility::Visible);
+		OverlaySubMission_2->SetVisibility(ESlateVisibility::Hidden);
+	}
+}
+
 // 서브미션~~~&&
 void UMainUI::HandleMission(int32 MissionIndex)
 {
@@ -105,7 +120,7 @@ void UMainUI::SubMissionWarning()
 
 void UMainUI::ShowOneSubMission()
 {
-	OverlaySubMission->SetVisibility(ESlateVisibility::Visible);
+	OverlaySubMission_1->SetVisibility(ESlateVisibility::Visible);
 	TextSubMission->SetText(FText::FromString(TEXT("신고 전 주변 상황 확인")));
 	TextContent->SetText(FText::FromString(TEXT("대피가 가능한지 확인하고,\n요구조자 인원 파악하기")));
 }
@@ -113,13 +128,35 @@ void UMainUI::ShowOneSubMission()
 
 void UMainUI::ShowTwoSubMission()
 {
-	TextSubMission->SetText(FText::FromString(TEXT("휴대폰을 찾아 신고")));
-	TextContent->SetText(FText::FromString(TEXT("현재 위치, 요구조자 상황에\n대해 침착하게 알리기")));	
+	// 핸드폰 미션 시작
+	UpdateOverlayVisibility(true);
+	TextSubMission_1->SetText(FText::FromString(TEXT("휴대폰을 찾아 신고")));
+	TextContent_1->SetText(FText::FromString(TEXT("- 위치 신고 (건물명, 호수)")));
+	TextContent_2->SetText(FText::FromString(TEXT("- 부상자 정보 전달")));
+	TextContent_3->SetText(FText::FromString(TEXT("- 화재 상황 설명")));	
+}
+
+void UMainUI::ChangePhoneSubMission(int32 idx)
+{
+	if (idx == 1)
+	{
+		TextContent_1->SetColorAndOpacity(FLinearColor::Gray);
+	}
+	else if (idx == 2)
+	{
+		TextContent_2->SetColorAndOpacity(FLinearColor::Gray);
+	}
+	else if (idx == 3)
+	{
+		TextContent_3->SetColorAndOpacity(FLinearColor::Gray);
+	}
 }
 
 
 void UMainUI::ShowThreeSubMission()
 {
+	// 핸드폰 미션 끝내고 다음 미션으로 넘어가기
+	UpdateOverlayVisibility(false);
 	TextSubMission->SetText(FText::FromString(TEXT("쓰러진 이웃 구조")));
 	TextContent->SetText(FText::FromString(TEXT("안전한 곳으로\n이웃을 이동시키기")));	
 }

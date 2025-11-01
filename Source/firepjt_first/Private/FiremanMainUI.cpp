@@ -46,7 +46,7 @@ void UFiremanMainUI::NativeOnInitialized()
 	}
 
 	// Set Alert Text
-	TextAlert->SetText(FText::FromString(TEXT("서브 미션을 완료하고\n 다시 시도하세요.")));
+	TextAlert->SetText(FText::FromString(TEXT("미션을 완료하고\n 다시 시도하세요.")));
 	TextAlert->SetVisibility(ESlateVisibility::Hidden);
 }
 
@@ -72,6 +72,9 @@ void UFiremanMainUI::ShowSubMissionUI(ESubMissions subMission)
 	case ESubMissions::MaskOut:
 		ShowMaskOutSubMission();
 		break;
+	case ESubMissions::Evacuation:
+		ShowEvacuationSubMission();
+		break;
 	case ESubMissions::ForceOpenDoor:
 		ShowForceOpenDoorSubMission();
 		break;
@@ -88,7 +91,7 @@ void UFiremanMainUI::SuccessSubMission()
 		CurrentSubMission++;
 
 		// Out of Range in ESubMissions
-		if (CurrentSubMission == 3)
+		if (CurrentSubMission == 4)
 		{
 			GetWorld()->GetTimerManager().SetTimer(TimerHandle, [&]()
 			{
@@ -139,6 +142,12 @@ void UFiremanMainUI::ShowMaskOutSubMission()
 {
 	TextSubMission->SetText(FText::FromString(TEXT("산소 마스크 지급")));
 	TextContent->SetText(FText::FromString(TEXT("요구조자에게 가까이 다가가\nR키 누르기")));
+}
+
+void UFiremanMainUI::ShowEvacuationSubMission()
+{
+	TextSubMission->SetText(FText::FromString(TEXT("안전한 곳으로 대피")));
+	TextContent->SetText(FText::FromString(TEXT("옥상을 향해 대피하세요.")));
 }
 
 void UFiremanMainUI::ShowForceOpenDoorSubMission()

@@ -3,6 +3,8 @@
 
 #include "FireTruckFireHose.h"
 
+#include "InteractWidgetComp.h"
+
 
 // Sets default values
 AFireTruckFireHose::AFireTruckFireHose()
@@ -16,6 +18,21 @@ AFireTruckFireHose::AFireTruckFireHose()
 	{
 		FireHoseComp->SetSkeletalMesh(fireHoseRef.Object);
 	}
+
+	// Interact Widget Comp
+	InteractWidgetComp = CreateDefaultSubobject<UInteractWidgetComp>(TEXT("InteractWidgetComp"));
+	ConstructorHelpers::FClassFinder<UUserWidget> interactWidgetCompRef(TEXT("/Game/CustomContents/UI/WBP_InteractWidget.WBP_InteractWidget_C"));
+	if (interactWidgetCompRef.Succeeded())
+	{
+		InteractWidgetComp->SetWidgetClass(interactWidgetCompRef.Class);
+		InteractWidgetComp->SetupAttachment(FireHoseComp);
+		InteractWidgetComp->SetRelativeLocationAndRotation(FVector(0,40,-70), FRotator(0,180,0));
+	}
+}
+
+void AFireTruckFireHose::HideInteractWidget()
+{
+	InteractWidgetComp->GetWidget()->SetVisibility(ESlateVisibility::Hidden);
 }
 
 // Called when the game starts or when spawned

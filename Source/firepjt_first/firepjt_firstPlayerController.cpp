@@ -10,6 +10,7 @@
 #include "firepjt_firstCameraManager.h"
 #include "Blueprint/UserWidget.h"
 #include "firepjt_first.h"
+#include "Blueprint/WidgetBlueprintLibrary.h"
 #include "Cubee/FireGameInstance.h"
 #include "Cubee/GameOverWidget.h"
 #include "Cubee/HouseGameState.h"
@@ -311,11 +312,16 @@ void Afirepjt_firstPlayerController::Server_PlayMissionThreeCinematic_Implementa
 
 void Afirepjt_firstPlayerController::OpenPhoneUI()
 {
-	phoneUI->AddToViewport();
-	phoneUI->ResetTEXT();
-	bShowMouseCursor = true;
+
+	SetShowMouseCursor(true);
 	SetIgnoreLookInput(true);
 	SetIgnoreMoveInput(true);
+	
+	phoneUI->AddToViewport();
+	//phoneUI->ResetTEXT();
+	//서브미션 초기화
+	phoneUI->InitMission();
+	
 	
 	AASequencePlayer* Seq = Cast<AASequencePlayer>(
 		UGameplayStatics::GetActorOfClass(GetWorld(), AASequencePlayer::StaticClass())

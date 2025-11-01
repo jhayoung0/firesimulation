@@ -26,7 +26,8 @@ public class firepjt_first : ModuleRules
 			"MovieSceneTracks",
 			"LevelSequence",
 			"CableComponent",
-			"MetasoundEngine"
+			"MetasoundEngine",
+			"SlateCore"
 		});
 
 	
