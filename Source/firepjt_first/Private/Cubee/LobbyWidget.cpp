@@ -52,9 +52,6 @@ void ULobbyWidget::NativeConstruct()
 // 체크 이미지 활성화
 void ULobbyWidget::ShowCheckImg(bool isFireman)
 {
-
-	
-	
 	// 로컬 플레이어가 아니면 함수 나가자
 	if (APlayerController* PC = GetOwningPlayer())
 	{
@@ -63,7 +60,6 @@ void ULobbyWidget::ShowCheckImg(bool isFireman)
 			return; // not our screen, skip visuals
 		}
 	}
-
 	
 	if (isFireman)
 	{
@@ -88,8 +84,6 @@ void ULobbyWidget::ShowCheckImg(bool isFireman)
 
 void ULobbyWidget::OnStartClicked()
 {
-	//if (!bIsHost) return;
-
 	ALobbyGameMode* GM = Cast<ALobbyGameMode>(GetWorld()->GetAuthGameMode());
 	if (GM)
 	{

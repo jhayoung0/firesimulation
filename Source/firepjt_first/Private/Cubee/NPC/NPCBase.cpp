@@ -3,6 +3,7 @@
 
 #include "Cubee/NPC/NPCBase.h"
 
+#include "firepjt_firstPlayerController.h"
 #include "Blueprint/UserWidget.h"
 #include "Components/Button.h"
 #include "Cubee/NPC/NPCWidget.h"
@@ -77,9 +78,10 @@ void ANPCBase::ProgressDialogue(int32 NextID)
 		return;
 	}
 
+	NPCWidget->Btn_Next->SetVisibility(ESlateVisibility::Visible);
 	NPCWidget->Btn_Select1->SetVisibility(ESlateVisibility::Hidden);
 	NPCWidget->Btn_Select2->SetVisibility(ESlateVisibility::Hidden);
-	NPCWidget->Btn_Next->SetVisibility(ESlateVisibility::Visible);
+	
 
 	CurrentDialogueID = NextID;
 	
@@ -98,8 +100,23 @@ void ANPCBase::ProgressDialogue(int32 NextID)
 		// 선택지 생성
 		if (CurrentDialogue->PlayerChoices.Num() > 0)
 		{
-			NPCWidget->Btn_Select1->SetVisibility(ESlateVisibility::Visible);
-			NPCWidget->Btn_Select2->SetVisibility(ESlateVisibility::Visible);
+			Afirepjt_firstPlayerController* PC = Cast<Afirepjt_firstPlayerController>(GetWorld()->GetFirstPlayerController());
+			EPlayerRole CurrentRole = PC->GetPlayerState<AHousePlayerState>()->PlayerRole;
+			
+			if (CurrentDialogue->SpeakerName.EqualTo(FText::FromString(TEXT("소방관")))
+				&& CurrentRole == EPlayerRole::Firefighter)
+			{
+				NPCWidget->Btn_Select1->SetVisibility(ESlateVisibility::Visible);
+				NPCWidget->Btn_Select2->SetVisibility(ESlateVisibility::Visible);
+			}
+
+			if (CurrentDialogue->SpeakerName.EqualTo(FText::FromString(TEXT("민간인")))
+				&& CurrentRole == EPlayerRole::Citizen)
+			{
+				NPCWidget->Btn_Select1->SetVisibility(ESlateVisibility::Visible);
+				NPCWidget->Btn_Select2->SetVisibility(ESlateVisibility::Visible);
+			}
+			
 			NPCWidget->Btn_Next->SetVisibility(ESlateVisibility::Hidden);
 
 			NPCWidget->SetSelectionText(CurrentDialogueID);
