@@ -89,11 +89,16 @@ void APeopleBase::BeginPlay()
 		if (mainui)
 		{
 			mainui->AddToViewport();
-			currOxygen = maxOxygen;
-			const float InitPercent = maxOxygen > 0.f ? currOxygen / maxOxygen : 0.f;
-			mainui->SetOxygenPercent(InitPercent);
-			// 서브미션 설정
-			mainui->HandleMission(1);
+			// 서브미션 설정 (3초뒤에 나오게 함)
+			FTimerHandle handle;
+			GetWorld()->GetTimerManager().SetTimer(handle, [&]()
+			{
+				currOxygen = maxOxygen;
+				const float InitPercent = maxOxygen > 0.f ? currOxygen / maxOxygen : 0.f;
+				mainui->SetOxygenPercent(InitPercent);
+				mainui->HandleMission(1);
+			},3, false);
+			
 		}
 	}
 }
@@ -142,10 +147,10 @@ void APeopleBase::Tick(float DeltaSeconds)
 	Posture = IsCrawl ? 0.8f : 1.0f;
 
 	if (HasMask) {
-		Gear = 0.4f;
+		Gear = 0.2f;
 	}
 	else if (HasWetTowel) {
-		Gear = 0.8f;
+		Gear = 0.5f;
 	}
 	else {
 		Gear = 1.0f;
@@ -308,6 +313,8 @@ void APeopleBase::AttachActor()
 				{
 					// 물수건 정보성 UI
 					mainui->AddInfoUI(1);
+					// 물수건으로 인해 산소바 색 변경
+					mainui->SetOxygenBarColor(FLinearColor::White);
 					
 					if (mainui->CurrentSubMission == 4)
 					{
@@ -426,6 +433,15 @@ void APeopleBase::DetachActor(AInteractActor* tempActor)
 			
 			HasWetTowel = false;
 			InteractingActor->ChangeTowel(false);
+			// 물수건으로 인해 산소바 색 변경
+			if (IsLocallyControlled() && mainui)
+			{
+				
+				mainui->SetOxygenBarColor(FColor::FromHex(TEXT("1ABCFFFF")).ReinterpretAsLinear());
+			}
+				
+			
+			
 		}
 		else if (tempActor->ActorHasTag(FName("Phone")))
 		{
@@ -509,6 +525,13 @@ void APeopleBase::NetmultiCastRPC_AttachMask_Implementation()
 	// 미션 넘기기
 	if (IsLocallyControlled())
 	{
+		// 물수건으로 인해 산소바 색 변경
+		if (mainui)
+		{
+			mainui->SetOxygenBarColor(FLinearColor::Green);
+		}
+	
+		
 		if (mainui && mainui->CurrentSubMission == 5)
 		{
 			// 서브미션 넘기기
@@ -571,6 +594,10 @@ void APeopleBase::NetmultiCastRPC_DetachMask_Implementation()
 	}
 	if (IsLocallyControlled())
 	{
+		// oxygen bar 색상 변경
+		// 산소바 색 변경
+		mainui->SetOxygenBarColor(FColor::FromHex(TEXT("1ABCFFFF")).ReinterpretAsLinear());
+		
 		// mask ui 끄기
 		mainui->ShowMaskUI(false);
 		// 마스크 sound 끄기

@@ -40,6 +40,11 @@ void UMainUI::SetOxygenPercent(float percent)
 	OxygenBar->SetPercent(percent);
 }
 
+void UMainUI::SetOxygenBarColor(FLinearColor color)
+{
+	OxygenBar->SetFillColorAndOpacity(color);
+}
+
 
 void UMainUI::UpdateOverlayVisibility(bool bShown)
 {

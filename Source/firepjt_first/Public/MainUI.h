@@ -61,6 +61,10 @@ public:
 	// 산소 바 산소 설정
 	UFUNCTION()
 	void SetOxygenPercent(float percent);
+
+	// 산소바 색변경
+	UFUNCTION()
+	void SetOxygenBarColor(FLinearColor color);
 	
 	// SubMission UI - 기본 submission
 	UPROPERTY(EditAnywhere)
