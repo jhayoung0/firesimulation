@@ -22,6 +22,7 @@
 #include "Cubee/NPC/NPCBase.h"
 #include "Elements/Framework/TypedElementSorter.h"
 #include "EnhancedInput/Public/InputMappingContext.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Net/UnrealNetwork.h"
@@ -34,6 +35,10 @@ AFireMan::AFireMan()
 	PrimaryActorTick.bCanEverTick = true;
 
 	GetCapsuleComponent()->OnComponentBeginOverlap.AddDynamic(this, &AFireMan::OnCapsuleBeginOverlap);
+
+	// Character Movement
+	GetCharacterMovement()->MaxWalkSpeed = 300.f;
+	GetCharacterMovement()->MaxWalkSpeedCrouched = 150.f;
 	
 	// Fireman Mesh
 	ConstructorHelpers::FObjectFinder<USkeletalMesh> firemanMeshRef(TEXT("/Script/Engine.SkeletalMesh'/Game/PROJECTS/HELLDIVERS_2/CHARACTERS/PLAYER/B-01_TACTICAL/fix_v2/SKM_B-01_v4_BRAWNY_SIMPLE.SKM_B-01_v4_BRAWNY_SIMPLE'"));
@@ -516,6 +521,9 @@ void AFireMan::Multicast_OnMaskOut_Implementation()
 
 void AFireMan::PlayOpenDoorAnim()
 {
+	if (IsLocallyControlled())
+	{
+	}
 	auto pc = Cast<APlayerController>(Controller);
 	if (pc)
 	{

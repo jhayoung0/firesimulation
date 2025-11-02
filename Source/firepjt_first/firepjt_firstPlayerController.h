@@ -50,6 +50,10 @@ protected:
 	virtual void SetupInputComponent() override;
 
 protected:
+	// PathFollowingComponent
+	UPROPERTY(EditAnywhere, Category = "PathFollowing")
+	class UPathFollowingComponent* PathFollowingComp;
+	
 	// UI
 	UPROPERTY(EditDefaultsOnly, Category = "UI")
 	TSubclassOf<UUserWidget> LobbyWidgetClass;
@@ -83,6 +87,9 @@ protected:
 	class UDataTable* FiremanMissionTable;
 
 public:
+	UFUNCTION()
+	void MovePlayerToLoc(FVector goalLoc);
+	
 	// Client RPC to update player count in lobby
 	UFUNCTION(Client, Reliable)
 	void Client_UpdatePlayerCount(int32 CurrentPlayers, int32 MaxPlayers);
