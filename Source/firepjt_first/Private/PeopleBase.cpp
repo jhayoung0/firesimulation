@@ -323,13 +323,7 @@ void APeopleBase::AttachActor()
 		}
 		else if (InteractingActor->ActorHasTag(FName("Phone")))
 		{
-			IsInteracting = true;
-			InteractingActor->ToggleWidget(false);
-			
-			// compActor에 붙이자.
-			InteractingActor->AttachToComponent(compActor, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
-			HasPhone = true;
-			
+			// 미션 전에 하면 핸드폰은 아예 attach 가 안 됨.
 			if (IsLocallyControlled())
 			{
 				// 두번째 미션 이전에 하려고 하면 워닝 뜨게 하기
@@ -339,6 +333,13 @@ void APeopleBase::AttachActor()
 				}
 				else
 				{
+					IsInteracting = true;
+					InteractingActor->ToggleWidget(false);
+			
+					// compActor에 붙이자.
+					InteractingActor->AttachToComponent(compActor, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+					HasPhone = true;
+					
 					// 위젯 띄우기
 					auto* pc = Cast<Afirepjt_firstPlayerController>(GetWorld()->GetFirstPlayerController());
 					pc->OpenPhoneUI();

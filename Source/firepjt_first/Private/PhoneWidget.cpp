@@ -9,6 +9,7 @@
 #include "Components/Button.h"
 #include "Components/EditableTextBox.h"
 #include "Components/ScrollBox.h"
+#include "Internationalization/Regex.h"
 #include "Components/TextBlock.h"
 #include "Cubee/InGameWidget.h"
 #include "Kismet/GameplayStatics.h"
@@ -141,12 +142,10 @@ void UPhoneWidget::CheckMission(FString text)
 		bContainAddress = true;
 		peoplebase->mainui->ChangePhoneSubMission(1);
 	}
-	else if ( text.Contains(TEXT("부상자")) &&
-			(
-			    text.Contains(TEXT("한 명")) || text.Contains(TEXT("1 명")) ||
-				 text.Contains(TEXT("한명")) || text.Contains(TEXT("1명"))
-			)
-		)
+	else if (FRegexMatcher(
+			FRegexPattern(TEXT("부상자.*?(한\\s*명|1\\s*명)|(한\\s*명|1\\s*명).*?부상자")), 
+			text
+		).FindNext())
 
 	{
 		bContainsPeopleSituation = true;
