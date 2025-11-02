@@ -3,6 +3,8 @@
 
 #include "FireMan.h"
 
+#include "AIController.h"
+#include "DoorActor.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "FireHose.h"
@@ -11,14 +13,16 @@
 #include "FireTruckCrowbar.h"
 #include "FireTruckFireHose.h"
 #include "InteractActor.h"
-#include "InteractWidgetComp.h"
 #include "MainUI.h"
 #include "PeopleBase.h"
+#include "Blueprint/AIBlueprintHelperLibrary.h"
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/SceneComponent.h"
 #include "Cubee/NPC/NPCBase.h"
+#include "Elements/Framework/TypedElementSorter.h"
 #include "EnhancedInput/Public/InputMappingContext.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Net/UnrealNetwork.h"
@@ -31,6 +35,10 @@ AFireMan::AFireMan()
 	PrimaryActorTick.bCanEverTick = true;
 
 	GetCapsuleComponent()->OnComponentBeginOverlap.AddDynamic(this, &AFireMan::OnCapsuleBeginOverlap);
+
+	// Character Movement
+	GetCharacterMovement()->MaxWalkSpeed = 300.f;
+	GetCharacterMovement()->MaxWalkSpeedCrouched = 150.f;
 	
 	// Fireman Mesh
 	ConstructorHelpers::FObjectFinder<USkeletalMesh> firemanMeshRef(TEXT("/Script/Engine.SkeletalMesh'/Game/PROJECTS/HELLDIVERS_2/CHARACTERS/PLAYER/B-01_TACTICAL/fix_v2/SKM_B-01_v4_BRAWNY_SIMPLE.SKM_B-01_v4_BRAWNY_SIMPLE'"));
@@ -192,7 +200,7 @@ void AFireMan::BeginPlay()
 	}
 
 	FiremanAnimInstance = Cast<UFiremanAnim>(GetMesh()->GetAnimInstance());
-	DoorActor = Cast<AInteractActor>(UGameplayStatics::GetActorOfClass(GetWorld(), DoorClass));
+	DoorActor = Cast<ADoorActor>(UGameplayStatics::GetActorOfClass(GetWorld(), DoorClass));
 	Person2Actor = Cast<AInteractActor>(UGameplayStatics::GetActorOfClass(GetWorld(), Person2Class));
 	FireTruckFireHoseActor = Cast<AFireTruckFireHose>(UGameplayStatics::GetActorOfClass(GetWorld(), FireTruckFireHoseClass));
 	FireTruckCrowbarActor = Cast<AFireTruckCrowbar>(UGameplayStatics::GetActorOfClass(GetWorld(), FireTruckCrowbarClass));
@@ -206,6 +214,8 @@ void AFireMan::BeginPlay()
 			FireManMainUIWidget->AddToViewport();
 		}
 	}
+
+	FiremanAnimInstance->OnMontageEnded.AddDynamic(this, &AFireMan::OnDoorMontageEnded);
 }
 
 // Called every frame
@@ -440,13 +450,6 @@ void AFireMan::OnUseTool()
 	
 	if (bDoesEquipCrowbar)
 	{
-		// Check SubMission Index
-		// if (FireManMainUIWidget->GetCurSubMissionNum() < 2)
-		// {
-		// 	// Print Alert Text
-		// 	FireManMainUIWidget->ShowAlert();
-		// 	return;
-		// }
 		// force open the door
 		ServerRPC_OpenDoor();
 	}
@@ -465,6 +468,19 @@ void AFireMan::CheckMaskToPerson(bool bPersonHasMask)
 bool AFireMan::GetBHasMask()
 {
 	return bHasMask;
+}
+
+void AFireMan::OnDoorMontageEnded(UAnimMontage* montage, bool bInterrupted)
+{
+	auto pc = Cast<APlayerController>(Controller);
+	if (pc)
+	{
+		auto subsys = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(pc->GetLocalPlayer());
+		if (subsys)
+		{
+			subsys->AddMappingContext(FiremanIMC, 0);
+		}
+	}
 }
 
 void AFireMan::OnMaskOut()
@@ -503,6 +519,28 @@ void AFireMan::Multicast_OnMaskOut_Implementation()
 	}
 }
 
+void AFireMan::PlayOpenDoorAnim()
+{
+	if (IsLocallyControlled())
+	{
+	}
+	auto pc = Cast<APlayerController>(Controller);
+	if (pc)
+	{
+		auto subsys = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(pc->GetLocalPlayer());
+		if (subsys)
+		{
+			subsys->RemoveMappingContext(FiremanIMC);
+		}
+	}
+	// walk to the door
+	UAIBlueprintHelperLibrary::SimpleMoveToLocation(GetController(), DoorActor->GetAnimPos());
+	
+	// timer를 통해 거리를 매번 재게 한 후에 PlayAnimMontage를 호출해야겠다
+	// start anim montage
+	PlayAnimMontage(DoorOpenAnimMontage);
+}
+
 void AFireMan::ServerRPC_OpenDoor_Implementation()
 {
 	Multicast_OpenDoor();
@@ -516,8 +554,7 @@ void AFireMan::Multicast_OpenDoor_Implementation()
 	if (dist <= InteractDist)
 	{
 		DoorActor->ToggleWidget(false);
-		// start anim montage
-		PlayAnimMontage(DoorOpenAnimMontage);
+		PlayOpenDoorAnim();
 
 		if (IsLocallyControlled())
 		{

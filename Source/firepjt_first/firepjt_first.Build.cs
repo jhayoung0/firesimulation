@@ -27,6 +27,8 @@ public class firepjt_first : ModuleRules
 			"LevelSequence",
 			"CableComponent",
 			"MetasoundEngine",
+			"NavigationSystem",
+			"AIModule",
 			"SlateCore"
 		});
 

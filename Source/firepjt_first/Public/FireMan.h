@@ -54,7 +54,7 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	TSubclassOf<class AInteractActor> DoorClass;
 	UPROPERTY()
-	TObjectPtr<AInteractActor> DoorActor;
+	TObjectPtr<class ADoorActor> DoorActor;
 	UPROPERTY(Replicated)
 	bool bDoesEquipCrowbar = false;
 
@@ -90,6 +90,10 @@ private:
 	TObjectPtr<class UFiremanAnim> FiremanAnimInstance;
 	UPROPERTY()
 	TObjectPtr<class UAnimMontage> DoorOpenAnimMontage;
+
+	// Animation Montage End Function
+	UFUNCTION()
+	void OnDoorMontageEnded(UAnimMontage* montage, bool bInterrupted);
 	
 	// Inputs
 	UPROPERTY(VisibleAnywhere)
@@ -173,6 +177,7 @@ private:
 	UFUNCTION(NetMulticast, Reliable)
 	void Multicast_OnMaskOut();
 	// Open Door
+	void PlayOpenDoorAnim();
 	UFUNCTION(Server, Reliable)
 	void ServerRPC_OpenDoor();
 	UFUNCTION(NetMulticast, Reliable)
