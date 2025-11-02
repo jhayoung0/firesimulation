@@ -2,6 +2,8 @@
 
 
 #include "FiremanAnim.h"
+
+#include "DoorActor.h"
 #include "Fireman.h"
 #include "InteractActor.h"
 
