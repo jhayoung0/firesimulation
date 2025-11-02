@@ -49,11 +49,7 @@ protected:
 	/** Input mapping context setup */
 	virtual void SetupInputComponent() override;
 
-protected:
-	// PathFollowingComponent
-	UPROPERTY(EditAnywhere, Category = "PathFollowing")
-	class UPathFollowingComponent* PathFollowingComp;
-	
+protected:	
 	// UI
 	UPROPERTY(EditDefaultsOnly, Category = "UI")
 	TSubclassOf<UUserWidget> LobbyWidgetClass;
@@ -86,10 +82,7 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Mission")
 	class UDataTable* FiremanMissionTable;
 
-public:
-	UFUNCTION()
-	void MovePlayerToLoc(FVector goalLoc);
-	
+public:	
 	// Client RPC to update player count in lobby
 	UFUNCTION(Client, Reliable)
 	void Client_UpdatePlayerCount(int32 CurrentPlayers, int32 MaxPlayers);

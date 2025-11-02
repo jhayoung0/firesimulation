@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "InputActionValue.h"
+#include "Navigation/PathFollowingComponent.h"
 #include "FireMan.generated.h"
 
 UCLASS()
@@ -90,10 +91,6 @@ private:
 	TObjectPtr<class UFiremanAnim> FiremanAnimInstance;
 	UPROPERTY()
 	TObjectPtr<class UAnimMontage> DoorOpenAnimMontage;
-
-	// Animation Montage End Function
-	UFUNCTION()
-	void OnDoorMontageEnded(UAnimMontage* montage, bool bInterrupted);
 	
 	// Inputs
 	UPROPERTY(VisibleAnywhere)
@@ -177,7 +174,9 @@ private:
 	UFUNCTION(NetMulticast, Reliable)
 	void Multicast_OnMaskOut();
 	// Open Door
-	void PlayOpenDoorAnim();
+	UFUNCTION()
+	void OnDoorMontageEnded(UAnimMontage* montage, bool bInterrupted);
+	void StartOpenDoor();
 	UFUNCTION(Server, Reliable)
 	void ServerRPC_OpenDoor();
 	UFUNCTION(NetMulticast, Reliable)

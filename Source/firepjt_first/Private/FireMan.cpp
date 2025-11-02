@@ -3,13 +3,13 @@
 
 #include "FireMan.h"
 
-#include "AIController.h"
 #include "DoorActor.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "FireHose.h"
 #include "FiremanAnim.h"
 #include "FiremanMainUI.h"
+#include "firepjt_firstPlayerController.h"
 #include "FireTruckCrowbar.h"
 #include "FireTruckFireHose.h"
 #include "InteractActor.h"
@@ -20,12 +20,13 @@
 #include "Components/CapsuleComponent.h"
 #include "Components/SceneComponent.h"
 #include "Cubee/NPC/NPCBase.h"
-#include "Elements/Framework/TypedElementSorter.h"
 #include "EnhancedInput/Public/InputMappingContext.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Kismet/GameplayStatics.h"
+#include "Navigation/PathFollowingComponent.h"
 #include "Net/UnrealNetwork.h"
+#include "Navigation/PathFollowingComponent.h"
 
 
 // Sets default values
@@ -37,8 +38,8 @@ AFireMan::AFireMan()
 	GetCapsuleComponent()->OnComponentBeginOverlap.AddDynamic(this, &AFireMan::OnCapsuleBeginOverlap);
 
 	// Character Movement
-	GetCharacterMovement()->MaxWalkSpeed = 300.f;
-	GetCharacterMovement()->MaxWalkSpeedCrouched = 150.f;
+	GetCharacterMovement()->MaxWalkSpeed = 400.f;
+	GetCharacterMovement()->MaxWalkSpeedCrouched = 170.f;
 	
 	// Fireman Mesh
 	ConstructorHelpers::FObjectFinder<USkeletalMesh> firemanMeshRef(TEXT("/Script/Engine.SkeletalMesh'/Game/PROJECTS/HELLDIVERS_2/CHARACTERS/PLAYER/B-01_TACTICAL/fix_v2/SKM_B-01_v4_BRAWNY_SIMPLE.SKM_B-01_v4_BRAWNY_SIMPLE'"));
@@ -214,7 +215,7 @@ void AFireMan::BeginPlay()
 			FireManMainUIWidget->AddToViewport();
 		}
 	}
-
+	
 	FiremanAnimInstance->OnMontageEnded.AddDynamic(this, &AFireMan::OnDoorMontageEnded);
 }
 
@@ -481,6 +482,7 @@ void AFireMan::OnDoorMontageEnded(UAnimMontage* montage, bool bInterrupted)
 			subsys->AddMappingContext(FiremanIMC, 0);
 		}
 	}
+	bUseControllerRotationYaw = true;
 }
 
 void AFireMan::OnMaskOut()
@@ -519,11 +521,8 @@ void AFireMan::Multicast_OnMaskOut_Implementation()
 	}
 }
 
-void AFireMan::PlayOpenDoorAnim()
+void AFireMan::StartOpenDoor()
 {
-	if (IsLocallyControlled())
-	{
-	}
 	auto pc = Cast<APlayerController>(Controller);
 	if (pc)
 	{
@@ -533,11 +532,10 @@ void AFireMan::PlayOpenDoorAnim()
 			subsys->RemoveMappingContext(FiremanIMC);
 		}
 	}
+	bUseControllerRotationYaw = false;
 	// walk to the door
-	UAIBlueprintHelperLibrary::SimpleMoveToLocation(GetController(), DoorActor->GetAnimPos());
-	
-	// timer를 통해 거리를 매번 재게 한 후에 PlayAnimMontage를 호출해야겠다
-	// start anim montage
+	Afirepjt_firstPlayerController* firepc = Cast<Afirepjt_firstPlayerController>(Controller);
+	SetActorLocation(DoorActor->GetAnimPos());
 	PlayAnimMontage(DoorOpenAnimMontage);
 }
 
@@ -554,7 +552,7 @@ void AFireMan::Multicast_OpenDoor_Implementation()
 	if (dist <= InteractDist)
 	{
 		DoorActor->ToggleWidget(false);
-		PlayOpenDoorAnim();
+		StartOpenDoor();
 
 		if (IsLocallyControlled())
 		{

@@ -2,6 +2,7 @@
 
 
 #include "firepjt_firstPlayerController.h"
+
 #include "ASequencePlayer.h"
 #include "EnhancedInputSubsystems.h"
 #include "FireMan.h"
@@ -10,7 +11,6 @@
 #include "firepjt_firstCameraManager.h"
 #include "Blueprint/UserWidget.h"
 #include "firepjt_first.h"
-#include "Blueprint/WidgetBlueprintLibrary.h"
 #include "Cubee/FireGameInstance.h"
 #include "Cubee/GameOverWidget.h"
 #include "Cubee/HouseGameState.h"
@@ -20,15 +20,12 @@
 #include "Cubee/VictoryWidget.h"
 #include "Cubee/NPC/Jinsang.h"
 #include "Kismet/GameplayStatics.h"
-#include "Navigation/PathFollowingComponent.h"
 #include "Widgets/Input/SVirtualJoystick.h"
 
 Afirepjt_firstPlayerController::Afirepjt_firstPlayerController()
 {
 	// set the player camera manager class
 	PlayerCameraManagerClass = Afirepjt_firstCameraManager::StaticClass();
-
-	PathFollowingComp = CreateDefaultSubobject<UPathFollowingComponent>(TEXT("PathFollowingComp"));
 }
 
 void Afirepjt_firstPlayerController::BeginPlay()
@@ -131,12 +128,6 @@ void Afirepjt_firstPlayerController::SetupInputComponent()
 			}
 		}
 	}
-
-}
-
-void Afirepjt_firstPlayerController::MovePlayerToLoc(FVector goalLoc)
-{
-	
 }
 
 void Afirepjt_firstPlayerController::BindToGameStateEvents()
