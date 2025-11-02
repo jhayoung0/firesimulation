@@ -141,11 +141,13 @@ void UPhoneWidget::CheckMission(FString text)
 		bContainAddress = true;
 		peoplebase->mainui->ChangePhoneSubMission(1);
 	}
-	else if (text.Contains(TEXT("부상자")) &&
-		(
-		    text.Contains(TEXT("한 명")) || text.Contains(TEXT("1 명")) ||
-			 text.Contains(TEXT("한명")) || text.Contains(TEXT("1명"))
+	else if ( text.Contains(TEXT("부상자")) &&
+			(
+			    text.Contains(TEXT("한 명")) || text.Contains(TEXT("1 명")) ||
+				 text.Contains(TEXT("한명")) || text.Contains(TEXT("1명"))
+			)
 		)
+
 	{
 		bContainsPeopleSituation = true;
 		peoplebase->mainui->ChangePhoneSubMission(2);
