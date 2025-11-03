@@ -15,7 +15,6 @@
 #include "InteractActor.h"
 #include "MainUI.h"
 #include "PeopleBase.h"
-#include "Blueprint/AIBlueprintHelperLibrary.h"
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/SceneComponent.h"
@@ -24,9 +23,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Kismet/GameplayStatics.h"
-#include "Navigation/PathFollowingComponent.h"
 #include "Net/UnrealNetwork.h"
-#include "Navigation/PathFollowingComponent.h"
 
 
 // Sets default values
@@ -309,7 +306,7 @@ void AFireMan::ServerRPC_OnGetFireHose_Implementation()
 		{
 			bCanUseFireHose = true;
 			OnChangeCanUseTool();
-			FireTruckFireHoseActor->HideInteractWidget();
+			MulticastRPC_HideInteractWidget();
 			ClientRPC_OnGetFireHose();
 			Multicast_OnEquipFireHose();
 		}
@@ -319,6 +316,11 @@ void AFireMan::ServerRPC_OnGetFireHose_Implementation()
 void AFireMan::ClientRPC_OnGetFireHose_Implementation()
 {
 	FireManMainUIWidget->AddInfoUI(0);
+}
+
+void AFireMan::MulticastRPC_HideInteractWidget_Implementation()
+{
+	FireTruckFireHoseActor->HideInteractWidget();
 }
 
 void AFireMan::OnEquipFireHose()

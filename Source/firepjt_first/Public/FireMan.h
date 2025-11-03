@@ -132,6 +132,8 @@ private:
 	void ServerRPC_OnGetFireHose();
 	UFUNCTION(Client, Reliable)
 	void ClientRPC_OnGetFireHose();
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastRPC_HideInteractWidget();
 	
 	void OnEquipFireHose();
 	UFUNCTION(Server, Reliable)
